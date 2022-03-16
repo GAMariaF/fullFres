@@ -73,3 +73,16 @@ nvm install v17.7.1
 # Create App:
 npx create-react-app frontend
 ```
+
+#### Pakker som sikkert dockerimage må ha for at dette skal funke:
+* libffi_devel
+
+
+#### Installerte python slik:
+```python
+wget https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz
+tar xvf Python-3.9.10.tgz
+cd Python-3.9*/
+./configure --enable-optimizations
+sudo make altinstall
+```
