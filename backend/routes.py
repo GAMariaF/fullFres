@@ -1,5 +1,5 @@
 from flask import Flask
-from frontend import app
+from backend import app
 
 @app.route('/')
 def hello():

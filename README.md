@@ -1,6 +1,14 @@
 # fullFres
 Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fra tumorsekvensering
 
+## Oppsett:
+* Sqlite-db via Sqlalchemy
+* Python3 
+* Flask for backend-server
+* React som frontend
+* Bootstrap som 
+
+
 #### Aktivere virtualenv:
 > virtualenv is used to manage Python packages for different projects. Using virtualenv allows you to avoid installing Python packages globally which could break system tools or other projects. You can install virtualenv using pip.
 
@@ -16,12 +24,54 @@ python3 -m pip install -r requirements.txt
 python -m pip install flask
 ```
 
-#### Kjør flask app:
-
+#### Kjør flask app (backend API):
 ```python
-# Si hvor app befinenrn seg
-export FLASK_APP=frontend/frontend
-# Sett til development, så den restarter hver gang man gjør en endring
-export FLASK_ENV=development
+python run_backend_server.py
 ```
 
+#### Kjør frontend server:
+```sh
+npm start
+#Starts the development server.
+
+npm run build
+#Bundles the app into static files for production.
+
+npm test
+#Starts the test runner.
+
+npm run eject
+#Removes this tool and copies build dependencies, configuration files
+#and scripts into the app directory. If you do this, you can’t go back!
+
+# We suggest that you begin by typing:
+
+cd frontend
+npm start
+```
+
+
+
+#### TODO:
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+- [] 
+
+
+#### Info om diverse installeringer etc
+```sh
+# Installer node:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+source ~/.bash_profile
+nvm install v17.7.1
+
+# Create App:
+npx create-react-app frontend
+```
