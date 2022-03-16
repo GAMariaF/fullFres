@@ -6,7 +6,9 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 * Python3 
 * Flask for backend-server
 * React som frontend
-* Bootstrap som 
+* Bootstrap som css
+* Tabell-bibliotek?
+* authentication?
 
 
 #### Aktivere virtualenv:
@@ -53,16 +55,16 @@ npm start
 
 
 #### TODO:
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
+- [ ] Bestemme tabell-bibliotek
+- [ ] Lage db schema
+- [ ] Lage funksjon for å generere DB
+- [ ] Lage test-mappe og script
+- [ ] Lage dockerfiles
+- [ ] Lage docker-compose oppsett
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
 
 
 #### Info om diverse installeringer etc
