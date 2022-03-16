@@ -61,10 +61,6 @@ npm start
 - [ ] Lage test-mappe og script
 - [ ] Lage dockerfiles
 - [ ] Lage docker-compose oppsett
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
 
 
 #### Info om diverse installeringer etc
