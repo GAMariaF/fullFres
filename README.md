@@ -10,6 +10,9 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 * Tabell-bibliotek?
 * authentication?
 
+### Info
+* Genexus VCF inneholder noen linjer med semikolon i protein feks sånn: p.[Gln61His;Glu62Lys]. Det skaper krøll i parsing. Ha noe konvertering i script som kopierer vcf fra server?
+
 
 #### Aktivere virtualenv:
 > virtualenv is used to manage Python packages for different projects. Using virtualenv allows you to avoid installing Python packages globally which could break system tools or other projects. You can install virtualenv using pip.
