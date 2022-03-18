@@ -26,7 +26,7 @@ deactivate
 # Installer biblioteker
 python3 -m pip install -r requirements.txt
 # Installere utenom requirements.txt:
-python -m pip install flask
+python -m pip install <pakkenavn>
 ```
 
 #### Kjør flask app (backend API):
