@@ -89,3 +89,5 @@ cd Python-3.9*/
 ./configure --enable-optimizations
 sudo make altinstall
 ```
+
+#### SQLAlchemy
