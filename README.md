@@ -91,3 +91,7 @@ sudo make altinstall
 ```
 
 #### SQLAlchemy
+```python
+import sqlite3
+import sqlalchemy
+```
