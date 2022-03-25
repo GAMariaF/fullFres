@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
+#sqlite syntax - rewrite ...
 def populate_db(db, vcf_df, run_id, sample_id):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
     with engine.connect() as conn:
