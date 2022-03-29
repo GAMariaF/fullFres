@@ -25,6 +25,9 @@ source env/bin/activate
 deactivate
 # Installer biblioteker
 python3 -m pip install -r requirements.txt
+
+flask-cors
+
 # Installere utenom requirements.txt:
 python -m pip install <pakkenavn>
 ```
@@ -34,26 +37,7 @@ python -m pip install <pakkenavn>
 python run_backend_server.py
 ```
 
-#### Kjør frontend server:
-```sh
-npm start
-#Starts the development server.
 
-npm run build
-#Bundles the app into static files for production.
-
-npm test
-#Starts the test runner.
-
-npm run eject
-#Removes this tool and copies build dependencies, configuration files
-#and scripts into the app directory. If you do this, you can’t go back!
-
-# We suggest that you begin by typing:
-
-cd frontend
-npm start
-```
 
 
 
@@ -71,11 +55,24 @@ npm start
 # Installer node:
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 source ~/.bash_profile
-nvm install v17.7.1
+nvm install v16.14.2
 
-# Create App:
-npx create-react-app frontend
+# Create Vue App:
+vue create frontend # preset = vue2
+
+# Pakker som er installert etterpå:
+npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
+
+
+# Starts the development server.
+npm run serve
+# Jeg måtte nedgradere nodeversion for å få det til
 ```
+
+
+```
+
+
 
 #### Pakker som sikkert dockerimage må ha for at dette skal funke:
 * libffi_devel
