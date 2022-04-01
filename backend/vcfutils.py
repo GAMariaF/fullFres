@@ -52,4 +52,3 @@ def get_run_id():
 # df = explode_format_gt(df)
 # df = explode_info(df)
 
-
