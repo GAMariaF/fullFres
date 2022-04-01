@@ -1,0 +1,42 @@
+import sqlite3
+import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy import text
+
+#sqlite syntax - rewrite ...
+def count_variant(db, chrom, pos, alt):
+    engine = create_engine("sqlite:///"+db, echo=True, future=True)
+    stmt = "SELECT COUNT(*) FROM interpret \
+            WHERE \
+            chrom = '"+chrom+"' AND \
+            pos = '"+pos+"' AND \
+            alt = '"+alt+"' \
+            ;"
+    with engine.connect() as conn:
+        result = conn.execute(text(stmt))
+        for row in result:
+            return row[0]
+
+def count_sample(db, sampleid):
+    engine = create_engine("sqlite:///"+db, echo=True, future=True)
+    stmt = "SELECT COUNT(*) FROM interpret \
+            WHERE \
+            sampleid = '"+sampleid+"' \
+            ;"
+    with engine.connect() as conn:
+        result = conn.execute(text(stmt))
+        for row in result:
+            return row[0]
+
+
+##### TEST #####
+runid = 'GX_0013'
+sampleid = '22SKH03041'
+chrom = 'chr1'
+pos = '27089668'
+alt = 'G'
+db = 'variant.db'
+
+xx = count_variant(db, chrom, pos, alt)
+yy = count_sample(db, sampleid)
+print( xx, yy)
