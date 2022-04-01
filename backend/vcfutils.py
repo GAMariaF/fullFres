@@ -4,7 +4,7 @@ import re
 
 def parse_thermo_vcf(vcf):
     ''' Les inn vcf til pandas dataframe'''
-    df = pd.read_csv(vcffile, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
+    df = pd.read_csv(vcf, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
     return df
    
 def filter_nocalls(df):
