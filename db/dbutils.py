@@ -40,13 +40,13 @@ def count_sample(db, sampleid):
 
 
 ##### TEST #####
-runid = 'GX_0013'
-sampleid = '22SKH03041'
-chrom = 'chr1'
-pos = '27089668'
-alt = 'G'
-db = 'variant.db'
+#runid = 'GX_0013'
+#sampleid = '22SKH03041'
+#chrom = 'chr1'
+#pos = '27089668'
+#alt = 'G'
+#db = 'variant.db'
 
-xx = count_variant(db, chrom, pos, alt)
-yy = count_sample(db, sampleid)
-print( xx, yy)
+#xx = count_variant(db, chrom, pos, alt)
+#yy = count_sample(db, sampleid)
+#print( xx, yy)
