@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, json
+from flask import Flask, request, jsonify
 from backend import app
 from flask_cors import cross_origin
 

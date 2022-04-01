@@ -3,10 +3,7 @@
   <div>
     <h1>Select the sample to interpret</h1>
     <b-table selectable select-mode="single" @row-selected="rowSelected" striped hover outlined :items="items" :fields="fields" :small="small"></b-table>
-    
   </div>
-
-
 
 </template>
 <script>
