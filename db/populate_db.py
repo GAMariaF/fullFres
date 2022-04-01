@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
+#sqlite also input to def?
 def populate_db(db, vcf_df, run_id, sample_id):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
     with engine.connect() as conn:
@@ -12,10 +13,6 @@ def populate_db(db, vcf_df, run_id, sample_id):
         vcf_df.to_sql('interpret',con=conn,if_exists='append',index=False)
         conn.commit()
 
-db = 'variant.db'
-vcf_df = pd.read_csv('vcf_dataframe2.csv')
-run_id = 'GX_0013'
-sample_id = '22SKH03044'
 
 #if no database
 #engine = create_engine("sqlite:///"+db, echo=True, future=True)
@@ -33,5 +30,11 @@ sample_id = '22SKH03044'
 #        AF FLOAT, \
 #        PRIMARY KEY (runid, sampleid, chrom, pos, alt) \
 #    )"))
+
+##### TEST #####
+db = 'variant.db'
+vcf_df = pd.read_csv('vcf_dataframe2.csv')
+run_id = 'GX_0011'
+sample_id = '22SKH03041'
 
 populate_db(db, vcf_df, run_id, sample_id)
