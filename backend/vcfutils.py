@@ -55,9 +55,13 @@ def get_sample_id(vcf):
     return sample_string
 #IonReporterAnalysisName=22SKH02673_LibPrep87
 
-
-def get_run_id():
-    pass
+def get_run_id(vcf):
+    run_list=[re.findall(r'GNXS-0297-\d{2}-GX_\d{4}_\d{2}/Auto',line) 
+            for line in open(vcf)]
+    run_string=[string for string in run_list if len(string) > 0][0][0]
+    run_string=run_string[13:-8]
+    return run_string
+#GNXS-0297-18-GX_0016_22/Auto
 
 ''' For aa parse en vcf -> Pandas df gjoer foelgende:  '''
 
