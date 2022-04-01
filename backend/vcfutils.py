@@ -4,7 +4,7 @@ import re
 
 def parse_thermo_vcf(vcf):
     ''' Les inn vcf til pandas dataframe'''
-    df = pd.read_csv(vcffile, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
+    df = pd.read_csv(vcf, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
     return df
    
 def filter_nocalls(df):
@@ -47,8 +47,14 @@ def explode_info(df):
     del dfOut["INFO"]
     return dfOut
 
-def get_sample_id():
-    pass
+def get_sample_id(vcf):
+    sample_list=[re.findall(r'IonReporterAnalysisName=.+_Lib',line) 
+            for line in open(vcf)]
+    sample_string=[string for string in sample_list if len(string) > 0][0][0]
+    sample_string=sample_string[24:-4]
+    return sample_string
+#IonReporterAnalysisName=22SKH02673_LibPrep87
+
 
 def get_run_id():
     pass
