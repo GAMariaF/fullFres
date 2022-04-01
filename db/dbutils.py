@@ -4,6 +4,25 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
+def generate_db()
+    engine = create_engine("sqlite:///"+db, echo=True, future=True)
+    with engine.connect() as conn:
+        result = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
+            runid TEXT, \
+            sampleid TEXT, \
+            chrom TEXT, \
+            pos INTEGER, \
+            id TEXT, \
+            ref TEXT, \
+            alt TEXT, \
+            qual TEXT, \
+            filter TEXT, \
+            AF FLOAT, \
+
+
+            PRIMARY KEY (runid, sampleid, chrom, pos, alt) \
+        )"))
+
 #sqlite also input to def?
 def populate_db(db, vcf_df, run_id, sample_id):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
