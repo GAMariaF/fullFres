@@ -16,7 +16,7 @@ df = filter_nocalls(df)
 df = explode_format_gt(df)
 df = explode_info(df)
 
-#df.to_csv('test.csv')
+df.to_csv('test.csv')
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variant.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)

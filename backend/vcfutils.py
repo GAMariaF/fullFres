@@ -47,6 +47,19 @@ def explode_info(df):
     del dfOut["INFO"]
     return dfOut
 
+def explode_func(df):
+    ''' Eksploderer FUNC-kolonnen til egne kolonner'''
+     df.FUNC = df. FUNC.str[1:-1] # eller strip-function
+     pp=df.FUNC[0].replace("'",'"') # må gjøre på hele kolonnen
+     res = json.loads(pp)
+     ny3_transpose = pd.DataFrame(res.items())
+     ny3 = ny3_transpose.transpose()
+    
+    
+    dfOut = pd.concat([df, ny2], axis=1)
+    del dfOut["FUNC"]
+    return dfOut
+
 def get_sample_id(vcf):
     sample_list=[re.findall(r'IonReporterAnalysisName=.+_Lib',line) 
             for line in open(vcf)]
