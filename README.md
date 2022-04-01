@@ -92,3 +92,6 @@ sudo make altinstall
 import sqlite3
 import sqlalchemy
 ```
+
+#### Info om Vue auth
+Jeg lager en relativt enkel login-løsning uten Oauth, og satser heller på en lokal mock backend ala: https://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example
