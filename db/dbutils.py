@@ -1,7 +1,17 @@
+import pandas as pd
 import sqlite3
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
+
+#sqlite also input to def?
+def populate_db(db, vcf_df, run_id, sample_id):
+    engine = create_engine("sqlite:///"+db, echo=True, future=True)
+    with engine.connect() as conn:
+        vcf_df.insert(0, 'runid', len(vcf_df)*[run_id], True)
+        vcf_df.insert(1, 'sampleid', len(vcf_df)*[sample_id], True)
+        vcf_df.to_sql('interpret',con=conn,if_exists='append',index=False)
+        conn.commit()
 
 #sqlite syntax - rewrite ...
 def count_variant(db, chrom, pos, alt):
