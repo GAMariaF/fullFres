@@ -57,7 +57,6 @@ def explode_func(df):
         dftemp2 = pd.DataFrame()
         temp0 = eval(df.FUNC[row])
         lentemp0 = len(temp0)
-        print(row, lentemp0)
         if lentemp0>1:
             dftemp1 = pd.DataFrame(temp0)
             # Add '(1)', '(2)' etc to different transcripts/genes of same variant
@@ -100,10 +99,10 @@ def get_run_id(vcf):
 
 # vcffile = '../tests/vcfs/test.vcf'
 # vcffile = '../tests/vcfs/Oncomine_Variants_(5.16)_filtered.vcf'
-vcffile = '../db/Oncomine_LibPrep82_ff8081817e2f1544017f550d95550014.vcf'
+#vcffile = '../db/Oncomine_LibPrep88_ff8081817e2f1544017f7c2a5b340019.vcf'
 
-df = parse_thermo_vcf(vcffile)
-df = filter_nocalls(df)
-df = explode_format_gt(df)
-df = explode_info(df)
-df = explode_func(df)
+#df = parse_thermo_vcf(vcffile)
+#df = filter_nocalls(df)
+#df = explode_format_gt(df)
+#df = explode_info(df)
+#df = explode_func(df)
