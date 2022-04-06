@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import json
 #from tkinter.ttk import Separator
 
 def parse_thermo_vcf(vcf):
@@ -48,17 +49,36 @@ def explode_info(df):
     return dfOut
 
 def explode_func(df):
-    ''' Eksploderer FUNC-kolonnen til egne kolonner'''
-     df.FUNC = df. FUNC.str[1:-1] # eller strip-function
-     pp=df.FUNC[0].replace("'",'"') # må gjøre på hele kolonnen
-     res = json.loads(pp)
-     ny3_transpose = pd.DataFrame(res.items())
-     ny3 = ny3_transpose.transpose()
-    
-    
-    dfOut = pd.concat([df, ny2], axis=1)
+    ''' Eksploderer FUNC-kolonnen til egne kolonner 
+        Hvis flere transcripter/gener per variant blir disse numerert'''
+    row_count = len(df.index)
+    dfOut = pd.DataFrame()
+    for row in range(row_count):
+        dftemp2 = pd.DataFrame()
+        temp0 = eval(df.FUNC[row])
+        lentemp0 = len(temp0)
+        print(row, lentemp0)
+        if lentemp0>1:
+            dftemp1 = pd.DataFrame(temp0)
+            # Add '(1)', '(2)' etc to different transcripts/genes of same variant
+            for i in range(lentemp0):
+                dftemp1.iloc[i] = dftemp1.iloc[i].add("("+str(i+1)+")")
+            dftemp1 = dftemp1.fillna("")
+            for column in dftemp1:
+                for rowtemp1 in range(1,lentemp0):
+                    dftemp1[column].iloc[0] += " " +dftemp1[column].iloc[rowtemp1]
+            dftemp2 = pd.DataFrame(dftemp1.iloc[[0]])
+            dftemp2.rename(index={0:row},inplace=True)
+        else:
+            dftemp2 = pd.DataFrame(temp0)
+            dftemp2.rename(index={0:row},inplace=True)
+            dftemp2 = dftemp2.fillna("")
+        dfrow = df.iloc[[row]]
+        dfOutrow = pd.concat([dfrow,dftemp2], axis = 1)
+        dfOut = pd.concat([dfOut,dfOutrow])
     del dfOut["FUNC"]
-    return dfOut
+    dfOut = dfOut.fillna("")
+    return dfOut       
 
 def get_sample_id(vcf):
     sample_list=[re.findall(r'IonReporterAnalysisName=.+_Lib',line) 
@@ -78,10 +98,12 @@ def get_run_id(vcf):
 
 ''' For aa parse en vcf -> Pandas df gjoer foelgende:  '''
 
-#vcffile = '../tests/vcfs/test.vcf'
+# vcffile = '../tests/vcfs/test.vcf'
 # vcffile = '../tests/vcfs/Oncomine_Variants_(5.16)_filtered.vcf'
-# df = parse_thermo_vcf(vcffile)
-# df = filter_nocalls(df)
-# df = explode_format_gt(df)
-# df = explode_info(df)
+vcffile = '../db/Oncomine_LibPrep82_ff8081817e2f1544017f550d95550014.vcf'
 
+df = parse_thermo_vcf(vcffile)
+df = filter_nocalls(df)
+df = explode_format_gt(df)
+df = explode_info(df)
+df = explode_func(df)

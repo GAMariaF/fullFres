@@ -67,8 +67,30 @@ def generate_db(db):
             VCFREF TEXT, \
             HS TEXT, \
             CLSF TEXT, \
-            FUNC	[{'origPos':'25398284','origRef':'C','normalizedRef':'C','gene':'KRAS','normalizedPos':'25398284','normalizedAlt':'T','polyphen':'0.517','gt':'pos','codon':'GAT','coding':'c.35G>A','sift':'0.27','grantham':'94.0','transcript':'NM_033360.4','function':'missense','protein':'p.Gly12Asp','location':'exonic','origAlt':'T','exon':'2','oncomineGeneClass':'Gain-of-Function','oncomineVariantClass':'Hotspot','CLNACC1':'12582','CLNSIG1':'Pathogenic','CLNREVSTAT1':'criteria_provided,_multiple_submitters,_no_conflicts','CLNID1':'rs121913529'}]
-
+            origPos INTEGER, \
+            origRef TEXT, \
+            normalizedRef TEXT, \
+            gene TEXT, \
+            normalizedPos INTEGER, \
+            normalizedAlt TEXT, \
+            polyphen FLOAT, \
+            gt TEXT, \
+            codon TEXT, \
+            coding TEXT, \
+            sift FLOAT, \
+            grantham FLOAT, \
+            transcript TEXT, \
+            function TEXT, \
+            protein TEXT, \
+            location TEXT, \
+            origAlt TEXT, \
+            exon INTEGER, \
+            oncomineGeneClass TEXT, \
+            oncomineVariantClass TEXT, \
+            CLNACC1 INTEGER, \
+            CLNSIG1 TEXT, \
+            CLNREVSTAT1 TEXT, \
+            CLNID1 TEXT, \
             PRIMARY KEY (runid, sampleid, chrom, pos, alt) \
         )"))
 
