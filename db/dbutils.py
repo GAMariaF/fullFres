@@ -7,7 +7,7 @@ from sqlalchemy import text
 def generate_db(db):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
     with engine.connect() as conn:
-        result = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
+        result_vcf = conn.execute(text("CREATE TABLE IF NOT EXISTS vcf ( \
 		runid TEXT, \
 		sampleid TEXT, \
 		chrom TEXT, \
@@ -95,52 +95,79 @@ def generate_db(db):
 		CLNSIG1 TEXT, \
 		CLNREVSTAT1 TEXT, \
 		CLNID1 TEXT, \
-		PRIMARY KEY (runid, sampleid, chrom, pos, alt) \
+		PRIMARY KEY (runid, sampleid, chrom, pos, ref, alt) \
         )"))
+        result_interpret = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
+		runid TEXT, \
+		sampleid TEXT, \
+		GENLISTE TEXT, \
+		chrom TEXT, \
+		POS TEXT, \
+		REF TEXT, \
+		ALT TEXT, \
+		SVARES_UT TEXT, \
+		POPULASJONSDATA TEXT, \
+		FUNKSJONSSTUDIER TEXT, \
+		PREDIKTIVE_DATA TEXT, \
+		CANCER_HOTSPOTS TEXT, \
+		COMPUTATIONAL_EVIDENCE TEXT, \
+		KONSERVERING TEXT, \
+		ANDRE_DB TEXT, \
+		KOMMENTAR TEXT, \
+		ONCOGENICITY INTEGER, \
+		TIER TEXT, \
+		KOMMENTAR2 TEXT, \
+		KOLONNE6 TEXT, \
+		KOLONNE7 TEXT, \
+		KOLONNE8 TEXT, \
+		KOLONNE9 TEXT, \
+		KOLONNE10 TEXT, \
+		KOLONNE11 TEXT, \
+		PRIMARY KEY (RUNID, SAMPLEID, CHROM, POS, REF, ALT) \
+		)"))
 
-#sqlite also input to def?
-def populate_db(db, vcf_df, run_id, sample_id):
-    engine = create_engine("sqlite:///"+db, echo=True, future=True)
-    with engine.connect() as conn:
-        vcf_df.insert(0, 'runid', len(vcf_df)*[run_id], True)
-        vcf_df.insert(1, 'sampleid', len(vcf_df)*[sample_id], True)
-        vcf_df.to_sql('interpret',con=conn,if_exists='append',index=False)
-        conn.commit()
+def populate_vcfdb(db, vcf_df, run_id, sample_id):
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	with engine.connect() as conn:
+		vcf_df.insert(0, 'runid', len(vcf_df)*[run_id], True)
+		vcf_df.insert(1, 'sampleid', len(vcf_df)*[sample_id], True)
+		vcf_df.to_sql('vcf',con=conn,if_exists='append',index=False)
+		conn.commit()
+
+def populate_db(db, vcf_df, table):
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	with engine.connect() as conn:
+		vcf_df.to_sql(table,con=conn,if_exists='append',index=False)
+		conn.commit()
 
 #sqlite syntax - rewrite ...
-def count_variant(db, chrom, pos, alt):
+def count_variant(db, chrom, pos, alt, table):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
-    stmt = "SELECT COUNT(*) FROM interpret \
+    stmt = "SELECT COUNT(*) \
+			FROM "+table+" \
             WHERE \
-            chrom = '"+chrom+"' AND \
-            pos = '"+pos+"' AND \
-            alt = '"+alt+"' \
+            	chrom = '"+chrom+"' AND \
+            	pos = '"+pos+"' AND \
+            	alt = '"+alt+"' \
             ;"
     with engine.connect() as conn:
         result = conn.execute(text(stmt))
         for row in result:
             return row[0]
 
-def count_sample(db, sampleid):
-    engine = create_engine("sqlite:///"+db, echo=True, future=True)
-    stmt = "SELECT COUNT(*) FROM interpret \
-            WHERE \
-            sampleid = '"+sampleid+"' \
-            ;"
-    with engine.connect() as conn:
-        result = conn.execute(text(stmt))
-        for row in result:
-            return row[0]
-
-
-##### TEST #####
-#runid = 'GX_0013'
-#sampleid = '22SKH03041'
-#chrom = 'chr1'
-#pos = '27089668'
-#alt = 'G'
-#db = 'variant.db'
-
-#xx = count_variant(db, chrom, pos, alt)
-#yy = count_sample(db, sampleid)
-#print( xx, yy)
+def list_runandsample_variant(db, chrom, pos, ref, alt, table):
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	stmt = "select \
+				runid, sampleid \
+			from \
+				"+table+" \
+			where \
+				chrom = '"+chrom+"' \
+				and POS = '"+pos+"' \
+				and REF = '"+ref+"' \
+				and ALT = '"+alt+"' \
+			;"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		for row in result:
+			return row
