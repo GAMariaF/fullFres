@@ -44,7 +44,7 @@ python run_backend_server.py
 #### TODO:
 - [ ] Bestemme tabell-bibliotek
 - [ ] Lage db schema
-- [x] Lage funksjon for å generere DB
+- [ ] Lage funksjon for å generere DB
 - [ ] Lage test-mappe og script
 - [ ] Lage dockerfiles
 - [ ] Lage docker-compose oppsett
