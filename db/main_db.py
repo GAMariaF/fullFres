@@ -33,11 +33,9 @@ df = explode_info(df)
 # INSERT DATA INTO TABLE VCF
 populate_vcfdb(db, df, run_id, sample_id, 'vcf')
 
-# EXPLODE COLUMN FUNC
-dfvariant = df[["CHROM","POS","ID","REF","ALT","CLSF","FUNC"]]
-dfvariant = explode_func(dfvariant)
-
 # INSERT DATA INTO TABLE VARIANT
+dfvariant = df[["CHROM","POS","ID","REF","ALT","FUNC"]]
+dfvariant = explode_func(dfvariant)
 populate_variantdb(db, dfvariant, 'variant')
 
 # INSERT DATA INTO TABLE INTERPRET

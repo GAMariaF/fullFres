@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 #sqlite syntax...
 def generate_db(db):
+
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
 	with engine.connect() as conn:
 		result_vcf = conn.execute(text("CREATE TABLE IF NOT EXISTS vcf ( \
@@ -15,6 +16,7 @@ def generate_db(db):
 		ID TEXT, \
 		QUAL TEXT, \
 		FILTER TEXT, \
+		GT TEXT, \
 		GQ INTEGER, \
 		AF FLOAT, \
 		AO INTEGER, \
@@ -68,6 +70,7 @@ def generate_db(db):
 		MISC TEXT, \
 		HS TEXT, \
 		SUBSET TEXT, \
+		CLSF TEXT, \
 		PRIMARY KEY (runid, sampleid, chrom_pos_ref_alt) \
         )"))
 		result_variant = conn.execute(text("CREATE TABLE IF NOT EXISTS variant ( \
@@ -77,7 +80,6 @@ def generate_db(db):
 		ID TEXT, \
 		REF TEXT, \
 		ALT TEXT, \
-		CLSF TEXT, \
 		origPos INTEGER, \
 		origRef TEXT, \
 		normalizedRef TEXT, \
@@ -123,6 +125,7 @@ def generate_db(db):
 		KOMMENTAR2 TEXT, \
 		DATO TEXT, \
 		BRUKER TEXT, \
+		KONTROLL TEXT, \
 		KOLONNE6 TEXT, \
 		KOLONNE7 TEXT, \
 		KOLONNE8 TEXT, \
@@ -131,7 +134,7 @@ def generate_db(db):
 		KOLONNE11 TEXT, \
 		PRIMARY KEY (RUNID, SAMPLEID, chrom_pos_ref_alt) \
 		)"))
-		stmt = "create view all_data as select * \
+		stmt = "create view if not exists all_data as select * \
 			from vcf \
 			left join variant \
 			on vcf.chrom_pos_ref_alt = variant.chrom_pos_ref_alt \
@@ -153,7 +156,6 @@ def populate_vcfdb(db, df, run_id, sample_id, table):
 		del df["POS"]
 		del df["REF"]
 		del df["ALT"]
-		del df["CLSF"]
 		del df["FUNC"]
 		df.to_sql(table ,con=conn,if_exists='append',index=False)
 		conn.commit()		
