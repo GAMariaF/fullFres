@@ -21,14 +21,15 @@ def explode_format_gt(df):
     
     '''
     df.reset_index(inplace=True,drop=True)
-    ny = pd.DataFrame(list(dict(zip(a,b)) for a,b in zip(df['FORMAT'].str.split(":"), df['GT'].str.split(":"))))
+    df.rename(columns = {'GT':'GTFORMAT'}, inplace = True)
+    ny = pd.DataFrame(list(dict(zip(a,b)) for a,b in zip(df['FORMAT'].str.split(":"), df['GTFORMAT'].str.split(":"))))
     for i in ["AF","AO","DP","FAO","FDP","FRO","FSAF","FSAR","FSRF","FSRR","RO","SAF","SAR","SRF","SRR"]: #1
         try:
             ny = ny.drop(i, axis=1)
         except:
             pass
     dfOut = pd.concat([df, ny], axis=1)
-    del dfOut["GT"]
+    del dfOut["GTFORMAT"]
     del dfOut["FORMAT"]
     return dfOut
 
