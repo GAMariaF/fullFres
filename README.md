@@ -69,11 +69,6 @@ npm run serve
 # Jeg måtte nedgradere nodeversion for å få det til
 ```
 
-
-```
-
-
-
 #### Pakker som sikkert dockerimage må ha for at dette skal funke:
 * libffi_devel
 
@@ -87,11 +82,8 @@ cd Python-3.9*/
 sudo make altinstall
 ```
 
-#### SQLAlchemy
-```python
-import sqlite3
-import sqlalchemy
-```
+#### DB schema
+![DB schema](https://raw.githubusercontent.com/oyvindbusk/fullFres/main/db/DB%20schema.png)
 
 #### Info om Vue auth
 Jeg lager en relativt enkel login-løsning uten Oauth, og satser heller på en lokal mock backend ala: https://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example
