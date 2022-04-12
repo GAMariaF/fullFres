@@ -4,17 +4,15 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
+#sqlite syntax...
 def generate_db(db):
-    engine = create_engine("sqlite:///"+db, echo=True, future=True)
-    with engine.connect() as conn:
-        result_vcf = conn.execute(text("CREATE TABLE IF NOT EXISTS vcf ( \
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	with engine.connect() as conn:
+		result_vcf = conn.execute(text("CREATE TABLE IF NOT EXISTS vcf ( \
 		runid TEXT, \
 		sampleid TEXT, \
-		chrom TEXT, \
-		POS INTEGER, \
+		chrom_pos_ref_alt TEXT, \
 		ID TEXT, \
-		REF TEXT, \
-		ALT TEXT, \
 		QUAL TEXT, \
 		FILTER TEXT, \
 		GQ INTEGER, \
@@ -70,6 +68,15 @@ def generate_db(db):
 		MISC TEXT, \
 		HS TEXT, \
 		SUBSET TEXT, \
+		PRIMARY KEY (runid, sampleid, chrom_pos_ref_alt) \
+        )"))
+		result_variant = conn.execute(text("CREATE TABLE IF NOT EXISTS variant ( \
+		chrom_pos_ref_alt TEXT, \
+		CHROM TEXT, \
+		POS INTEGER, \
+		ID TEXT, \
+		REF TEXT, \
+		ALT TEXT, \
 		CLSF TEXT, \
 		origPos INTEGER, \
 		origRef TEXT, \
@@ -95,16 +102,13 @@ def generate_db(db):
 		CLNSIG1 TEXT, \
 		CLNREVSTAT1 TEXT, \
 		CLNID1 TEXT, \
-		PRIMARY KEY (runid, sampleid, chrom, pos, ref, alt) \
+		PRIMARY KEY (chrom, pos, ref, alt) \
         )"))
-        result_interpret = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
+		result_interpret = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
 		runid TEXT, \
 		sampleid TEXT, \
 		GENLISTE TEXT, \
-		chrom TEXT, \
-		POS TEXT, \
-		REF TEXT, \
-		ALT TEXT, \
+		chrom_pos_ref_alt TEXT, \
 		SVARES_UT TEXT, \
 		POPULASJONSDATA TEXT, \
 		FUNKSJONSSTUDIER TEXT, \
@@ -117,38 +121,75 @@ def generate_db(db):
 		ONCOGENICITY INTEGER, \
 		TIER TEXT, \
 		KOMMENTAR2 TEXT, \
+		DATO TEXT, \
+		BRUKER TEXT, \
 		KOLONNE6 TEXT, \
 		KOLONNE7 TEXT, \
 		KOLONNE8 TEXT, \
 		KOLONNE9 TEXT, \
 		KOLONNE10 TEXT, \
 		KOLONNE11 TEXT, \
-		PRIMARY KEY (RUNID, SAMPLEID, CHROM, POS, REF, ALT) \
+		PRIMARY KEY (RUNID, SAMPLEID, chrom_pos_ref_alt) \
 		)"))
+		stmt = "create view all_data as select * \
+			from vcf \
+			left join variant \
+			on vcf.chrom_pos_ref_alt = variant.chrom_pos_ref_alt \
+			left join interpret \
+			on vcf.chrom_pos_ref_alt = interpret.chrom_pos_ref_alt \
+			and vcf.runid = interpret.runid \
+			and vcf.sampleid = interpret.sampleid;"
+		result_all = conn.execute(text(stmt))
 
-def populate_vcfdb(db, vcf_df, run_id, sample_id):
+def populate_vcfdb(db, df, run_id, sample_id, table):
+	df = df.copy(deep=True)
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
 	with engine.connect() as conn:
-		vcf_df.insert(0, 'runid', len(vcf_df)*[run_id], True)
-		vcf_df.insert(1, 'sampleid', len(vcf_df)*[sample_id], True)
-		vcf_df.to_sql('vcf',con=conn,if_exists='append',index=False)
-		conn.commit()
+		df.insert(0, 'runid', len(df)*[run_id], True)
+		df.insert(1, 'sampleid', len(df)*[sample_id], True)
+		df["POS"]=df["POS"].astype(str)
+		df.insert(2, 'chrom_pos_ref_alt', df[["CHROM", "POS", "REF", "ALT"]].agg("".join, axis=1))
+		del df["CHROM"]
+		del df["POS"]
+		del df["REF"]
+		del df["ALT"]
+		del df["CLSF"]
+		del df["FUNC"]
+		df.to_sql(table ,con=conn,if_exists='append',index=False)
+		conn.commit()		
 
-def populate_db(db, vcf_df, table):
+def populate_variantdb(db, df, table):
+	df = df.copy(deep=True)
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
 	with engine.connect() as conn:
-		vcf_df.to_sql(table,con=conn,if_exists='append',index=False)
+		df["POS"]=df["POS"].astype(str)
+		df.insert(0, 'chrom_pos_ref_alt', df[["CHROM", "POS", "REF", "ALT"]].agg("".join, axis=1))
+		df.to_sql(table ,con=conn,if_exists='append',index=False)
+		conn.commit()		
+
+def populate_interpretdb(db, df, table):
+	df = df.copy(deep=True)
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	with engine.connect() as conn:
+		df["POS"]=df["POS"].astype(str)
+		df.insert(2, 'chrom_pos_ref_alt', df[["CHROM", "POS", "REF", "ALT"]].agg("".join, axis=1))
+		del df["CHROM"]
+		del df["POS"]
+		del df["REF"]
+		del df["ALT"]
+		df.to_sql(table,con=conn,if_exists='append',index=False)
 		conn.commit()
 
 #sqlite syntax - rewrite ...
-def count_variant(db, chrom, pos, alt, table):
+def count_variant(db, chrom, pos, ref, alt, table):
     engine = create_engine("sqlite:///"+db, echo=True, future=True)
     stmt = "SELECT COUNT(*) \
 			FROM "+table+" \
             WHERE \
-            	chrom = '"+chrom+"' AND \
-            	pos = '"+pos+"' AND \
-            	alt = '"+alt+"' \
+            	CHROM = '"+chrom+"' AND \
+            	POS = '"+pos+"' AND \
+				REF = '"+ref+"' AND \
+            	ALT = '"+alt+"' \
             ;"
     with engine.connect() as conn:
         result = conn.execute(text(stmt))
@@ -157,15 +198,13 @@ def count_variant(db, chrom, pos, alt, table):
 
 def list_runandsample_variant(db, chrom, pos, ref, alt, table):
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	pos = str(pos)
 	stmt = "select \
 				runid, sampleid \
 			from \
 				"+table+" \
 			where \
-				chrom = '"+chrom+"' \
-				and POS = '"+pos+"' \
-				and REF = '"+ref+"' \
-				and ALT = '"+alt+"' \
+				chrom_pos_ref_alt = '"+chrom+pos+ref+alt+"' \
 			;"
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
