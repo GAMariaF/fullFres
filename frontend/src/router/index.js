@@ -6,6 +6,10 @@ import Samples from '../views/Samples.vue';
 import Variants from '../views/Variants.vue';
 import AllVariants from '../views/AllVariants.vue';
 
+// temp?
+import login from '../views/LoginWorld.vue';
+
+
 const routes = [
 	{
 		path: '/variants/:id',
@@ -28,7 +32,13 @@ const routes = [
 		path: '/profile',
 		name: 'Profile',
 		component: Profile
-	}
+	},
+	{
+		path: '/login',
+		name: 'login',
+		component: login
+	},
+	
 ];
 const router = new VueRouter({
 	mode: 'history',
