@@ -23,95 +23,78 @@ def token_required(f):
     def decorator(*args, **kwargs):
         token = None    
         if request.cookies.get('sid') != None:
-            print("1")
-            #token = request.headers['Authorization']
             token = request.cookies.get('sid')
         if not token:
-            print("2")
             return jsonify({'message': 'a valid token is missing'})
         try:
-            print("3")
-            print(token)
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            print("4")
             current_user = Users.query.filter_by(
                 public_id=data['public_id']).first()
-            print("5")
         except jwt.ExpiredSignatureError:
-            print("6")
             return jsonify({'message': 'Signature expired. Please log in again.'})
         except:
-            print("7")
             return jsonify({'message': 'token is invalid'})
-
         return f(current_user, *args, **kwargs)
     return decorator
-
 
 @app.route('/login', methods=['POST'])
 def login_user():
     auth = request.get_json()
     if not auth or not auth['username'] or not auth['password']:
-        print("55")
         return make_response('could not verify', 401, {'Authentication': 'login required"'})
     user = Users.query.filter_by(name=auth['username']).first()
     if user is None:
         return make_response('could not verify',  401, {'Authentication': '"login required"'})
     if check_password_hash(user.password, auth['password']):
-        print("62")
         token = jwt.encode({'public_id': user.public_id, 'exp': datetime.datetime.utcnow(
         ) + datetime.timedelta(hours=45), 'iat': datetime.datetime.utcnow()}, app.config['SECRET_KEY'], "HS256")
         resp = make_response(f"The Cookie has been Set")
         resp.set_cookie('sid', token, expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
         return resp
-    print("66")
     return make_response('could not verify',  401, {'Authentication': '"login required"'})
 
-@app.route('/api', methods=['GET', 'POST'])
-@cross_origin()
-
-def api(current_user):
+@app.route('/api/<query>', methods=['GET', 'POST'])
+@token_required
+def api(current_user, query):
     if request.method == 'GET':
-        print("vi er i rute")
-        print(current_user)
+        if query == "samples":
         
-        response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
         
-        return response
+            
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+            return response
+        else:
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+            return response
 
 
 @app.route('/chklogin')
-def chklogin():
+@token_required
+def chklogin(current_user):
     name = request.cookies.get('sid')
-    print("--")
-    print(name)
-    print("--")
     if name == None:        
         response = make_response(jsonify(logstatus="false"))
     else:
         # Sjekk om bruker i database og ikke utløpt
         # returner enten "logstatus": true, "username": c.username}
-        
         response = make_response(jsonify(logstatus="true", username="buso"), 200)
     return response
 
-@app.route('/setcookie')
-def setcookie():
-    resp = make_response(f"The Cookie has been Set")
+# @app.route('/setcookie')
+# def setcookie():
+#     resp = make_response(f"The Cookie has been Set")
     
-
-
-    resp.set_cookie('sid','buso', expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
-    return resp
- ##jester.setCookie(name="sid", value=loginS, expires=daysForward(7), path="/")
+#     resp.set_cookie('sid','buso', expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
+#     return resp
+#  ##jester.setCookie(name="sid", value=loginS, expires=daysForward(7), path="/")
  
-@app.route('/getcookie')
-def getcookie():
-    name = request.cookies.get('sid')
-    print(name)
-    print("--")
-    response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
-    return response
+# @app.route('/getcookie')
+# def getcookie():
+#     name = request.cookies.get('sid')
+#     print(name)
+#     print("--")
+#     response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+#     return response
 
 # @app.route('/api/<query>', methods=['GET', 'POST'])
 # @cross_origin()

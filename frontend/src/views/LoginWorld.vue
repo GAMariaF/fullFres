@@ -3,8 +3,8 @@
     <div class="h-100 bg-plum-plate-login bg-animation">
       <div class="d-flex h-100 justify-content-center align-items-center">
         <b-col md="8" class="mx-auto app-login-box">
-        <span v-show="loggedInStatus">You are already logged in. Go to <router-link to="/samples">samples ready for interpretation</router-link></span>
-          <div v-show="!loggedInStatus" class="modal-dialog w-100 mx-auto">
+        <span v-show="state">You are already logged in. Go to <router-link to="/samples">samples ready for interpretation</router-link></span>
+          <div v-show="!state" class="modal-dialog w-100 mx-auto">
             <div class="modal-content">
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
@@ -63,22 +63,19 @@
                   
                   <br />
                   <br />
-                  <b-button variant="primary" @click="chkGet" size="lg"
-                    >testget</b-button
-                  >
                   <br />
                   {{ tempdata }}
                   <br />
                   <br />
-                  <b-button variant="primary" @click="checkLoggedIn" size="lg">Chklogin</b-button>
+                  
                   <br />
                   
                   <br />
-                  <b-button variant="primary" @click="cookie_explore" size="lg">Cookie</b-button>
+                  
                   <br />
                   <br />
-                  <b-button variant="primary" @click="cookie_explore_2" size="lg">Cookie_2</b-button>
-                  {{ loggedInStatus }}
+                  
+                  
                 </div>
               </div>
             </div>
@@ -102,9 +99,7 @@ export default {
     username: "buso",
     password: "buso123",
     tempdata: "",
-    login_URL: "http://172.16.0.3:5000/login",
-    token: "",
-    loggedInStatus: false
+    login_URL: "http://172.16.0.3:5000/login"    
   }),
   methods: {
     doLogin: function () {
@@ -134,50 +129,58 @@ export default {
         alert("Please fill the text!");
       }
     },
-    checkLoggedIn: function () {
-      const baseURI = "http://172.16.0.3:5000/login";
-      this.$http
-        .post(baseURI, {
-          username: this.username,
-          password: this.password,
-        })
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
-    },
-    chkGet: function () {
-      const baseURI = "http://172.16.0.3:5000/api";
-      //const TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJiMGYzNTZkMi1kZWE1LTRhMTYtYTdiMi1hNTI3Y2Q4ZDlkMTYiLCJleHAiOjE2NTE3MzM0MjcsImlhdCI6MTY1MTU3MTQyN30.Jt0pwT7oqEpumw75npb9180n5Ij5iu29U_fUbOCy_dc";
-      const TOKEN = this.token
-      this.$http
-        .get(baseURI, { headers: { Authorization: TOKEN } })
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
-    },
-    cookie_explore: function() {
-        const baseURI = "http://172.16.0.3:5000/setcookie";
-        axios.get(baseURI)
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
-    },
-    cookie_explore_2: function() {
-        const baseURI = "http://172.16.0.3:5000/getcookie";
-        axios.get(baseURI)
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
-    },
+    // checkLoggedIn: function () {
+    //   const baseURI = "http://172.16.0.3:5000/login";
+    //   this.$http
+    //     .post(baseURI, {
+    //       username: this.username,
+    //       password: this.password,
+    //     })
+    //     .then((response) => response.data)
+    //     .then((data) => {
+    //       console.log(data);
+    //     });
+    // },
+    // chkGet: function () {
+    //   const baseURI = "http://172.16.0.3:5000/api";
+    //   //const TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJiMGYzNTZkMi1kZWE1LTRhMTYtYTdiMi1hNTI3Y2Q4ZDlkMTYiLCJleHAiOjE2NTE3MzM0MjcsImlhdCI6MTY1MTU3MTQyN30.Jt0pwT7oqEpumw75npb9180n5Ij5iu29U_fUbOCy_dc";
+    //   const TOKEN = this.token
+    //   this.$http
+    //     .get(baseURI, { headers: { Authorization: TOKEN } })
+    //     .then((response) => response.data)
+    //     .then((data) => {
+    //       console.log(data);
+    //     });
+    // },
+    // cookie_explore: function() {
+    //     const baseURI = "http://172.16.0.3:5000/setcookie";
+    //     axios.get(baseURI)
+    //     .then((response) => response.data)
+    //     .then((data) => {
+    //       console.log(data);
+    //     });
+    // },
+    // cookie_explore_2: function() {
+    //     const baseURI = "http://172.16.0.3:5000/getcookie";
+    //     axios.get(baseURI)
+    //     .then((response) => response.data)
+    //     .then((data) => {
+    //       console.log(data);
+    //     });
+    // },
   },
   created: function() {
-      this.token = this.$store.getters.token;
-      this.loggedInStatus = this.$store.getters.loggedInStatus;
-
-  }
+      this.$store.dispatch("initStore");
+  },
+  computed: {
+    state() {
+      return  this.$store.getters.loggedInStatus
+      }
+  },
+  watch: {
+    state (newState, oldState) {
+      console.log(`State changed from ${oldState} to ${newState}`)
+    }
+  },
 };
 </script>
