@@ -11,3 +11,6 @@ pytz==2021.3
 python-dateutil==2.8.2
 gnureadline==8.0.0
 Flask-Cors==3.0.10
+Flask-SQLAlchemy==2.5.1
+uuid==1.30
+pyjwt==2.3.0

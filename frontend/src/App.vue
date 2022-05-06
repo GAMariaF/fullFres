@@ -13,6 +13,24 @@ export default {
   name: 'App',
   components: {
     Navbar
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+    state() {
+      return  this.$store.getters.loggedInStatus
+      }
+  },
+  watch: {
+    state (newState, oldState) {
+      console.log(`State changed from ${oldState} to ${newState}`)
+    }
+  },
+  created: function() {
+    this.$store.dispatch("initStore");
+    console.log(this.$store.getters.loggedInStatus);
   }
 }
 </script>
