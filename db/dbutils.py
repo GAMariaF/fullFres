@@ -261,8 +261,7 @@ def populate_interpretdb(db, df_interpret, chrom_pos_ref_alt_date):
 			df_interpret_copy.to_sql('interpret', con=conn, if_exists='append', index=False)
 			conn.commit()
 		else:
-			pr
-			int("Entry already in database")
+			print("Entry already in database")
 			return
 
 #sqlite syntax - rewrite ...
