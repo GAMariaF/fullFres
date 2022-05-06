@@ -152,15 +152,6 @@ def populate_vcf_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 	if dfvcf.empty:
 		print("Missing data to import to tables Variant and Vcf")
 		return
-	# Check if runid and sampleid already in vcf table
-	with engine.connect() as conn:
-		stmt_vcfindb = "select * from vcf \
-					where runid = '"+run_id+"' \
-					AND sampleid = '"+sample_id+"';"
-		df_vcfindb = pd.read_sql_query(text(stmt_vcfindb), con = conn)
-	if not df_vcfindb.empty:
-		print(run_id, " and ", sample_id, " already in database in table vcf")
-		return
 
 	dfvcf_copy = dfvcf.copy(deep=True)
 	dfvariant_copy = dfvariant.copy(deep=True)
@@ -207,9 +198,20 @@ def populate_vcf_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 				if variantindb:
 					# if in db: use key in variant table (chrom_pos_ref_alt_date) as key to vcf table
 					# do not add variant to table variant
+					# if sample, run and variant already in vcf database don't add
 					dfvariant_copy = dfvariant_copy.drop(row)
 					dfvcf_copy.chrom_pos_ref_alt_date.loc[row] = dfdb_variant_latest.chrom_pos_ref_alt_date.iloc[0]
-
+					print (dfvcf_copy.chrom_pos_ref_alt_date.loc[row])
+					stmtvcf = "select * from vcf \
+						where runid = '"+dfvcf_copy.runid.loc[row]+"' \
+							AND sampleid = '"+dfvcf_copy.sampleid.loc[row]+"' \
+							AND chrom_pos_ref_alt_date = '"+dfvcf_copy.chrom_pos_ref_alt_date.loc[row]+"';"
+					dfdb_vcf = pd.read_sql_query(text(stmtvcf), con = conn)
+					if not dfdb_vcf.empty:
+						print(dfvcf_copy.runid.loc[row], \
+							dfvcf_copy.sampleid.loc[row], \
+								dfvcf_copy.chrom_pos_ref_alt_date.loc[row], " is already in database")
+						dfvcf_copy = dfvcf_copy.drop(row)
 				else:
 					# if not in db, i.e existing variant but with new FUNC
 					dfvcf_copy.chrom_pos_ref_alt_date.loc[row] = dfvariant_copy.chrom_pos_ref_alt_date.loc[row]
@@ -224,7 +226,7 @@ def populate_vcf_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 		del dfvcf_copy["ALT"]
 		del dfvcf_copy["FUNC"]
 		dfvcf_copy.to_sql('vcf', con=conn, if_exists='append', index=False)
-		if not dfvariant_copy.emty:
+		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
 			dfvariant_copy.to_sql('variant', con=conn, if_exists='append', index=False)
 		conn.commit()	
