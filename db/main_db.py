@@ -10,8 +10,8 @@ from vcfutils import explode_func
 from vcfutils import get_sample_id
 from vcfutils import get_run_id
 from dbutils import generate_db
-from dbutils import populate_vcfdb
-from dbutils import populate_variantdb
+from dbutils import populate_vcf_variantdb
+#from dbutils import populate_variantdb
 from dbutils import populate_interpretdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
@@ -29,18 +29,17 @@ df = parse_thermo_vcf(vcffile)
 df = filter_nocalls(df)
 df = explode_format_gt(df)
 df = explode_info(df)
-
-# INSERT DATA INTO TABLE VCF
-populate_vcfdb(db, df, run_id, sample_id, 'vcf')
-
-# INSERT DATA INTO TABLE VARIANT
 dfvariant = df[["CHROM","POS","ID","REF","ALT","FUNC"]]
 dfvariant = explode_func(dfvariant)
-populate_variantdb(db, dfvariant, 'variant')
+
+# INSERT DATA INTO TABLE VCF AND VARIANT
+populate_vcf_variantdb(db, df, dfvariant, run_id, sample_id)
 
 # INSERT DATA INTO TABLE INTERPRET
 df_interpret = pd.read_excel("Tolkningsskjema.xlsx")
-populate_interpretdb(db, df_interpret, 'interpret')
+df_interpret = df_interpret.iloc[0:1]
+chrom_pos_ref_alt_date = 'chr1225398284CT220504131039'
+populate_interpretdb(db, df_interpret, chrom_pos_ref_alt_date)
 
 chrom = "chr12"
 pos = "25398284"
