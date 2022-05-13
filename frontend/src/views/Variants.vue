@@ -1,7 +1,7 @@
 <template>
   <div>
     <variant-table  :loading="loading"   />
-    {{variants}}
+    
   </div>
 </template>
 <script>
