@@ -43,7 +43,9 @@ def explode_info(df):
     # First maa vi fjerne alle semikolon som er inne i klammer:
     df["INFO"] = df["INFO"].apply(replace_semi)
     # Replace HS MED HS=NA
-    df['INFO'] = df['INFO'].str.replace(';HS;',';HS=NA;')
+    # ok???? ';HS;',';HS=NA;' --> 'HS;','HS=NA;' /mfahls
+    df['INFO'] = df['INFO'].str.replace('HS;','HS=NA;')
+    df['INFO'] = df['INFO'].str.replace('Non-Targeted;','Non-Targeted=1;')
     ny2 = pd.DataFrame([dict(w.split('=', 1) for w in x) for x in df["INFO"].str.split(";")])
     dfOut = pd.concat([df, ny2], axis=1)
     del dfOut["INFO"]

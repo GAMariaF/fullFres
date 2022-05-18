@@ -9,9 +9,9 @@ from vcfutils import explode_info
 from vcfutils import explode_func
 from vcfutils import get_sample_id
 from vcfutils import get_run_id
+# from vcfutils import replace_semi
 from dbutils import generate_db
 from dbutils import populate_vcf_variantdb
-#from dbutils import populate_variantdb
 from dbutils import populate_interpretdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
@@ -26,10 +26,10 @@ generate_db(db)
 
 # TRANSFER VCF TO DATAFRAME
 df = parse_thermo_vcf(vcffile)
-df = filter_nocalls(df)
+# df = filter_nocalls(df)
 df = explode_format_gt(df)
 df = explode_info(df)
-dfvariant = df[["CHROM","POS","ID","REF","ALT","FUNC"]]
+dfvariant = df[["CHROM","POS","ID","REF","ALT","TYPE","SVTYPE","FUNC"]]
 dfvariant = explode_func(dfvariant)
 
 # INSERT DATA INTO TABLE VCF AND VARIANT
