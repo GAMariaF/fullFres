@@ -16,7 +16,7 @@ from dbutils import populate_interpretdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
 
-vcffile = './Oncomine_Variants_(5.16)_filtered.vcf'
+vcffile = './../Oncomine_Extended_516_filtered_xx.vcf'
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
