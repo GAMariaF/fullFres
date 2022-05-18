@@ -3,7 +3,16 @@
   <div>
     {{loggedInStatus}}
     <h1>Select the sample to interpret</h1>
-    <b-table selectable select-mode="single" @row-selected="rowSelected" striped hover outlined :items="items" :fields="fields" :small="small"></b-table>
+
+<div class="container" id="login">
+            <div class="row row justify-content-center">
+                <div class="col-md-10">
+                  <b-table selectable select-mode="single" @row-selected="rowSelected" striped hover outlined :items="items" :fields="fields" :small="small"></b-table>
+</div>
+</div>
+</div>
+
+    
   </div>
 
 </template>

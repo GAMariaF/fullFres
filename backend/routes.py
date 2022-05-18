@@ -59,7 +59,6 @@ def api(current_user, query):
     if request.method == 'GET':
         if query == "samples":
         
-        
             
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
