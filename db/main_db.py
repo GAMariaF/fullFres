@@ -16,7 +16,8 @@ from dbutils import populate_interpretdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
 
-vcffile = './../Oncomine_Extended_516_filtered_xx.vcf'
+vcffile = './tests/vcfs/22shk04823_Oncomine_Extended_516_filtered.vcf'
+excelfile = './tests/vcfs/22shk04823_variants.xlsx'
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
@@ -25,11 +26,11 @@ sample_id = get_sample_id(vcffile)
 generate_db(db)
 
 # TRANSFER VCF TO DATAFRAME
-df = parse_thermo_vcf(vcffile)
+df = parse_thermo_vcf(vcffile,excelfile)
 # df = filter_nocalls(df)
 df = explode_format_gt(df)
 df = explode_info(df)
-dfvariant = df[["CHROM","POS","ID","REF","ALT","TYPE","SVTYPE","FUNC"]]
+dfvariant = df[["CHROM","POS","REF","ALT","TYPE","SVTYPE","FUNC"]]
 dfvariant = explode_func(dfvariant)
 
 # INSERT DATA INTO TABLE VCF AND VARIANT

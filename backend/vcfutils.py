@@ -3,9 +3,31 @@ import re
 import json
 #from tkinter.ttk import Separator
 
-def parse_thermo_vcf(vcf):
-    ''' Les inn vcf til pandas dataframe'''
-    df = pd.read_csv(vcf, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
+def parse_thermo_vcf(vcf,excel):
+    ''' Les inn vcf og excel, slå de sammen til en pandas dataframe'''
+    df_vcf = pd.read_csv(vcf, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])
+    df_excel = pd.read_excel(excel)
+    df1 = pd.DataFrame()
+    df2 = pd.DataFrame()
+    # With fusion
+    df_excel_w = df_excel.loc[df_excel['Type'] == 'Fusion']
+    if not df_excel_w.empty:
+        df_excel_w.loc[:,'ID'] = df_excel_w.loc[:,'Variant ID'] + "_1"
+        df1 = pd.merge(df_excel_w,df_vcf,on='ID',how='left')
+        df1.loc[:,'ID']=df1.loc[:,'Variant ID']
+    # Without fusion 
+    df_excel_wo = df_excel.loc[df_excel['Type'] != 'Fusion']
+    if not df_excel_wo.empty:
+        df_excel_wo = df_excel_wo.reset_index(drop='True')
+        df_vcf["Locus_vcf"] = df_vcf.CHROM.astype(str)+":" \
+                    +df_vcf.POS.astype(str)
+        #df_vcf.Locus = df_vcf.Locus.astype(str)
+        #df_excel_wo.Locus.astype(str)
+        df2 = pd.merge(df_excel_wo,df_vcf,\
+                    left_on=['Locus'],right_on=['Locus_vcf'],how='left')
+        df2 = df2.drop(columns=['Locus_vcf'])
+    df = pd.concat([df1,df2])
+    df = df.reset_index(drop='True')
     return df
    
 def filter_nocalls(df):
