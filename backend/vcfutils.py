@@ -28,6 +28,8 @@ def parse_thermo_vcf(vcf,excel):
         df2 = df2.drop(columns=['Locus_vcf'])
     df = pd.concat([df1,df2])
     df = df.reset_index(drop='True')
+    # Removing columns TYPE and SVTYPE (already specifiec in column Type)
+    df = df.drop(columns=['TYPE','SVTYPE'], errors='ignore')
     return df
    
 def filter_nocalls(df):
