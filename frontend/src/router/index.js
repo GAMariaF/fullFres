@@ -5,6 +5,7 @@ import Profile from '../views/Profile.vue';
 import Samples from '../views/Samples.vue';
 import Variants from '../views/Variants.vue';
 import AllVariants from '../views/AllVariants.vue';
+import Control from '../views/Control.vue';
 
 // temp?
 import login from '../views/LoginWorld.vue';
@@ -27,6 +28,11 @@ const routes = [
 		path: '/samples',
 		name: 'Samples',
 		component: Samples
+	},
+	{
+		path: '/control',
+		name: 'Control',
+		component: Control
 	},
 	{
 		path: '/profile',
