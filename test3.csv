@@ -1,0 +1,11 @@
+,CHROM,POS,REF,ALT,Type,gene,exon,oncomineGeneClass,oncomineVariantClass,origPos,origRef,normalizedRef,normalizedPos,normalizedAlt,gt,codon,coding,transcript,function,protein,location,origAlt,CLNACC1,CLNSIG1,CLNREVSTAT1,CLNID1,polyphen,sift,grantham
+0,chr21,42880008,C,C]chr21:39795483],Fusion,TMPRSS2,1,Gain-of-Function,Fusion,,,,,,,,,,,,,,,,,,,,
+1,chr21,42880008,C,C]chr21:39817544],Fusion,TMPRSS2,1,Gain-of-Function,Fusion,,,,,,,,,,,,,,,,,,,,
+2,chr21,42880008,C,C]chr21:39846044],Fusion,TMPRSS2,1,Gain-of-Function,Fusion,,,,,,,,,,,,,,,,,,,,
+3,chr21,42878372,C,C]chr21:39817544],Fusion,TMPRSS2,1,,,,,,,,,,,,,,,,,,,,,,
+4,chrX,66764989,A,<CNV>,CNV,AR,,Gain-of-Function,Amplification,,,,,,,,,,,,,,,,,,,,
+5,chr13,32913708,ATTTAAGT,A,del,BRCA2,11,Loss-of-Function,Truncating,32913708,ATTTAAGT,ATTTAAGT,32913708,A,pos,TAA,c.5217_5223delTTTAAGT,NM_000059.3,nonsense,p.Tyr1739Ter,exonic,A,51822,Pathogenic,reviewed_by_expert_panel,rs80359496,,,
+6,chr5,176520243,G,A,snp,FGFR4,9,,,176520243,G,G,176520243,A,pos,AGG,c.1162G>A,NM_213647.3,missense,p.Gly388Arg,exonic,A,16326,Pathogenic,no_assertion_criteria_provided,rs351855,0.998,0.01,125.0
+7,chr9,139411783,C,A,snp,NOTCH1,9,,,139411783,C,C,139411783,A,pos,TTC,c.1496G>T,NM_017617.5,missense,p.Cys499Phe,exonic,A,,,,,1.0,0.0,205.0
+8,chr9,139411786,G,C,snp,NOTCH1,9,,,139411786,G,G,139411786,C,pos,CGC,c.1493C>G,NM_017617.5,missense,p.Pro498Arg,exonic,C,,,,,1.0,0.01,103.0
+9,chr3,47058549,C,<CNV>,CNV,SETD2,,,,,,,,,,,,,,,,,,,,,,,

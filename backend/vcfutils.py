@@ -29,7 +29,12 @@ def parse_thermo_vcf(vcf,excel):
     df = pd.concat([df1,df2])
     df = df.reset_index(drop='True')
     # Removing columns TYPE and SVTYPE (already specifiec in column Type)
-    df = df.drop(columns=['TYPE','SVTYPE'], errors='ignore')
+    df = df.drop(columns=['TYPE','SVTYPE', 'Gene', 'Locus', \
+                        'AA Change', 'Ref','Alt','Raw Read Depth', \
+                        'Effective Read Depth', 'Alt Allele Read Counts',\
+                        'Allele Ratio', 'Nuc Change', 'Allele Frequency', \
+                        'Allele Frequency (%)', 'Filtered Read Coverage', \
+                        'Allele read Count'], errors='ignore')
     return df
    
 def filter_nocalls(df):
