@@ -152,23 +152,62 @@ def generate_db(db):
 		grantham TEXT, \
 		PRIMARY KEY (CHROM, POS, ALT, DATE) \
         )"))
+		result_fusion = conn.execute(text("CREATE TABLE IF NOT EXISTS fusion ( \
+		CHROM_POS_ALTEND_DATE TEXT, \
+		CHROM TEXT, \
+		POS TEXT, \
+		ID TEXT, \
+		REF TEXT, \
+		ALT TEXT, \
+		DATE TEXT, \
+		Type TEXT, \
+		gene TEXT, \
+		exon TEXT, \
+		oncomineGeneClass TEXT, \
+		oncomineVariantClass TEXT, \
+		PRIMARY KEY (CHROM, POS, ALT, DATE) \
+        )"))
+		result_CNV = conn.execute(text("CREATE TABLE IF NOT EXISTS CNV ( \
+		CHROM_POS_ALTEND_DATE TEXT, \
+		CHROM TEXT, \
+		POS TEXT, \
+		ID TEXT, \
+		REF TEXT, \
+		END TEXT, \
+		DATE TEXT, \
+		Type TEXT, \
+		gene TEXT, \
+		exon TEXT, \
+		oncomineGeneClass TEXT, \
+		oncomineVariantClass TEXT, \
+		PRIMARY KEY (CHROM, POS, END, DATE) \
+        )"))
 		result_interpretation = conn.execute(text("CREATE TABLE IF NOT EXISTS interpretation ( \
+		CHROM_POS_ALTEND_DATE TEXT, \
 		runid TEXT, \
 		sampleid TEXT, \
-		GENLISTE TEXT, \
-		chrom_pos_ref_alt_date TEXT, \
-		SVARES_UT TEXT, \
-		POPULASJONSDATA TEXT, \
-		FUNKSJONSSTUDIER TEXT, \
-		PREDIKTIVE_DATA TEXT, \
-		CANCER_HOTSPOTS TEXT, \
-		COMPUTATIONAL_EVIDENCE TEXT, \
-		KONSERVERING TEXT, \
-		ANDRE_DB TEXT, \
-		KOMMENTAR TEXT, \
-		ONCOGENICITY INTEGER, \
-		TIER TEXT, \
-		KOMMENTAR2 TEXT, \
+		Genliste TEXT, \
+		Perc_Tumor TEXT, \
+		Gen TEXT, \
+		Transkript TEXT, \
+		Annotering_variant TEXT, \
+		Reads TEXT, \
+		Copy_Number TEXT, \
+		Allelfraksjon TEXT, \
+		COSMIC TEXT, \
+		Svares_ut TEXT, \
+		Populasjonsdata TEXT, \
+		Funksjonsstudier TEXT, \
+		Prediktive_data TEXT, \
+		Cancer_hotspots TEXT, \
+		Computational_evidens TEXT, \
+		Konservering TEXT, \
+		ClinVar TEXT, \
+		Andre_DB TEXT, \
+		Kommentar TEXT, \
+		Oncogenicity TEXT, \
+		Tier TEXT, \
+		Kommentar2 TEXT, \
 		DATO TEXT, \
 		BRUKER TEXT, \
 		KONTROLL TEXT, \
@@ -178,17 +217,17 @@ def generate_db(db):
 		KOLONNE9 TEXT, \
 		KOLONNE10 TEXT, \
 		KOLONNE11 TEXT, \
-		PRIMARY KEY (RUNID, SAMPLEID, chrom_pos_ref_alt_date) \
+		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
 		)"))
-		stmt = "create view if not exists all_data as select * \
-			from vcf \
-			left join variant \
-			on vcf.chrom_pos_ref_alt_date = variant.chrom_pos_ref_alt_date \
-			left join interpret \
-			on vcf.chrom_pos_ref_alt_date = interpret.chrom_pos_ref_alt_date \
-			and vcf.runid = interpret.runid \
-			and vcf.sampleid = interpret.sampleid;"
-		result_all = conn.execute(text(stmt))
+#		stmt = "create view if not exists all_data as select * \
+#			from vcf \
+#			left join variant \
+#			on vcf.chrom_pos_ref_alt_date = variant.chrom_pos_ref_alt_date \
+#			left join interpret \
+#			on vcf.chrom_pos_ref_alt_date = interpret.chrom_pos_ref_alt_date \
+#			and vcf.runid = interpret.runid \
+#			and vcf.sampleid = interpret.sampleid;"
+#		result_all = conn.execute(text(stmt))
 
 def populate_vcf_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 	# add variants to table vcf and add variants if new to table variant
