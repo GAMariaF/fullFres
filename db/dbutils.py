@@ -10,105 +10,149 @@ def generate_db(db):
 
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
 	with engine.connect() as conn:
-		result_vcf = conn.execute(text("CREATE TABLE IF NOT EXISTS vcf ( \
+		result_sample = conn.execute(text("CREATE TABLE IF NOT EXISTS sample ( \
 		runid TEXT, \
 		sampleid TEXT, \
-		chrom_pos_ref_alt_date TEXT, \
+		CHROM_POS_ALTEND_DATE TEXT, \
+		User_Classification TEXT, \
+		Variant_ID TEXT, \
+		Variant_Name TEXT, \
+		Key_Variant TEXT, \
+		Oncomine_Reporter_Evidence TEXT, \
+		Type TEXT, \
+		Oncomine_Gene_Class TEXT, \
+		Oncomine_Variant_Class TEXT, \
+		Call TEXT, \
+		Call_Details TEXT, \
+		Phred_QUAL_Score TEXT, \
+		Zygosity TEXT, \
+		P_Value TEXT, \
+		PPA TEXT, \
+		Read_Counts_Per_Million TEXT, \
+		Oncomine_Driver_Gene TEXT, \
+		Gene_Isoform TEXT, \
+		NormalizedReadCount TEXT, \
+		Imbalance_Score TEXT, \
+		Copy_Number TEXT, \
+		P_Value_1 TEXT, \
+		CNV_Confidence TEXT, \
+		Valid_CNV_Amplicons TEXT, \
 		ID TEXT, \
 		QUAL TEXT, \
 		FILTER TEXT, \
 		GT TEXT, \
-		GQ INTEGER, \
-		AF FLOAT, \
-		AO INTEGER, \
-		DP INTEGER, \
-		FAO INTEGER, \
-		FDP INTEGER, \
-		FDVR INTEGER, \
+		GQ TEXT, \
+		CN TEXT, \
+		READ_COUNT TEXT, \
+		GENE_NAME TEXT, \
+		EXON_NUM TEXT, \
+		RPM TEXT, \
+		NORM_COUNT TEXT, \
+		NORM_COUNT_TO_HK TEXT, \
+		FUSION_DRIVER_GENE TEXT, \
+		ANNOTATION TEXT, \
+		PASS_REASON TEXT, \
+		Non-Targeted TEXT, \
 		FR TEXT, \
-		FRO INTEGER, \
-		FSAF INTEGER, \
-		FSAR INTEGER, \
-		FSRF INTEGER, \
-		FSRR INTEGER, \
-		FWDB FLOAT, \
-		FXX FLOAT, \
-		GCM INTEGER, \
-		HRUN INTEGER, \
-		HS_ONLY INTEGER, \
-		LEN INTEGER, \
-		MLLD FLOAT, \
+		PRECISE TEXT, \
+		END TEXT, \
+		NUMTILES TEXT, \
+		SD TEXT, \
+		CDF_MAPD TEXT, \
+		RAW_CN TEXT, \
+		REF_CN TEXT, \
+		PVAL TEXT, \
+		CI TEXT, \
+		AF TEXT, \
+		AO TEXT, \
+		DP TEXT, \
+		FAO TEXT, \
+		FDP TEXT, \
+		FDVR TEXT, \
+		FR TEXT, \
+		FRO TEXT, \
+		FSAF TEXT, \
+		FSAR TEXT, \
+		FSRF TEXT, \
+		FSRR TEXT, \
+		FWDB TEXT, \
+		FXX TEXT, \
+		GCM TEXT, \
+		HRUN TEXT, \
+		HS_ONLY TEXT, \
+		LEN TEXT, \
+		MLLD TEXT, \
 		OALT TEXT, \
 		OID TEXT, \
 		OMAPALT TEXT, \
-		OPOS INTEGER, \
+		OPOS TEXT, \
 		OREF TEXT, \
-		PB FLOAT, \
-		PBP INTEGER, \
-		PPD INTEGER, \
-		QD FLOAT, \
-		RBI FLOAT, \
-		REFB FLOAT, \
-		REVB FLOAT, \
-		RO INTEGER, \
-		SAF INTEGER, \
-		SAR INTEGER, \
-		SPD INTEGER, \
-		SRF INTEGER, \
-		SRR INTEGER, \
-		SSEN INTEGER, \
-		SSEP INTEGER, \
-		SSSB FLOAT, \
-		STB FLOAT, \
-		STBP FLOAT, \
-		TYPE TEXT, \
-		VARB FLOAT, \
+		PB TEXT, \
+		PBP TEXT, \
+		PPD TEXT, \
+		QD TEXT, \
+		RBI TEXT, \
+		REFB TEXT, \
+		REVB TEXT, \
+		RO TEXT, \
+		SAF TEXT, \
+		SAR TEXT, \
+		SPD TEXT, \
+		SRF TEXT, \
+		SRR TEXT, \
+		SSEN TEXT, \
+		SSEP TEXT, \
+		SSSB TEXT, \
+		STB TEXT, \
+		STBP TEXT, \
+		VARB TEXT, \
 		NID TEXT, \
 		MISA TEXT, \
+		CLSF TEXT, \
 		VCFALT TEXT, \
-		VCFPOS INTEGER, \
+		VCFPOS TEXT, \
 		VCFREF TEXT, \
-		MISC TEXT, \
 		HS TEXT, \
 		SUBSET TEXT, \
-		CLSF TEXT, \
-		PRIMARY KEY (runid, sampleid, chrom_pos_ref_alt_date) \
+		MISC TEXT, \
+		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
         )"))
 		result_variant = conn.execute(text("CREATE TABLE IF NOT EXISTS variant ( \
-		chrom_pos_ref_alt_date TEXT, \
+		CHROM_POS_ALTEND_DATE TEXT, \
 		CHROM TEXT, \
-		POS INTEGER, \
+		POS TEXT, \
 		ID TEXT, \
 		REF TEXT, \
 		ALT TEXT, \
 		DATE TEXT, \
-		origPos INTEGER, \
+		Type TEXT, \
+		gene TEXT, \
+		exon TEXT, \
+		oncomineGeneClass TEXT, \
+		oncomineVariantClass TEXT, \
+		origPos TEXT, \
 		origRef TEXT, \
 		normalizedRef TEXT, \
-		gene TEXT, \
-		normalizedPos INTEGER, \
+		normalizedPos TEXT, \
 		normalizedAlt TEXT, \
-		polyphen FLOAT, \
 		gt TEXT, \
 		codon TEXT, \
 		coding TEXT, \
-		sift FLOAT, \
-		grantham FLOAT, \
 		transcript TEXT, \
 		function TEXT, \
 		protein TEXT, \
 		location TEXT, \
 		origAlt TEXT, \
-		exon INTEGER, \
-		oncomineGeneClass TEXT, \
-		oncomineVariantClass TEXT, \
-		CLNACC1 INTEGER, \
+		CLNACC1 TEXT, \
 		CLNSIG1 TEXT, \
 		CLNREVSTAT1 TEXT, \
 		CLNID1 TEXT, \
-		PRIMARY KEY (CHROM, POS, REF, ALT, DATE) \
+		polyphen TEXT, \
+		sift TEXT, \
+		grantham TEXT, \
+		PRIMARY KEY (CHROM, POS, ALT, DATE) \
         )"))
-		result_interpret = conn.execute(text("CREATE TABLE IF NOT EXISTS interpret ( \
+		result_interpretation = conn.execute(text("CREATE TABLE IF NOT EXISTS interpretation ( \
 		runid TEXT, \
 		sampleid TEXT, \
 		GENLISTE TEXT, \
