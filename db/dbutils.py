@@ -271,11 +271,30 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 				# if variant not previously in database, add new variant
 				dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
 
-		del dfvcf_copy["CHROM"]
-		del dfvcf_copy["POS"]
-		del dfvcf_copy["REF"]
-		del dfvcf_copy["ALTEND"]
-		del dfvcf_copy["FUNC"]
+		dfvcf_copy = dfvcf_copy.drop(columns=['CHROM','POS', \
+						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE'], \
+						errors='ignore')
+		dfvcf_copy = dfvcf_copy.rename(columns={ \
+				'User Classification': 'User_Classification', \
+				'Variant ID': 'Variant_ID', \
+				'Variant Name': 'Variant_Name', \
+				'Key Variant': 'Key_Variant', \
+				'Oncomine Reporter Evidence': 'Oncomine_Reporter_Evidence', \
+				'Oncomine Gene Class': 'Oncomine_Gene_Class', \
+				'Oncomine Variant Class': 'Oncomine_Variant_Class', \
+				'Call Details': 'Call_Details', \
+				'Phred QUAL Score': 'Phred_QUAL_Score', \
+				'P-Value': 'P_Value', \
+				'P-Value.1': 'P_Value_1', \
+				'Read Counts Per Million': 'Read_Counts_Per_Million', \
+				'Oncomine Driver Gene': 'Oncomine_Driver_Gene', \
+				'Gene Isoform': 'Gene_Isoform', \
+				'Imbalance Score': 'Imbalance_Score', \
+				'Copy Number': 'Copy_Number', \
+				'CNV Confidence': 'CNV_Confidence', \
+				'Valid CNV Amplicons': 'Valid_CNV_Amplicons', \
+				'Non-Targeted': 'Non_Targeted' \
+				})
 		dfvcf_copy.to_sql('sample', con=conn, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
