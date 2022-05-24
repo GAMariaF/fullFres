@@ -11,8 +11,8 @@ from vcfutils import get_sample_id
 from vcfutils import get_run_id
 # from vcfutils import replace_semi
 from dbutils import generate_db
-from dbutils import populate_vcf_variantdb
-from dbutils import populate_interpretdb
+from dbutils import populate_thermo_variantdb
+#from dbutils import populate_interpretdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
 
@@ -30,11 +30,11 @@ df = parse_thermo_vcf(vcffile,excelfile)
 # df = filter_nocalls(df)
 df = explode_format_gt(df)
 df = explode_info(df)
-dfvariant = df[["CHROM","POS","ID","REF","ALT","Type","FUNC"]]
+dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
 dfvariant = explode_func(dfvariant)
 
 # INSERT DATA INTO TABLE VCF AND VARIANT
-populate_vcf_variantdb(db, df, dfvariant, run_id, sample_id)
+populate_thermo_variantdb(db, df, dfvariant, run_id, sample_id)
 
 # INSERT DATA INTO TABLE INTERPRET
 df_interpret = pd.read_excel("Tolkningsskjema.xlsx")

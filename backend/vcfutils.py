@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import re
 import json
 #from tkinter.ttk import Separator
@@ -28,6 +29,7 @@ def parse_thermo_vcf(vcf,excel):
         df2 = df2.drop(columns=['Locus_vcf'])
     df = pd.concat([df1,df2])
     df = df.reset_index(drop='True')
+    df = df.rename(columns={'ALT':'ALTEND'})
     # Removing columns TYPE and SVTYPE (already specifiec in column Type)
     df = df.drop(columns=['TYPE','SVTYPE', 'Gene', 'Locus', \
                         'AA Change', 'Ref','Alt','Raw Read Depth', \
@@ -78,6 +80,11 @@ def explode_info(df):
     ny2 = pd.DataFrame([dict(w.split('=', 1) for w in x) for x in df["INFO"].str.split(";")])
     dfOut = pd.concat([df, ny2], axis=1)
     del dfOut["INFO"]
+    if 'END' in dfOut.columns:
+            dfOut['ALTEND'] = dfOut['ALTEND'].replace('<CNV>',np.nan)
+            temp1 = dfOut.ALTEND
+            temp2 = dfOut.END
+            dfOut.ALTEND = temp1.combine_first(temp2)
     return dfOut
 
 def explode_func(df):

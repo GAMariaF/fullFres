@@ -7,7 +7,6 @@ from sqlalchemy import text
 
 #sqlite syntax...
 def generate_db(db):
-
 	engine = create_engine("sqlite:///"+db, echo=True, future=True)
 	with engine.connect() as conn:
 		result_sample = conn.execute(text("CREATE TABLE IF NOT EXISTS sample ( \
@@ -198,12 +197,16 @@ def generate_db(db):
 #			and vcf.sampleid = interpret.sampleid;"
 #		result_all = conn.execute(text(stmt))
 	
-def create_key(db, dfvcf, dfvariant, run_id, sample_id):
-	# add runid, sampleid and create key CHROM_POS_ALTEND_DATE 
-	# to dfvcf and dfvariant
+def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
+	# add variants to table sample and add variants if new to table variant
+	engine = create_engine("sqlite:///"+db, echo=True, future=True)
+	if dfvcf.empty:
+		print("Missing data to import to tables Variant and Vcf")
+		return
+
 	dfvcf_copy = dfvcf.copy(deep=True)
 	dfvariant_copy = dfvariant.copy(deep=True)
-	# add chrom_pos_ref_altend_date column
+	# add chrom_pos_ref_alt_date column
 	dfvcf_copy.insert(0, 'runid', run_id, True)
 	dfvcf_copy.insert(1, 'sampleid', sample_id, True)
 	dfvcf_copy.insert(2, 'CHROM_POS_ALTEND_DATE', "" )
@@ -213,16 +216,17 @@ def create_key(db, dfvcf, dfvariant, run_id, sample_id):
 	dfvariant_copy.insert(6, 'DATE', date)
 	dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
 	dfvariant_copy.CHROM_POS_ALTEND_DATE = \
-		dfvariant_copy[["CHROM", "POS", "ALT", "DATE"]].agg("".join, axis=1)
+		dfvariant_copy[["CHROM", "POS", "ALTEND", "DATE"]] \
+			.agg("".join, axis=1)
 
 	# Connecting to sqlite database
 	with engine.connect() as conn:
-		#BRUK kombinasjon chrom,pos,alt og sjekk om denne er med i variant-tabell 
+		#BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i variant-tabell 
 		for row in range(len(dfvcf_copy)):
 			stmt = "select * from variant \
 				where CHROM = '"+dfvariant_copy.CHROM[row]+"' \
 					AND POS = '"+dfvariant_copy.POS[row]+"' \
-					AND ALT = '"+dfvariant_copy.ALT[row]+"';"
+					AND ALTEND = '"+dfvariant_copy.ALTEND[row]+"';"
 			dfdb_variant = pd.read_sql_query(text(stmt), con = conn)
 
 			#hvis med: sjekk hvis den er lik den som skal legges in
@@ -245,15 +249,14 @@ def create_key(db, dfvcf, dfvariant, run_id, sample_id):
 				if variantindb:
 					# if in db: use key in variant table (chrom_pos_ref_alt_date) as key to vcf table
 					# do not add variant to table variant
-					# if sample, run and variant already in vcf database don't add
+					# if sample, run and variant already in sample database don't add
 					dfvariant_copy = dfvariant_copy.drop(row)
-					dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row] = \
-								dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]
+					dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row] = dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]
 					print (dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row])
-					stmtvcf = "select * from vcf \
+					stmtvcf = "select * from sample \
 						where runid = '"+dfvcf_copy.runid.loc[row]+"' \
 							AND sampleid = '"+dfvcf_copy.sampleid.loc[row]+"' \
-							AND chrom_pos_ref_alt_date = '"+dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row]+"';"
+							AND CHROM_POS_ALTEND_DATE = '"+dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row]+"';"
 					dfdb_vcf = pd.read_sql_query(text(stmtvcf), con = conn)
 					if not dfdb_vcf.empty:
 						print(dfvcf_copy.runid.loc[row], \
@@ -267,50 +270,27 @@ def create_key(db, dfvcf, dfvariant, run_id, sample_id):
 			else:
 				# if variant not previously in database, add new variant
 				dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
-	return dfvcf,dfvariant
-
-
-def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
-	# add data to table sample, variant, fusion and CNV
-	engine = create_engine("sqlite:///"+db, echo=True, future=True)
-	if dfvcf.empty:
-		print("Missing data to import to tables sample, variant, fusion and CNV")
-		return
-
-	# df variant
-	dftemp = dfvariant[dfvariant.Type!='Fusion']
-	dfindelsnp = dftemp[dftemp.Type!='CNV']
-	# df fusion	
-	dffusion = dfvariant[dfvariant.Type=='Fusion']
-	# df CNV
-	dfCNV = dfvariant[dfvariant.Type=='CNV']
-
-	if not dfindelsnp.empty:
-		create_key(db, dfvcf_copy, dfindelsnp, run_id, sample_id)
-		if not dfindelsnp.empty:
-			with engine.connect() as conn:
-				dfindelsnp["POS"]=dfindelsnp["POS"].astype(str)
-				dfindelsnp.to_sql('variant', con=conn, \
-							if_exists='append', index=False)
-				conn.commit()
 
 		del dfvcf_copy["CHROM"]
 		del dfvcf_copy["POS"]
 		del dfvcf_copy["REF"]
-		del dfvcf_copy["ALT"]
+		del dfvcf_copy["ALTEND"]
 		del dfvcf_copy["FUNC"]
 		dfvcf_copy.to_sql('sample', con=conn, if_exists='append', index=False)
+		if not dfvariant_copy.empty:
+			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
+			dfvariant_copy.to_sql('variant', con=conn, if_exists='append', index=False)
 		conn.commit()	
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i variant-tabell 
 #	hvis med 
 #		sjekk hvis den er lik den som skal legges in
 #			hvis lik
-#				bruk key (chrom_pos_ref_alt_date) som nokkel i vcf-tabell
+#				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
 #			hvis forskjellig
 #				lag chrom_pos_ref_alt_date
 #				legg inn ny post i variant-tabell med key (chrom_pos_ref_alt_date)
-#				bruk key (chrom_pos_ref_alt_date) som nokkel i vcf-tabell
+#				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
 
 #def populate_interpretdb(db, df_interpret, chrom_pos_ref_alt_date):
 #	# Only one entry
