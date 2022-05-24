@@ -13,7 +13,8 @@ def parse_thermo_vcf(vcf,excel):
     # With fusion
     df_excel_w = df_excel.loc[df_excel['Type'] == 'Fusion']
     if not df_excel_w.empty:
-        df_excel_w.loc[:,'ID'] = df_excel_w.loc[:,'Variant ID'] + "_1"
+        #df_excel_w.loc[:,'ID'] = df_excel_w.loc[:,'Variant ID'] + "_1"
+        df_excel_w = df_excel_w.assign(ID = df_excel_w.loc[:,'Variant ID'] + "_1")
         df1 = pd.merge(df_excel_w,df_vcf,on='ID',how='left')
         df1.loc[:,'ID']=df1.loc[:,'Variant ID']
     # Without fusion 
