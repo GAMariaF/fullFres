@@ -3,6 +3,7 @@
     <div class="h-100 bg-plum-plate-login bg-animation">
       <div class="d-flex h-100 justify-content-center align-items-center">
         <b-col md="8" class="mx-auto app-login-box">
+          
         <span v-show="state">You are already logged in. Go to <router-link to="/samples">samples ready for interpretation</router-link></span>
           <div v-show="!state" class="modal-dialog w-100 mx-auto">
             <div class="modal-content">

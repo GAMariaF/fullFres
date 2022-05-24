@@ -159,11 +159,9 @@ export default {
     },
     oncogenicitySelected(items) {
       console.log("selected row")
-      console.log(typeof items[0])
-      
+      console.log(typeof items[0])      
       console.log(typeof items.length)
 
-      
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
       var index = this.selectedoncogenicity_list.indexOf(items[0]);
@@ -173,7 +171,6 @@ export default {
       } else {
         // Legge til hvis ikke tilstede
         this.selectedoncogenicity_list.push(items[0]);
-        
       }
       // Legg til en tabell hvor default styrke er valgt
       // Tabellen vises kun hvis lengden av this.selectedACMG != 0
@@ -182,12 +179,15 @@ export default {
       if(items.length !== 0 | typeof items[0] !== 'undefined') {
         this.oncoScoring(this.selectedoncogenicity_list);
         }
-      
-
       },    
     rowSelected(items) {
-      this.selectedVariant = items[0].Variant;
-      console.log("tester linje 100")
+      if (items.length===1) {
+        this.selectedVariant = items[0].Variant;
+        console.log("tester linje 100")
+      } else if (items.length===0) {
+        this.selectedVariant = "";
+        console.log("unselected")
+      }
     },
     openInfoModal(item, index, button) {
         console.log("tester om openInfoModal funker")

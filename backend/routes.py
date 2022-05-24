@@ -58,8 +58,6 @@ def login_user():
 def api(current_user, query):
     if request.method == 'GET':
         if query == "samples":
-        
-            
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
@@ -70,6 +68,7 @@ def api(current_user, query):
 @app.route('/chklogin')
 @token_required
 def chklogin(current_user):
+    print(current_user)
     name = request.cookies.get('sid')
     if name == None:        
         response = make_response(jsonify(logstatus="false"))
@@ -79,41 +78,11 @@ def chklogin(current_user):
         response = make_response(jsonify(logstatus="true", username="buso"), 200)
     return response
 
-# @app.route('/setcookie')
-# def setcookie():
-#     resp = make_response(f"The Cookie has been Set")
-    
-#     resp.set_cookie('sid','buso', expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
-#     return resp
-#  ##jester.setCookie(name="sid", value=loginS, expires=daysForward(7), path="/")
- 
-# @app.route('/getcookie')
-# def getcookie():
-#     name = request.cookies.get('sid')
-#     print(name)
-#     print("--")
-#     response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
-#     return response
-
-# @app.route('/api/<query>', methods=['GET', 'POST'])
-# @cross_origin()
-# @token_required
-# def api(query):
-#     if request.method == 'GET':
-#         print(query)
-#         if query == "samples":
-#             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
-#             response.headers.add('Access-Control-Allow-Credentials', 'true')
-#             return response
-#         if query == 'variants':
-#             response = make_response( jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
-#             response.headers.add('Access-Control-Allow-Credentials', 'true')
-#             return response
-#         else:
-#             response = make_response( jsonify(isError=False, message="Success", statusCode=200, data=data), 200)
-#             response.headers.add('Access-Control-Allow-Credentials', 'true')
-#             return response
-#     # Skriv feilmelding hvis det ikke er GET
+@app.route('/signoff', methods=['POST'])
+def signoff():
+    print(request.get_json())
+    response = jsonify({'message': 'Thanks for the data!'})
+    return response
 
 
 if __name__ == '__main__':
