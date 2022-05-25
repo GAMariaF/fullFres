@@ -16,8 +16,8 @@ from dbutils import populate_thermo_variantdb
 from dbutils import count_variant
 from dbutils import list_runandsample_variant
 
-vcffile = './tests/vcfs/22skh03593_Oncomine_Extended_516_filtered.vcf'
-excelfile = './tests/vcfs/22skh03593_variants.xlsx'
+vcffile = './tests/vcfs/Oncomine_Extended_516_filtered.vcf'
+excelfile = './tests/vcfs/22skh02864_variants.xlsx'
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
