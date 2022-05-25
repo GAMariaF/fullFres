@@ -178,9 +178,9 @@ def generate_db(db):
 		Kommentar2 TEXT, \
 		DATO TEXT, \
 		BRUKER TEXT, \
+		DATO_SIGNOFF TEXT, \
 		KONTROLL TEXT, \
-		KOLONNE6 TEXT, \
-		KOLONNE7 TEXT, \
+		DATO_GODKJENNING TEXT, \
 		KOLONNE8 TEXT, \
 		KOLONNE9 TEXT, \
 		KOLONNE10 TEXT, \
@@ -305,6 +305,25 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 #				lag chrom_pos_ref_alt_date
 #				legg inn ny post i variant-tabell med key (chrom_pos_ref_alt_date)
 #				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
+
+def list_samples(db):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT sampleid \
+				FROM interpretation \
+				WHERE DATO_SIGNOFF IS NOT NULL \
+				UNION \
+				SELECT DISTINCT sampleid \
+				FROM sample \
+				WHERE sampleid \
+				NOT IN (select sampleid from interpretation);"
+	with engine.connect() as conn:
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	return samplelist
+
+#select sampleid from interpretation where DATO_SIGNOFF is not null;
+
+
+
 
 #sqlite syntax - rewrite ...
 def count_variant(db, chrom, pos, ref, alt, table):
