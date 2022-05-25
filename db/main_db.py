@@ -12,8 +12,8 @@ from vcfutils import get_run_id
 from dbutils import generate_db
 from dbutils import populate_thermo_variantdb
 from dbutils import list_samples
-from dbutils import count_variant
-from dbutils import list_runandsample_variant
+from dbutils import list_signoff_samples
+from dbutils import list_approved_samples
 
 vcffile = './tests/vcfs/22skh03593_Oncomine_Extended_516_filtered.vcf'
 excelfile = './tests/vcfs/22skh03593_variants.xlsx'
@@ -36,6 +36,9 @@ dfvariant = explode_func(dfvariant)
 populate_thermo_variantdb(db, df, dfvariant, run_id, sample_id)
 
 list_samples(db)
+list_signoff_samples(db)
+list_approved_samples(db)
+
 
 # INSERT DATA INTO TABLE INTERPRET
 df_interpret = pd.read_excel("Tolkningsskjema.xlsx")

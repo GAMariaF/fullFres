@@ -310,7 +310,7 @@ def list_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid \
 				FROM interpretation \
-				WHERE DATO_SIGNOFF IS NOT NULL \
+				WHERE DATO_SIGNOFF IS NULL \
 				UNION \
 				SELECT DISTINCT sampleid \
 				FROM sample \
@@ -320,10 +320,32 @@ def list_samples(db):
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	return samplelist
 
-#select sampleid from interpretation where DATO_SIGNOFF is not null;
+def list_signoff_samples(db):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT sampleid \
+				FROM interpretation \
+				WHERE DATO_SIGNOFF IS NOT NULL \
+				AND DATO_GODKJENNING IS NULL;"
+	with engine.connect() as conn:
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	return samplelist
 
+def list_approved_samples(db):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT sampleid \
+				FROM interpretation \
+				WHERE DATO_GODKJENNING IS NOT NULL;"
+	with engine.connect() as conn:
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	return samplelist
 
+def all_variants():
+	#include frequency
+	return
 
+def sample_variants():
+	#list all variants for specific sample
+	return
 
 #sqlite syntax - rewrite ...
 def count_variant(db, chrom, pos, ref, alt, table):
