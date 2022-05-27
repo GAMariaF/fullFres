@@ -14,6 +14,8 @@ from dbutils import populate_thermo_variantdb
 from dbutils import list_samples
 from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
+from dbutils import list_all_variants
+from dbutils import list_sample_variants
 
 vcffile = './tests/vcfs/22skh03593_Oncomine_Extended_516_filtered.vcf'
 excelfile = './tests/vcfs/22skh03593_variants.xlsx'
@@ -38,6 +40,8 @@ populate_thermo_variantdb(db, df, dfvariant, run_id, sample_id)
 list_samples(db)
 list_signoff_samples(db)
 list_approved_samples(db)
+list_all_variants(db)
+list_sample_variants(db,run_id,sample_id)
 
 
 # INSERT DATA INTO TABLE INTERPRET
@@ -45,13 +49,3 @@ df_interpret = pd.read_excel("Tolkningsskjema.xlsx")
 df_interpret = df_interpret.iloc[0:1]
 chrom_pos_ref_alt_date = 'chr1225398284CT220504131039'
 populate_interpretdb(db, df_interpret, chrom_pos_ref_alt_date)
-
-chrom = "chr12"
-pos = "25398284"
-ref = "C"
-alt = "T"
-db = 'variantdb.db'
-
-count_variant(db, chrom, pos, ref, alt, 'variant')
-
-list_runandsample_variant(db, chrom, pos, ref, alt, 'interpret')

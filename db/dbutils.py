@@ -307,6 +307,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 #				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
 
 def list_samples(db):
+	#list all samples ready for interpretation
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid \
 				FROM interpretation \
@@ -321,6 +322,7 @@ def list_samples(db):
 	return samplelist
 
 def list_signoff_samples(db):
+	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid \
 				FROM interpretation \
@@ -331,6 +333,7 @@ def list_signoff_samples(db):
 	return samplelist
 
 def list_approved_samples(db):
+	#list all approved samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid \
 				FROM interpretation \
@@ -339,41 +342,29 @@ def list_approved_samples(db):
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	return samplelist
 
-def all_variants():
-	#include frequency
-	return
-
-def sample_variants():
-	#list all variants for specific sample
-	return
-
-#sqlite syntax - rewrite ...
-def count_variant(db, chrom, pos, ref, alt, table):
-    engine = create_engine("sqlite:///"+db, echo=True, future=True)
-    stmt = "SELECT COUNT(*) \
-			FROM "+table+" \
-            WHERE \
-            	CHROM = '"+chrom+"' AND \
-            	POS = '"+pos+"' AND \
-				REF = '"+ref+"' AND \
-            	ALT = '"+alt+"' \
-            ;"
-    with engine.connect() as conn:
-        result = conn.execute(text(stmt))
-        for row in result:
-            return row[0]
-
-def list_runandsample_variant(db, chrom, pos, ref, alt, table):
-	engine = create_engine("sqlite:///"+db, echo=True, future=True)
-	pos = str(pos)
-	stmt = "select \
-				runid, sampleid \
-			from \
-				"+table+" \
-			where \
-				chrom_pos_ref_alt = '"+chrom+pos+ref+alt+"' \
-			;"
+def list_all_variants(db):
+	#list all variants including frequency
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT COUNT(*) \
+		, v.gene, v.Type, v.oncomineGeneClass, \
+		v.oncomineVariantClass, v.CHROM, v.POS, v.ALTEND \
+		FROM sample s, variant v \
+		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
+		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
-		result = conn.execute(text(stmt))
-		for row in result:
-			return row
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	return samplelist
+
+def list_sample_variants(db,runid,sampleid):
+	#list all variants for specific sample
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT s.sampleid, s.runid, v.gene, v.Type, \
+		v.oncomineGeneClass, v.oncomineVariantClass, \
+		v.CHROM, v.POS, v.ALTEND \
+		FROM sample s, variant v \
+		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
+		AND runid='"+runid+"' \
+		AND sampleid='"+sampleid+"';"
+	with engine.connect() as conn:
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	return samplelist
