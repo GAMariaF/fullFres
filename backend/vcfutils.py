@@ -95,23 +95,24 @@ def explode_func(df):
     dfOut = pd.DataFrame()
     for row in range(row_count):
         dftemp2 = pd.DataFrame()
-        temp0 = eval(df.FUNC[row])
-        lentemp0 = len(temp0)
-        if lentemp0>1:
-            dftemp1 = pd.DataFrame(temp0)
-            # Add '(1)', '(2)' etc to different transcripts/genes of same variant
-            for i in range(lentemp0):
-                dftemp1.iloc[i] = dftemp1.iloc[i].add("("+str(i+1)+")")
-            dftemp1 = dftemp1.fillna("")
-            for column in dftemp1:
-                for rowtemp1 in range(1,lentemp0):
-                    dftemp1[column].iloc[0] += " " +dftemp1[column].iloc[rowtemp1]
-            dftemp2 = pd.DataFrame(dftemp1.iloc[[0]])
-            dftemp2.rename(index={0:row},inplace=True)
-        else:
-            dftemp2 = pd.DataFrame(temp0)
-            dftemp2.rename(index={0:row},inplace=True)
-            dftemp2 = dftemp2.fillna("")
+        if not pd.isnull(df.FUNC[row]):
+            temp0 = eval(df.FUNC[row])
+            lentemp0 = len(temp0)
+            if lentemp0>1:
+                dftemp1 = pd.DataFrame(temp0)
+                # Add '(1)', '(2)' etc to different transcripts/genes of same variant
+                for i in range(lentemp0):
+                    dftemp1.iloc[i] = dftemp1.iloc[i].add("("+str(i+1)+")")
+                dftemp1 = dftemp1.fillna("")
+                for column in dftemp1:
+                    for rowtemp1 in range(1,lentemp0):
+                        dftemp1[column].iloc[0] += " " +dftemp1[column].iloc[rowtemp1]
+                dftemp2 = pd.DataFrame(dftemp1.iloc[[0]])
+                dftemp2.rename(index={0:row},inplace=True)
+            else:
+                dftemp2 = pd.DataFrame(temp0)
+                dftemp2.rename(index={0:row},inplace=True)
+                dftemp2 = dftemp2.fillna("")
         dfrow = df.iloc[[row]]
         dfOutrow = pd.concat([dfrow,dftemp2], axis = 1)
         dfOut = pd.concat([dfOut,dfOutrow])

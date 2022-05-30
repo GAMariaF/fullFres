@@ -197,7 +197,7 @@ def generate_db(db):
 #			and vcf.sampleid = interpret.sampleid;"
 #		result_all = conn.execute(text(stmt))
 	
-def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
+def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
 	# add variants to table sample and add variants if new to table variant
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
@@ -290,10 +290,20 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id):
 				'Valid CNV Amplicons': 'Valid_CNV_Amplicons', \
 				'Non-Targeted': 'Non_Targeted' \
 				})
+		# Data to table interpretation
+		dfinterpretation = pd.DataFrame()
+		dfinterpretation = dfinterpretation.assign(runid = dfvcf_copy['runid'],
+								sampleid = dfvcf_copy['sampleid'], 
+								CHROM_POS_ALTEND_DATE = dfvcf_copy['CHROM_POS_ALTEND_DATE'])
+		dfinterpretation = dfinterpretation.assign( \
+								Perc_Tumor = percent_tumor, \
+								Genliste = sample_diseasetype)
+		# Transfer data to database
 		dfvcf_copy.to_sql('sample', con=conn, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
 			dfvariant_copy.to_sql('variant', con=conn, if_exists='append', index=False)
+		dfinterpretation.to_sql('interpretation', con=conn, if_exists='append', index=False)
 		conn.commit()	
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i variant-tabell 
@@ -319,7 +329,8 @@ def list_samples(db):
 				NOT IN (select sampleid from interpretation);"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
-	return samplelist
+	samplelist_json = samplelist.to_json()
+	return samplelist_json
 
 def list_signoff_samples(db):
 	#list all signed off samples ready for approval
@@ -330,7 +341,8 @@ def list_signoff_samples(db):
 				AND DATO_GODKJENNING IS NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
-	return samplelist
+	samplelist_json = samplelist.to_json()
+	return samplelist_json
 
 def list_approved_samples(db):
 	#list all approved samples
@@ -340,7 +352,9 @@ def list_approved_samples(db):
 				WHERE DATO_GODKJENNING IS NOT NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
-	return samplelist
+	samplelist_json = samplelist.to_json()
+	return samplelist_json
+
 
 def list_all_variants(db):
 	#list all variants including frequency
@@ -353,7 +367,9 @@ def list_all_variants(db):
 		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
-	return samplelist
+	samplelist_json = samplelist.to_json()
+	return samplelist_json
+
 
 def list_sample_variants(db,runid,sampleid):
 	#list all variants for specific sample
@@ -367,4 +383,24 @@ def list_sample_variants(db,runid,sampleid):
 		AND sampleid='"+sampleid+"';"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
-	return samplelist
+	samplelist_json = samplelist.to_json()
+	return samplelist_json
+
+
+##### TOLKNINGSSKJEMA ###################
+select sample.runid, sample.sampleid, interpretation.Genliste,	interpretation.Perc_Tumor, variant.gene, variant.transcript, 
+	variant.transcript || ':' || variant.coding || ' ' || substr(variant.protein,1,2) || '(' || substr(variant.protein,3,50) || ')',
+	sample.FAO || ' / ' || sample.FDP, sample.Copy_Number, sample.AF, interpretation.COSMIC, interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, 
+	sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, sample.Type, sample.Oncomine_Gene_Class, sample.Oncomine_Variant_Class, variant.gene, 
+	variant.chrom || ':' || variant.pos,
+	variant.protein, variant.ref, variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, sample.Oncomine_Driver_Gene,
+	sample.Copy_Number, sample.CNV_Confidence, sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, interpretation.Funksjonsstudier, interpretation.Prediktive_data,
+	interpretation.Cancer_hotspots, interpretation.Computational_evidens, interpretation.Konservering, interpretation.ClinVar, sample.CLSF, interpretation.Andre_DB, interpretation.Kommentar,
+	interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar
+			from sample 
+			left join variant 
+			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date 
+			left join interpretation 
+			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date 
+			and sample.runid = interpretation.runid 
+			and sample.sampleid = interpretation.sampleid;
