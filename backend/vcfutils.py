@@ -135,6 +135,22 @@ def get_run_id(vcf):
     return run_string
 #GNXS-0297-18-GX_0016_22/Auto
 
+def get_percent_tumor(vcf):
+    sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{2}',line) 
+            for line in open(vcf)]
+    sample_string=[string for string in sample_list if len(string) > 0][0][0]
+    sample_string=sample_string[-2:]
+    return sample_string
+# ##manually_input_percent_tumor_cellularity=85
+
+def get_sample_diseasetype(vcf):
+    sample_list=[re.findall(r'##sampleDiseaseType=.*',line) 
+            for line in open(vcf)]
+    sample_string=[string for string in sample_list if len(string) > 0][0][0]
+    sample_string=sample_string[20:]
+    return sample_string
+# ##sampleDiseaseType=Prostate Cancer
+
 ''' For aa parse en vcf -> Pandas df gjoer foelgende:  '''
 
 # vcffile = '../tests/vcfs/test.vcf'
