@@ -9,7 +9,7 @@
       striped
       hover
       outlined
-      :items="items"
+      :items="variants"
       :fields="fields"
       :small="small"
     >
@@ -35,7 +35,6 @@
       size="lg"
       @hide="
         resetInfoModal();
-        updateVariants();
       "
     >
       <b-container fluid>
@@ -66,32 +65,37 @@
         </b-row>
         <b-row>
           <pre>Select which criterions apply to this variant:</pre>
-          <b-col cols="10">
-          
-              <h5>Available evidence types </h5>
-              <b-table selectable select-mode="single" @row-selected="oncogenicitySelected" striped hover outlined :items="oncogenicitycriteria" :small="small" :fields="oncogenicityfields">
-                <template #cell(evidence)="data">
-                  <span v-html="data.value"></span>
-                </template>
-              </b-table>
-
+          <b-col cols="12">
+          <h5>Available evidence types </h5>
+          <span v-for="item in oncogenicitycriteria" :key="item.tag">
+            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+            
+          </span>
+        
+            <br>
+            <div>
+            Oncoscore:
+            </div>
             {{ oncoScore }}
 
             <br>
-<div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-  <!-- content -->
-  {{item.tag}}
-</div>
+        <div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
+          <!-- content -->
+          {{item.tag}}
+        </div>
             
           </b-col>
         </b-row>
       </b-container>
     </b-modal>
-
+      <p>Når tolkning er ferdig, sign off her:</p>
+      <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
+        
     <!--  -->
   </div>
 </template>
 <script>
+
 
 import { config } from '../config.js'
 export default {
@@ -99,6 +103,7 @@ export default {
   props: [ "loading" ],
   data() {
     return {
+      
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -118,23 +123,15 @@ export default {
       },
       sampleID: this.$route.params.id,
       selectedVariant: "",
-      items: [
-        {
-          Kromosom: 4,
-          Start: "123321",
-          Stop: "123321",
-          Variant: "c.432423A>T",
-        },
-        { Kromosom: 21, Start: "4213", Stop: "4213", Variant: "c.4323A>T" },
-        {
-          Kromosom: 9,
-          Start: "32132",
-          Stop: "32132",
-          Variant: "c.41132423C>T",
-        },
-        { Kromosom: 8, Start: "3213", Stop: "3213", Variant: "c.43242A>G" },
-      ],
-      fields: ["Kromosom", "Start", "Stop", "Variant", "Info"],
+      fields: [
+        {key: "CHROM",
+        label: "Kromosom"},
+        {key: "POS"},
+        {key: "REF"},
+        {key: "ALT"},
+        {key: "FILTER"},
+        {key: "Info"}
+        ],
     };
   },
   methods: {
@@ -157,29 +154,31 @@ export default {
       }
     })
     },
+
     oncogenicitySelected(items) {
       console.log("selected row")
-      console.log(typeof items[0])      
-      console.log(typeof items.length)
+      console.log("--")
+      console.log(items)
+      console.log("--")
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
-      var index = this.selectedoncogenicity_list.indexOf(items[0]);
+      var index = this.selectedoncogenicity_list.indexOf(items);
       if (index !== -1) {
         // Fjern hvis tilstede
         this.selectedoncogenicity_list.splice(index, 1);  
       } else {
         // Legge til hvis ikke tilstede
-        this.selectedoncogenicity_list.push(items[0]);
+        this.selectedoncogenicity_list.push(items);
       }
       // Legg til en tabell hvor default styrke er valgt
       // Tabellen vises kun hvis lengden av this.selectedACMG != 0
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
-      if(items.length !== 0 | typeof items[0] !== 'undefined') {
+      if(items.length !== 0 | typeof items !== 'undefined') {
         this.oncoScoring(this.selectedoncogenicity_list);
-        }
-      },    
+      } 
+    },
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
@@ -204,6 +203,22 @@ export default {
       this.infoModal.title = "";
       this.infoModal.content = "";
     },
+    signOff() {
+      console.log("Sign off method")
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+    },
   },
+  created: function() {
+    this.$store.dispatch("initVariantStore");
+    return this.$store.getters.variants;
+  },
+  computed: {
+    variants() {
+          return this.$store.getters.variants;
+    }
+  }
+
 };
 </script>
+
+

@@ -5,13 +5,8 @@ var util_funcs = {
         // Funksjon som sender query til backend
         const baseURI = url + '/api/' + query
         return axios.get(baseURI)
-        .then(function (response) {return response.data});
-        
-        
+        .then(function (response) {return response.data});      
     }
-	
-
-
 };
 
 export default util_funcs;
