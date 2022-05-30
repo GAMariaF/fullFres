@@ -60,6 +60,11 @@ def api(current_user, query):
         if query == "samples":
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
+        elif query == "variants":
+            print("jada, her er vi")
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
+            return response
+
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
