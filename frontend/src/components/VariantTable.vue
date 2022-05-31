@@ -35,6 +35,7 @@
       size="lg"
       @hide="
         resetInfoModal();
+        
       "
     >
       <b-container fluid>
@@ -46,12 +47,14 @@
                 id="textarea"
                 size="sm"
                 placeholder="Comment here: "
+                v-model="variants[selectedRowIndex].comment"
               ></b-form-textarea>
           </b-col>
           <b-col cols="2">
               <label>Class</label>
-              <b-form-select :options="options"
+              <b-form-select  :options="options"
                 class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].class"
               ></b-form-select>
             </b-col>
 
@@ -69,9 +72,7 @@
           <h5>Available evidence types </h5>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
             <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
-            
           </span>
-        
             <br>
             <div>
             Oncoscore:
@@ -86,11 +87,40 @@
             
           </b-col>
         </b-row>
+
+        <b-row>
+          <b-col>
+          <pre>  
+          <b-button v-b-toggle.variant_info_full_collapse variant="primary">Show full variant info</b-button>
+            <b-collapse id="variant_info_full_collapse" class="mt-2">
+          <div class="table-responsive">
+            <table class="table-hover">
+              <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(value, name) in variants[selectedRowIndex]" :key="name">
+                    <td>{{ name }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+              </tbody>
+            </table>   
+          </div>
+</b-collapse>
+
+          </pre>
+
+          </b-col>
+        </b-row>
+
       </b-container>
     </b-modal>
       <p>Når tolkning er ferdig, sign off her:</p>
       <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
-        
+
     <!--  -->
   </div>
 </template>
@@ -103,7 +133,6 @@ export default {
   props: [ "loading" ],
   data() {
     return {
-      
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -189,19 +218,15 @@ export default {
       }
     },
     openInfoModal(item, index, button) {
-        console.log("tester om openInfoModal funker")
+        console.log("openInfoModal")
       this.selectedRowIndex = index;
       this.infoModal.title = `Row index: ${index}`;
-      this.infoModal.content = JSON.stringify({
-        "name":"Amy",
-        "age":37
-      });
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
     },
-
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
+      console.log("infomodal lukket")
     },
     signOff() {
       console.log("Sign off method")
@@ -209,7 +234,7 @@ export default {
     },
   },
   created: function() {
-    this.$store.dispatch("initVariantStore");
+    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty'});
     return this.$store.getters.variants;
   },
   computed: {
