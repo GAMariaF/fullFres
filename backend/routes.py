@@ -121,12 +121,7 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-<<<<<<< HEAD
-            samples = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "samples") # byttes ut til noe fra dbutils
-            #samples = list_approved_samples(db)
-=======
             samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
->>>>>>> 935653d63f318bd25c8612213ac7144a54e6d14e
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
