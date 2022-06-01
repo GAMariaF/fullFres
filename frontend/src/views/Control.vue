@@ -43,7 +43,7 @@ export default {
       sampleID: "",
       selectedSample: "",
       items: [],
-      fields: ["Sample"],
+      fields: ["sampleid"],
     };
   },
   created: function () {
@@ -54,7 +54,7 @@ export default {
   methods: {
     rowSelected(items) {
       if (items.length === 1) {
-        this.selectedSample = items[0].Sample;
+        this.selectedSample = items[0].sampleid;
         this.signOff();
       } else if (items.length === 0) {
         this.selectedSample = "";
@@ -68,7 +68,7 @@ export default {
       axios
         .get(baseURI)
         .then((response) => response.data)
-        .then((data) => (this.items = JSON.parse(data.data)));
+        .then((data) => (this.items = data.data));
     },
     signOff() {
       console.log("Send data med post til flask");

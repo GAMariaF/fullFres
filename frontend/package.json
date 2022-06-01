@@ -13,6 +13,7 @@
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
     "js-base64": "^3.7.2",
+    "umd": "^3.0.3",
     "vue": "^2.6.11",
     "vue-axios": "^3.4.1",
     "vue-jwt-decode": "^0.1.0",

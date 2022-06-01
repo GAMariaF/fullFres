@@ -1,3 +1,4 @@
+from random import sample
 from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
@@ -15,6 +16,10 @@ from sqlalchemy import text
 import pandas as pd
 import json
 
+
+
+
+
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
 #SELECT DISTINCT(sampleid) FROM sample
@@ -27,14 +32,11 @@ def run_q(db, query):
         stmt = "SELECT DISTINCT(sampleid) FROM sample"
         with engine.connect() as conn:
             samplelist = pd.read_sql_query(text(stmt), con= conn)
-            s = samplelist.sampleid.tolist()
-            # Lage json f
-            j=""
-            for i in s:
-                j = j + ',{{"Sample":"{}"}}'.format(i)
-                #j = j[1:]
-            j = "[" + j + "]"
-            return j.replace("[,","[") 
+            
+            
+            
+            return samplelist.to_dict('records')
+            
     elif query == "allvariants":
         stmt = """SELECT * FROM variant
         LEFT JOIN (SELECT DISTINCT sample.CHROM_POS_ALTEND_DATE, group_concat(sample.GT,"|") AS gt, group_concat(sample.User_Classification,"|") AS User_Classification_combnd FROM sample GROUP BY CHROM_POS_ALTEND_DATE) as s
@@ -55,6 +57,7 @@ def run_q(db, query):
         variants['visibility'] = "true"
         variants['class'] = ""
         variants['comment'] = ""
+        
         return variants.to_dict('records')
     
 def insert_interp(db):
@@ -109,7 +112,8 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-            samples = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "samples")
+            samples = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "samples") # byttes ut til noe fra dbutils
+            #samples = list_approved_samples(db)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):

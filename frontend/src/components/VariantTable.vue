@@ -52,9 +52,11 @@
           </b-col>
           <b-col cols="2">
               <label>Class</label>
-              <b-form-select  :options="options"
+              <b-form-select
+                :options="options"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
+                @change="updateVariants"
               ></b-form-select>
             </b-col>
 
@@ -122,6 +124,8 @@
       <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
 
     <!--  -->
+    <br>
+    Klasse: {{variants[0].class}}
   </div>
 </template>
 <script>
@@ -164,6 +168,9 @@ export default {
     };
   },
   methods: {
+    updateVariants(){
+      this.$store.commit("SET_STORE", this.variants)
+    },
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
     selectedoncogenicity_list.forEach(item => {
@@ -238,8 +245,9 @@ export default {
     return this.$store.getters.variants;
   },
   computed: {
-    variants() {
-          return this.$store.getters.variants;
+    variants: {
+      get() {return this.$store.getters.variants;},
+      set(value) {this.$store.commit("SET_STORE", value)}
     }
   }
 

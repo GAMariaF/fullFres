@@ -35,13 +35,13 @@ export default {
       sampleID: "",
       selectedSample: "",
       items: [],
-      fields: ["Sample"],
+      fields: ["sampleid"],
     };
   },
   methods: {
     rowSelected(items) {
       if (items.length === 1) {
-        this.selectedSample = items[0].Sample;
+        this.selectedSample = items[0].sampleid;
       } else if (items.length === 0) {
         this.selectedSample = "";
       }
@@ -54,7 +54,7 @@ export default {
       axios
         .get(baseURI)
         .then((response) => response.data)
-        .then((data) => (this.items = JSON.parse(data.data)));
+        .then((data) => (this.items = data.data));
     },
   },
   created: function () {
