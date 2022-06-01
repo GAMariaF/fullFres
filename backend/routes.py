@@ -8,6 +8,15 @@ from functools import wraps
 from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
+import sys
+sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
+sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
+### settings.json gir path til dbutils og vcfutils
+from dbutils import list_samples
+from dbutils import list_signoff_samples
+from dbutils import list_approved_samples
+from dbutils import list_all_variants
+from dbutils import list_sample_variants
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -112,8 +121,12 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
+<<<<<<< HEAD
             samples = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "samples") # byttes ut til noe fra dbutils
             #samples = list_approved_samples(db)
+=======
+            samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+>>>>>>> 935653d63f318bd25c8612213ac7144a54e6d14e
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
