@@ -226,7 +226,7 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
-        console.log("tester linje 100")
+        
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -246,12 +246,32 @@ export default {
     signOff() {
       console.log("Sign off method")
       // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/updatevariants";
+
+      this.$http.post(
+            baseURI,
+            {
+              sampleid: this.$route.params.id,
+              variants: this.variants
+            },
+            {
+              withCredentials: true,
+              // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              headers: { "Content-Type": "application/json" },
+              
+
+            }
+          ).then((response) => response.data)
+          .then((data) => {
+            console.log(data);
+          });
+
     },
     sendVariantsToPost() {
     },
   },
   created: function() {
-    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": "false"});
+    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
     return this.$store.getters.variants;
   },
   computed: {

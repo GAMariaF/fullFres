@@ -138,10 +138,16 @@ def api(current_user, query):
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
+    elif request.method == 'POST':
+        if query == "updatevariants":
+            print("---")
+            print(request.json)           
+            print("Variants posted for update in database")
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
+            return response
 
 
 @app.route('/chklogin')
-
 @token_required
 def chklogin(current_user):
     print(current_user)
@@ -151,8 +157,15 @@ def chklogin(current_user):
     else:
         # Sjekk om bruker i database og ikke utløpt
         # returner enten "logstatus": true, "username": c.username}
-        response = make_response(jsonify(logstatus="true", username="buso"), 200)
+        response = make_response(jsonify(logstatus="true", username=current_user), 200)
     return response
+
+
+
+
+
+
+
 
 @app.route('/signoff', methods=['POST'])
 def signoff():

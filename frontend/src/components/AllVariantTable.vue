@@ -161,11 +161,13 @@ export default {
       selectedVariant: "",
       fields: [
         {key: "CHROM",
-        label: "Kromosom"},
-        {key: "POS"},
-        {key: "REF"},
-        {key: "ALT"},
-        {key: "FILTER"},
+        label: "Kromosom",
+        sortable: true },
+        {key: "POS",sortable: true},
+        {key: "ALTEND",sortable: true},
+        {key: "COUNT(*)",sortable: true},
+        {key: "Type"},
+        {key: "gene"},
         {key: "Info"}
         ],
     };
@@ -226,7 +228,7 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
-        console.log("tester linje 100")
+        
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -253,7 +255,7 @@ export default {
     },
   },
   created: function() {
-    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": "true"});
+    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": true});
     return this.$store.getters.variants;
   },
   computed: {
