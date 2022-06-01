@@ -6,7 +6,7 @@
         <b-table
           selectable
           select-mode="single"
-          @row-selected="rowSelected"
+          @row-selected="sampleRowSelected"
           striped
           hover
           outlined
@@ -20,7 +20,30 @@
         <div v-if="selectedSample !== ''">
           Her skal variantene komme som en tabell
           <br />
-          fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------fdjskfløjsaklfdøsjafklødjklfsdjkølfjklsaføjsdaklfjsdfjsdjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-------------------------------------------
+              <b-table
+      selectable
+      select-mode="single"
+      @row-selected="rowSelected"
+      striped
+      hover
+      outlined
+      :filter="filter"
+      :filter-included-fields="filterOn"
+      :items="variants"
+      :fields="variantFields"
+      :small="small"
+    >
+
+     <template #cell(Info)="row">
+          <b-button
+            size="sm"
+            @click="openInfoModal(row.item, row.index, $event.target)"
+            class="mr-1"
+          >
+            Info
+          </b-button>
+        </template>
+    </b-table>
           <br />
           {{ selectedSample }}
         </div>
@@ -44,6 +67,18 @@ export default {
       selectedSample: "",
       items: [],
       fields: ["sampleid"],
+      variantFields: [
+        {key: "CHROM",
+        label: "Kromosom"},
+        {key: "POS"},
+        {key: "REF"},
+        {key: "ALT"},
+        {key: "FILTER"},
+        {key: "Info"}
+        ],
+        filter: "true",
+        filterOn: ["visibility"],
+
     };
   },
   created: function () {
@@ -53,9 +88,21 @@ export default {
   },
   methods: {
     rowSelected(items) {
+      if (items.length===1) {
+        this.selectedVariant = items[0].Variant;
+        console.log("tester linje 100")
+      } else if (items.length===0) {
+        this.selectedVariant = "";
+        console.log("unselected")
+      }
+    },
+    sampleRowSelected(items) {
       if (items.length === 1) {
         this.selectedSample = items[0].sampleid;
-        this.signOff();
+        // Get variants for that sample:
+        this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty'});
+        this.variants =  this.$store.getters.variants;
+        // this.signOff();
       } else if (items.length === 0) {
         this.selectedSample = "";
       }
@@ -69,26 +116,7 @@ export default {
         .get(baseURI)
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
-    },
-    signOff() {
-      console.log("Send data med post til flask");
-      const baseURI = config.$backend_url + "/signoff";
-      const date = new Date().toJSON().slice(0, 10).replace(/-/g, "/");
-      this.$http
-        .post(
-          baseURI,
-          {
-            sampleid: this.selectedSample,
-            user: this.$store.getters.username,
-            date: date
-          },
-          { headers: { "Content-Type": "application/json" } }
-        )
-        .then((respoonse) => respoonse.data)
-        .then((data) => {
-          console.log(data);
-        });
-    },
+    }
   },
   watch: {
     state(newState, oldState) {

@@ -48,6 +48,8 @@
                 size="sm"
                 placeholder="Comment here: "
                 v-model="variants[selectedRowIndex].comment"
+                @change="updateVariants;setChanged()"
+                
               ></b-form-textarea>
           </b-col>
           <b-col cols="2">
@@ -56,7 +58,8 @@
                 :options="options"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
-                @change="updateVariants"
+                @change="updateVariants;setChanged()"
+                
               ></b-form-select>
             </b-col>
 
@@ -170,6 +173,7 @@ export default {
   methods: {
     updateVariants(){
       this.$store.commit("SET_STORE", this.variants)
+      console.log("updateVariants")
     },
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
@@ -190,7 +194,11 @@ export default {
       }
     })
     },
-
+    setChanged() {
+      this.variants[this.selectedRowIndex].visibility = true;
+      this.updateVariants();
+      console.log("setChanged")
+      },
     oncogenicitySelected(items) {
       console.log("selected row")
       console.log("--")
@@ -225,7 +233,7 @@ export default {
       }
     },
     openInfoModal(item, index, button) {
-        console.log("openInfoModal")
+      console.log("openInfoModal")
       this.selectedRowIndex = index;
       this.infoModal.title = `Row index: ${index}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
@@ -238,6 +246,10 @@ export default {
     signOff() {
       console.log("Sign off method")
       // Metode for  sende inn dato, og tolkede varianter til backend.
+    },
+    sendVariantsToPost() {
+
+
     },
   },
   created: function() {

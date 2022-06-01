@@ -63,7 +63,7 @@ def run_q(db, query):
             variants = pd.read_sql_query(text(stmt), con= conn)
         # legg til noen ekstra kolonner:
         variants['changed'] = "false"
-        variants['visibility'] = "true"
+        variants['visibility'] = "false"
         variants['class'] = ""
         variants['comment'] = ""
         
@@ -131,7 +131,8 @@ def api(current_user, query):
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
-            allvariants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "allvariants")
+            allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+            #allvariants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "allvariants")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         else:

@@ -31,10 +31,17 @@ flask-cors
 # Installere utenom requirements.txt:
 python -m pip install <pakkenavn>
 ```
-
+### Starte for test:
 #### Kjør flask app (backend API):
-```python
-python run_backend_server.py
+```sh
+# Starte flask 
+# Fra /illumina/analysis/dev/2022/fullFres
+python run_backend_server.py # Sier i fra om du må aktivere virtualenv
+# Starte javascript
+cd frontend; sh start_frontend.sh 
+
+# Passord 
+#bruker: passord: buso123
 ```
 
 
