@@ -1,6 +1,6 @@
 <template>
   <div  id="app" class="container-fluid">
-    <h1>Variants for sample: {{ sampleID }}</h1>
+    <h1>All variants</h1>
     <p>Click a row to start interpreting that Variant:</p>
     <b-table
       selectable
@@ -123,12 +123,12 @@
 
       </b-container>
     </b-modal>
-      <p>Når tolkning er ferdig, sign off her:</p>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
+    
+    
 
     <!--  -->
-    <br>
-    Klasse: {{variants[0].class}}
+    
+    
   </div>
 </template>
 <script>
@@ -136,7 +136,7 @@
 
 import { config } from '../config.js'
 export default {
-  name: "varianttable",
+  name: "allvarianttable",
   props: [ "loading" ],
   data() {
     return {
@@ -248,10 +248,12 @@ export default {
       // Metode for  sende inn dato, og tolkede varianter til backend.
     },
     sendVariantsToPost() {
+        console.log()
+
     },
   },
   created: function() {
-    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": "false"});
+    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": "true"});
     return this.$store.getters.variants;
   },
   computed: {

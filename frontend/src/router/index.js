@@ -19,7 +19,7 @@ const routes = [
 		props: true
 	},
 	{
-		path: '/variants',
+		path: '/allvariants',
 		name: 'AllVariants',
 		component: AllVariants,
 		props: true
