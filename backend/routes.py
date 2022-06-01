@@ -8,14 +8,64 @@ from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
 
-'''
-En route man kan sende alle varianter fra med POST request
-'''
+# Imports som er brukt for aa teste db
+import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy import text
+import pandas as pd
+import json
 
-data = "['foo', {'bar': ('baz', None, 1.0, 2)}]"
-samples = '[{"Sample": "4_21"}, {"Sample": "21_21"}, {"Sample": "9_21"}, {"Sample": "8_21"}]'
+# Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
+# Hent ut unike samples:
+#SELECT DISTINCT(sampleid) FROM sample
+
+
+def run_q(db, query):
+    #list all variants including frequency
+    engine = create_engine("sqlite:///"+db, echo=False, future=True)
+    if query == "samples":
+        stmt = "SELECT DISTINCT(sampleid) FROM sample"
+        with engine.connect() as conn:
+            samplelist = pd.read_sql_query(text(stmt), con= conn)
+            s = samplelist.sampleid.tolist()
+            # Lage json f
+            j=""
+            for i in s:
+                j = j + ',{{"Sample":"{}"}}'.format(i)
+                #j = j[1:]
+            j = "[" + j + "]"
+            return j.replace("[,","[") 
+    elif query == "allvariants":
+        stmt = """SELECT * FROM variant
+        LEFT JOIN (SELECT DISTINCT sample.CHROM_POS_ALTEND_DATE, group_concat(sample.GT,"|") AS gt, group_concat(sample.User_Classification,"|") AS User_Classification_combnd FROM sample GROUP BY CHROM_POS_ALTEND_DATE) as s
+        ON variant.CHROM_POS_ALTEND_DATE=s.CHROM_POS_ALTEND_DATE
+        """
+        with engine.connect() as conn:
+            variants = pd.read_sql_query(text(stmt), con= conn)
+        return variants.to_dict('records')
+    elif query.startswith("variants_"):
+        """ query som i forste omgang bare returnerer varianter fra tabeller sample og variant for en enkelt prove"""
+        stmt = """SELECT * FROM sample
+                LEFT JOIN variant ON variant.CHROM_POS_ALTEND_DATE=sample.CHROM_POS_ALTEND_DATE 
+                WHERE sample.sampleid = "{id}" """.format(id = query.split("_")[1])
+        with engine.connect() as conn:
+            variants = pd.read_sql_query(text(stmt), con= conn)
+        # legg til noen ekstra kolonner:
+        variants['changed'] = "false"
+        variants['visibility'] = "true"
+        variants['class'] = ""
+        variants['comment'] = ""
+        return variants.to_dict('records')
+    
+def insert_interp(db):
+    pass
+
+
+
+insert_interp("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+
+
 variants = '[{"CHROM": "chr1",	"POS": "11187893",	"ID": ".",	"REF": "T",	"ALT": "C",	"QUAL": "10540.1",	"FILTER": "PASS",	"AF": "0.995253",	"AO": "623",	"DP": "632",	"FAO": "629",	"FDP": "632"},{"CHROM": "chr1",	"POS": "27089638",	"ID": ".",	"REF": "A",	"ALT": "G",	"QUAL": "69.4455",	"FILTER": "PASS",	"AF": "0.0668449",	"AO": "25",	"DP": "374", "FAO": "25", "FDP": "374"},{"CHROM": "chr1",	"POS": "27100205",	"ID": ".",	"REF": "A",	"ALT": "AGCA",	"QUAL": "1451.4", 	"FILTER": "PASS",	"AF": "0.437299",	"AO": "146",	"DP": "453",	"FAO": "136",	"FDP": "311"}]'
-
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -56,21 +106,29 @@ def login_user():
 @app.route('/api/<query>', methods=['GET', 'POST'])
 @token_required
 def api(current_user, query):
+    print(query)
     if request.method == 'GET':
         if query == "samples":
+            samples = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "samples")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
-        elif query == "variants":
-            print("jada, her er vi")
+        elif query.startswith("variants_"):
+            print("Sender varianter for sample id: " + query.split("_")[1])
+            variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
-
+        elif query == "allvariants":
+            print("Sender alle varianter")
+            allvariants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "allvariants")
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
+            return response
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
 
 
 @app.route('/chklogin')
+
 @token_required
 def chklogin(current_user):
     print(current_user)
