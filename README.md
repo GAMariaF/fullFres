@@ -26,7 +26,7 @@ deactivate
 # Installer biblioteker
 python3 -m pip install -r requirements.txt
 
-flask-cors
+
 
 # Installere utenom requirements.txt:
 python -m pip install <pakkenavn>
@@ -49,12 +49,12 @@ cd frontend; sh start_frontend.sh
 
 
 #### TODO:
-- [ ] Bestemme tabell-bibliotek
-- [ ] Lage db schema
-- [ ] Lage funksjon for å generere DB
+- [x] Bestemme tabell-bibliotek
+- [x] Lage db schema
+- [x] Lage funksjon for å generere DB
 - [ ] Lage test-mappe og script
 - [ ] Lage dockerfiles
-- [ ] Lage docker-compose oppsett
+
 
 
 #### Info om diverse installeringer etc

@@ -11,6 +11,8 @@ from flask_cors import cross_origin
 import sys
 sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
 sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
+#sys.path.insert(0, '/fullFres/backend')
+#sys.path.insert(0, '/fullFres/db')
 ### settings.json gir path til dbutils og vcfutils
 from dbutils import list_samples
 from dbutils import list_signoff_samples
@@ -121,18 +123,20 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-            samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+            #samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+            samples = list_samples("/fullFres/db/variantdb.db")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
+            #variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
+            variants = run_q("/fullFres/db/variantdb.db", query)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
-            allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
-            #allvariants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", "allvariants")
+            #allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+            allvariants = list_all_variants('/fullFres/db/variantdb.db')
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         else:

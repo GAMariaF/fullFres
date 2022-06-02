@@ -93,6 +93,8 @@
 
 <script>
 import axios from 'axios';
+import { config } from '../config.js'
+
 
 export default {
   name: "Login",
@@ -100,13 +102,13 @@ export default {
     username: "buso",
     password: "buso123",
     tempdata: "",
-    login_URL: "http://172.16.0.3:5000/login"    
+    login_URL: config.$backend_url + "/login"    
   }),
   methods: {
     doLogin: function () {
       // Sjekker brukernavn og passord mot database og sender tilbake en JWT
       if (this.username != "" && this.password != "") {
-        const baseURI = "http://172.16.0.3:5000/login";
+        const baseURI = config.$backend_url + "/login";
         const article = {
             username: this.username,
             password: this.password
@@ -130,45 +132,7 @@ export default {
         alert("Please fill the text!");
       }
     },
-    // checkLoggedIn: function () {
-    //   const baseURI = "http://172.16.0.3:5000/login";
-    //   this.$http
-    //     .post(baseURI, {
-    //       username: this.username,
-    //       password: this.password,
-    //     })
-    //     .then((response) => response.data)
-    //     .then((data) => {
-    //       console.log(data);
-    //     });
-    // },
-    // chkGet: function () {
-    //   const baseURI = "http://172.16.0.3:5000/api";
-    //   //const TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJiMGYzNTZkMi1kZWE1LTRhMTYtYTdiMi1hNTI3Y2Q4ZDlkMTYiLCJleHAiOjE2NTE3MzM0MjcsImlhdCI6MTY1MTU3MTQyN30.Jt0pwT7oqEpumw75npb9180n5Ij5iu29U_fUbOCy_dc";
-    //   const TOKEN = this.token
-    //   this.$http
-    //     .get(baseURI, { headers: { Authorization: TOKEN } })
-    //     .then((response) => response.data)
-    //     .then((data) => {
-    //       console.log(data);
-    //     });
-    // },
-    // cookie_explore: function() {
-    //     const baseURI = "http://172.16.0.3:5000/setcookie";
-    //     axios.get(baseURI)
-    //     .then((response) => response.data)
-    //     .then((data) => {
-    //       console.log(data);
-    //     });
-    // },
-    // cookie_explore_2: function() {
-    //     const baseURI = "http://172.16.0.3:5000/getcookie";
-    //     axios.get(baseURI)
-    //     .then((response) => response.data)
-    //     .then((data) => {
-    //       console.log(data);
-    //     });
-    // },
+   
   },
   created: function() {
       this.$store.dispatch("initStore");

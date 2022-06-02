@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { config } from '../config.js'
 const state = {
     loggedInStatus: false,
     username: '',
@@ -14,7 +14,7 @@ const getters = {
 
 const actions = {
     initStore: ({ commit }) => {
-        const baseURI = "http://172.16.0.3:5000/chklogin";
+        const baseURI = config.$backend_url + "/chklogin";
         axios.get(baseURI)
         .then((response) => response.data)
         .then((data) => {
