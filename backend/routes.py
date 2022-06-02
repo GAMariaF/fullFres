@@ -123,20 +123,20 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-            #samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
-            samples = list_samples("/fullFres/db/variantdb.db")
+            samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+            #samples = list_samples("/fullFres/db/variantdb.db")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            #variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
-            variants = run_q("/fullFres/db/variantdb.db", query)
+            variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
+            #variants = run_q("/fullFres/db/variantdb.db", query)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
-            #allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
-            allvariants = list_all_variants('/fullFres/db/variantdb.db')
+            allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+            #allvariants = list_all_variants('/fullFres/db/variantdb.db')
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         else:
@@ -161,7 +161,7 @@ def chklogin(current_user):
     else:
         # Sjekk om bruker i database og ikke utløpt
         # returner enten "logstatus": true, "username": c.username}
-        response = make_response(jsonify(logstatus="true", username=current_user), 200)
+        response = make_response(jsonify(logstatus="true", username=current_user.name), 200)
     return response
 
 
