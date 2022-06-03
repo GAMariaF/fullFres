@@ -19,8 +19,6 @@ def generate_db(db):
 		Key_Variant TEXT, \
 		Oncomine_Reporter_Evidence TEXT, \
 		Type TEXT, \
-		Oncomine_Gene_Class TEXT, \
-		Oncomine_Variant_Class TEXT, \
 		Call TEXT, \
 		Call_Details TEXT, \
 		Phred_QUAL_Score TEXT, \
@@ -257,7 +255,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
 
 		dfvcf_copy = dfvcf_copy.drop(columns=['CHROM','POS', \
-						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE'], \
+						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE', \
+						'Oncomine Gene Class','Oncomine Variant Class'], \
 						errors='ignore')
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
@@ -265,8 +264,6 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				'Variant Name': 'Variant_Name', \
 				'Key Variant': 'Key_Variant', \
 				'Oncomine Reporter Evidence': 'Oncomine_Reporter_Evidence', \
-				'Oncomine Gene Class': 'Oncomine_Gene_Class', \
-				'Oncomine Variant Class': 'Oncomine_Variant_Class', \
 				'Call Details': 'Call_Details', \
 				'Phred QUAL Score': 'Phred_QUAL_Score', \
 				'P-Value': 'P_Value', \
