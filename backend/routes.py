@@ -28,8 +28,7 @@ import pandas as pd
 import json
 
 
-
-
+db_path = "/illumina/analysis/dev/2022/fullFres/db/variantdb.db"
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
@@ -43,9 +42,6 @@ def run_q(db, query):
         stmt = "SELECT DISTINCT(sampleid) FROM sample"
         with engine.connect() as conn:
             samplelist = pd.read_sql_query(text(stmt), con= conn)
-            
-            
-            
             return samplelist.to_dict('records')
             
     elif query == "allvariants":
@@ -63,12 +59,6 @@ def run_q(db, query):
                 WHERE sample.sampleid = "{id}" """.format(id = query.split("_")[1])
         with engine.connect() as conn:
             variants = pd.read_sql_query(text(stmt), con= conn)
-        # legg til noen ekstra kolonner:
-        variants['changed'] = "false"
-        variants['visibility'] = "false"
-        variants['class'] = ""
-        variants['comment'] = ""
-        
         return variants.to_dict('records')
     
 def insert_interp(db):
@@ -76,10 +66,10 @@ def insert_interp(db):
 
 
 
-insert_interp("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+insert_interp(db_path)
 
 
-variants = '[{"CHROM": "chr1",	"POS": "11187893",	"ID": ".",	"REF": "T",	"ALT": "C",	"QUAL": "10540.1",	"FILTER": "PASS",	"AF": "0.995253",	"AO": "623",	"DP": "632",	"FAO": "629",	"FDP": "632"},{"CHROM": "chr1",	"POS": "27089638",	"ID": ".",	"REF": "A",	"ALT": "G",	"QUAL": "69.4455",	"FILTER": "PASS",	"AF": "0.0668449",	"AO": "25",	"DP": "374", "FAO": "25", "FDP": "374"},{"CHROM": "chr1",	"POS": "27100205",	"ID": ".",	"REF": "A",	"ALT": "AGCA",	"QUAL": "1451.4", 	"FILTER": "PASS",	"AF": "0.437299",	"AO": "146",	"DP": "453",	"FAO": "136",	"FDP": "311"}]'
+
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -123,20 +113,17 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-            samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
-            #samples = list_samples("/fullFres/db/variantdb.db")
+            samples = list_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
-            #variants = run_q("/fullFres/db/variantdb.db", query)
+            variants = run_q(db_path, query)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
-            allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
-            #allvariants = list_all_variants('/fullFres/db/variantdb.db')
+            allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         else:
@@ -181,9 +168,3 @@ def signoff():
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-
-
-# response = flask.jsonify({'some': 'data'})
-#    response.headers.add('Access-Control-Allow-Origin', '*')
-#    return response
