@@ -17,7 +17,6 @@ def generate_db(db):
 		Variant_ID TEXT, \
 		Variant_Name TEXT, \
 		Key_Variant TEXT, \
-		Annotering_variant TEXT, \
 		Oncomine_Reporter_Evidence TEXT, \
 		Type TEXT, \
 		Oncomine_Gene_Class TEXT, \
@@ -138,6 +137,7 @@ def generate_db(db):
 		codon TEXT, \
 		coding TEXT, \
 		transcript TEXT, \
+		annotation_variant TEXT, \
 		function TEXT, \
 		protein TEXT, \
 		location TEXT, \
