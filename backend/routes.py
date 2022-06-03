@@ -9,8 +9,8 @@ from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
 import sys
-sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
-sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
+sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/backend')
+sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/db')
 #sys.path.insert(0, '/fullFres/backend')
 #sys.path.insert(0, '/fullFres/db')
 ### settings.json gir path til dbutils og vcfutils
@@ -67,9 +67,6 @@ def insert_interp(db):
 
 
 insert_interp(db_path)
-
-
-
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -132,7 +129,15 @@ def api(current_user, query):
     elif request.method == 'POST':
         if query == "updatevariants":
             print("---")
-            print(request.json)           
+            
+            
+            j = json.loads(json.dumps(request.json))
+            
+            print(j["sampleid"])
+            for i in j["variants"]:
+                print(i["runid"])
+                print(i["class"])
+            
             print("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response
@@ -150,12 +155,6 @@ def chklogin(current_user):
         # returner enten "logstatus": true, "username": c.username}
         response = make_response(jsonify(logstatus="true", username=current_user.name), 200)
     return response
-
-
-
-
-
-
 
 
 @app.route('/signoff', methods=['POST'])

@@ -22,7 +22,8 @@ from dbutils import list_interpretation
 
 vcffile = './tests/vcfs/22skh06417_Oncomine_Extended_516_filtered.vcf'
 excelfile = './tests/vcfs/22skh06417_variants.xlsx'
-db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
+#db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
+db = '/illumina/analysis/dev/2022/fullFres/db/variantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
 percent_tumor = get_percent_tumor(vcffile)
