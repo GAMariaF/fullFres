@@ -373,21 +373,36 @@ def list_sample_variants(db,runid,sampleid):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-
-##### TOLKNINGSSKJEMA ###################
-#select sample.runid, sample.sampleid, interpretation.Genliste,	interpretation.Perc_Tumor, variant.gene, variant.transcript, 
-#	variant.transcript || ':' || variant.coding || ' ' || substr(variant.protein,1,2) || '(' || substr(variant.protein,3,50) || ')',
-#	sample.FAO || ' / ' || sample.FDP, sample.Copy_Number, sample.AF, interpretation.COSMIC, interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, 
-#	sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, sample.Type, sample.Oncomine_Gene_Class, sample.Oncomine_Variant_Class, variant.gene, 
-#	variant.chrom || ':' || variant.pos,
-#	variant.protein, variant.ref, variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, sample.Oncomine_Driver_Gene,
-#	sample.Copy_Number, sample.CNV_Confidence, sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, interpretation.Funksjonsstudier, interpretation.Prediktive_data,
-#	interpretation.Cancer_hotspots, interpretation.Computational_evidens, interpretation.Konservering, interpretation.ClinVar, sample.CLSF, interpretation.Andre_DB, interpretation.Kommentar,
-#	interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar
-#			from sample 
-#			left join variant 
-#			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date 
-#			left join interpretation 
-#			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date 
-#			and sample.runid = interpretation.runid 
-#			and sample.sampleid = interpretation.sampleid;
+def list_interpretation(db,runid,sampleid):
+	#list "tolkningsskjema"
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "select sample.runid, sample.sampleid, interpretation.Genliste,	\
+		interpretation.Perc_Tumor, variant.gene, variant.transcript, \
+		variant.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
+		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
+		interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, \
+		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
+		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, variant.gene, \
+		variant.chrom || ':' || variant.pos as Locus, variant.protein, variant.ref, \
+		variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
+		variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
+		sample.Oncomine_Driver_Gene, sample.Copy_Number, sample.CNV_Confidence, \
+		sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, \
+		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
+		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
+		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, \
+		interpretation.Andre_DB, interpretation.Kommentar, \
+		interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar \
+			from sample \
+			left join variant \
+			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
+			left join interpretation \
+			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
+			and sample.runid = interpretation.runid \
+			and sample.sampleid = interpretation.sampleid \
+			WHERE sample.runid='"+runid+"' \
+			AND sample.sampleid='"+sampleid+"';"
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json

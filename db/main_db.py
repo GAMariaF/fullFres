@@ -18,6 +18,7 @@ from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
 from dbutils import list_all_variants
 from dbutils import list_sample_variants
+from dbutils import list_interpretation
 
 vcffile = './tests/vcfs/22skh06417_Oncomine_Extended_516_filtered.vcf'
 excelfile = './tests/vcfs/22skh06417_variants.xlsx'
@@ -47,10 +48,4 @@ list_signoff_samples(db)
 list_approved_samples(db)
 list_all_variants(db)
 list_sample_variants(db,run_id,sample_id)
-
-
-# INSERT DATA INTO TABLE INTERPRET
-df_interpret = pd.read_excel("Tolkningsskjema.xlsx")
-df_interpret = df_interpret.iloc[0:1]
-chrom_pos_ref_alt_date = 'chr1225398284CT220504131039'
-populate_interpretdb(db, df_interpret, chrom_pos_ref_alt_date)
+list_interpretation(db,run_id,sample_id)
