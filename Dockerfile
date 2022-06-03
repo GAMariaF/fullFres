@@ -5,6 +5,8 @@ LABEL maintainer="Maria.Fahlstrom@sthf.no & oyvindbusk@gmail.com"
 LABEL description="Image based on Ubuntu for running the cancer interpretation utility"
 
 ENV DEBIAN_FRONTEND=noninteractive 
+ENV AM_I_IN_A_DOCKER_CONTAINER Yes
+
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN apt-get update && apt-get install -y software-properties-common gcc git curl make zlib1g-dev build-essential libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 
@@ -41,9 +43,10 @@ RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g
 RUN cd /fullFres && pip3 uninstall -y setuptools 
 RUN cd /fullFres && pip3 install setuptools 
 RUN cd /fullFres && python3 -m pip install -r requirements.txt
-# Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
+# Run like: docker run -v /illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db:/db/variantdb.db -p 8080:8080 -it --rm fullfres /bin/bash
 
 
 
-
+# Ta database som parameter til docker container
+# Legger denne her - det er her den skal naas fra python /db/variantdb.db
 #pm2 start "npm run serve" --name frontend

@@ -76,7 +76,7 @@ def insert_interp(db):
 
 
 
-insert_interp("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+#insert_interp("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
 
 
 variants = '[{"CHROM": "chr1",	"POS": "11187893",	"ID": ".",	"REF": "T",	"ALT": "C",	"QUAL": "10540.1",	"FILTER": "PASS",	"AF": "0.995253",	"AO": "623",	"DP": "632",	"FAO": "629",	"FDP": "632"},{"CHROM": "chr1",	"POS": "27089638",	"ID": ".",	"REF": "A",	"ALT": "G",	"QUAL": "69.4455",	"FILTER": "PASS",	"AF": "0.0668449",	"AO": "25",	"DP": "374", "FAO": "25", "FDP": "374"},{"CHROM": "chr1",	"POS": "27100205",	"ID": ".",	"REF": "A",	"ALT": "AGCA",	"QUAL": "1451.4", 	"FILTER": "PASS",	"AF": "0.437299",	"AO": "146",	"DP": "453",	"FAO": "136",	"FDP": "311"}]'
@@ -123,20 +123,20 @@ def api(current_user, query):
     print(query)
     if request.method == 'GET':
         if query == "samples":
-            samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
-            #samples = list_samples("/fullFres/db/variantdb.db")
+            #samples = list_samples("/illumina/analysis/dev/2022/fullFres/db/variantdb.db")
+            samples = list_samples("/db/variantdb.db")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
-            #variants = run_q("/fullFres/db/variantdb.db", query)
+            #variants = run_q("/illumina/analysis/dev/2022/fullFres/db/variantdb.db", query)
+            variants = run_q("/db/variantdb.db", query)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
-            allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
-            #allvariants = list_all_variants('/fullFres/db/variantdb.db')
+            #allvariants = list_all_variants('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+            allvariants = list_all_variants('/db/variantdb.db')
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         else:
