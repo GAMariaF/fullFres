@@ -5,15 +5,33 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 * Sqlite-db via Sqlalchemy
 * Python3 
 * Flask for backend-server
-* React som frontend
+* Vue som frontend
 * Bootstrap som css
-* Tabell-bibliotek?
-* authentication?
+* bootstrap-vue standard tabell som tabellbibliotek
+* enkel auth med cookies og krypterte brukernavn/passord
 
 ### Info
 * Genexus VCF inneholder noen linjer med semikolon i protein feks sånn: p.[Gln61His;Glu62Lys]. Det skaper krøll i parsing. Ha noe konvertering i script som kopierer vcf fra server?
 
+### Kjøre via docker:
+```
+# Bygg docker image (hvis det ikke eksisterer) . Viktig å stå i fullFres-mappen hvor Dockerfile er tilgjengelig
+docker build -t fullfres .
 
+# Start image (den tar databasen som input-parameter)
+docker run \
+-v /illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db:/db/variantdb.db \
+-p 5000:5000 \
+-p 8080:8080 \
+-it \
+--rm \
+fullfres
+
+# OBS ! ta bort --rm hvis du vil at containeren skal eksistere etter at du har gått ut!
+# For å stoppe -> ctrl-c
+```
+
+### Kjøre lokalt (enklest for dev):
 #### Aktivere virtualenv:
 > virtualenv is used to manage Python packages for different projects. Using virtualenv allows you to avoid installing Python packages globally which could break system tools or other projects. You can install virtualenv using pip.
 
@@ -44,18 +62,12 @@ cd frontend; sh start_frontend.sh
 #bruker: passord: buso123
 ```
 
-
-
-
-
 #### TODO:
 - [x] Bestemme tabell-bibliotek
 - [x] Lage db schema
 - [x] Lage funksjon for å generere DB
 - [ ] Lage test-mappe og script
-- [ ] Lage dockerfiles
-
-
+- [x] Lage dockerfiles
 
 #### Info om diverse installeringer etc
 ```sh
@@ -70,15 +82,10 @@ vue create frontend # preset = vue2
 # Pakker som er installert etterpå:
 npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
 
-
 # Starts the development server.
 npm run serve
 # Jeg måtte nedgradere nodeversion for å få det til
 ```
-
-#### Pakker som sikkert dockerimage må ha for at dette skal funke:
-* libffi_devel
-
 
 #### Installerte python slik:
 ```python
