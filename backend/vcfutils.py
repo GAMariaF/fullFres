@@ -100,8 +100,17 @@ def explode_func(df):
             lentemp0 = len(temp0)
             if lentemp0>1:
                 dftemp1 = pd.DataFrame(temp0)
+                dftemp1['annotation_variant'] = ''
                 # Add '(1)', '(2)' etc to different transcripts/genes of same variant
                 for i in range(lentemp0):
+                    try:
+                        dftemp1['annotation_variant'].iloc[i] = \
+                            str(dftemp1['transcript'].iloc[i]) + ':' + \
+                            str(dftemp1['coding'].iloc[i]) + ' ' + \
+                            str(dftemp1['protein'].iloc[i][:2]) + '(' + \
+                            str(dftemp1['protein'].iloc[i][2:]) + ')'
+                    except:
+                        pass
                     dftemp1.iloc[i] = dftemp1.iloc[i].add("("+str(i+1)+")")
                 dftemp1 = dftemp1.fillna("")
                 for column in dftemp1:
@@ -111,6 +120,15 @@ def explode_func(df):
                 dftemp2.rename(index={0:row},inplace=True)
             else:
                 dftemp2 = pd.DataFrame(temp0)
+                dftemp2['annotation_variant'] = ''
+                try:
+                    dftemp2['annotation_variant'].iloc[0] = \
+                        str(dftemp2['transcript'].iloc[0]) + ':' + \
+                        str(dftemp2['coding'].iloc[0]) + ' ' + \
+                        str(dftemp2['protein'].iloc[0][:2]) + '(' + \
+                        str(dftemp2['protein'].iloc[0][2:]) + ')'
+                except:
+                    pass
                 dftemp2.rename(index={0:row},inplace=True)
                 dftemp2 = dftemp2.fillna("")
         dfrow = df.iloc[[row]]
