@@ -16,7 +16,7 @@ def in_docker():
     else:
         return False
 
-if not in_virtualenv() or not in_docker():
+if not in_virtualenv() and not in_docker():
     print("\n\n--Har du husket aa aktivere virtualenv--\n\n--source env/bin/activate--\n")
     exit()
 
@@ -24,7 +24,7 @@ from backend import app
 
 if __name__ == '__main__':
     print( "in_virtualenv()")
-    app.run(port=5000, threaded=True, debug=True)
+    app.run('0.0.0.0',port=5000, threaded=True, debug=True)
     #app.run('172.16.0.3', port=5000, threaded=True, debug=True)
     
 
