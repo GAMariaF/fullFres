@@ -17,6 +17,7 @@ def generate_db(db):
 		Variant_ID TEXT, \
 		Variant_Name TEXT, \
 		Key_Variant TEXT, \
+		Annotering_variant TEXT, \
 		Oncomine_Reporter_Evidence TEXT, \
 		Type TEXT, \
 		Oncomine_Gene_Class TEXT, \
@@ -148,6 +149,10 @@ def generate_db(db):
 		polyphen TEXT, \
 		sift TEXT, \
 		grantham TEXT, \
+		changed TEXT, \
+		visibility TEXT, \
+		class TEXT, \
+		comment TEXT, \
 		PRIMARY KEY (CHROM, POS, ALTEND, DATE) \
         )"))
 		result_interpretation = conn.execute(text("CREATE TABLE IF NOT EXISTS interpretation ( \
@@ -156,12 +161,6 @@ def generate_db(db):
 		sampleid TEXT, \
 		Genliste TEXT, \
 		Perc_Tumor TEXT, \
-		Gen TEXT, \
-		Transkript TEXT, \
-		Annotering_variant TEXT, \
-		Reads TEXT, \
-		Copy_Number TEXT, \
-		Allelfraksjon TEXT, \
 		COSMIC TEXT, \
 		Svares_ut TEXT, \
 		Populasjonsdata TEXT, \
@@ -187,15 +186,6 @@ def generate_db(db):
 		KOLONNE11 TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
 		)"))
-#		stmt = "create view if not exists all_data as select * \
-#			from vcf \
-#			left join variant \
-#			on vcf.chrom_pos_ref_alt_date = variant.chrom_pos_ref_alt_date \
-#			left join interpret \
-#			on vcf.chrom_pos_ref_alt_date = interpret.chrom_pos_ref_alt_date \
-#			and vcf.runid = interpret.runid \
-#			and vcf.sampleid = interpret.sampleid;"
-#		result_all = conn.execute(text(stmt))
 	
 def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
 	# add variants to table sample and add variants if new to table variant

@@ -2,8 +2,6 @@ import pandas as pd
 import sys
 sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
 sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
-#sys.path.insert(0, '/fullFres/fullFres/backend')
-#sys.path.insert(0, '/fullFres/fullFres/db')
 from vcfutils import parse_thermo_vcf
 from vcfutils import filter_nocalls
 from vcfutils import explode_format_gt
@@ -24,7 +22,6 @@ from dbutils import list_sample_variants
 vcffile = './tests/vcfs/22skh06417_Oncomine_Extended_516_filtered.vcf'
 excelfile = './tests/vcfs/22skh06417_variants.xlsx'
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db'
-#db = '/fullFres/fullFres/db/variantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
 percent_tumor = get_percent_tumor(vcffile)
