@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 import Profile from '../views/Profile.vue';
 import Samples from '../views/Samples.vue';
+import AllSamples from '../views/AllSamples.vue';
 import Variants from '../views/Variants.vue';
 import AllVariants from '../views/AllVariants.vue';
 import Control from '../views/Control.vue';
@@ -28,6 +29,11 @@ const routes = [
 		path: '/samples',
 		name: 'Samples',
 		component: Samples
+	},
+	{
+		path: '/allsamples',
+		name: 'AllSamples',
+		component: AllSamples
 	},
 	{
 		path: '/control',

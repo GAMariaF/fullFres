@@ -2,6 +2,7 @@
   <div>
     {{ loggedInStatus }}
     <h1>Select the sample to interpret</h1>
+    <br>
     <div class="container" id="login">
       <div class="row row justify-content-center">
         <div class="col-md-10">
@@ -15,7 +16,12 @@
             :items="items"
             :fields="fields"
             :small="small"
-          ></b-table>
+          >
+          <!-- Formatting Type column -->
+          <template #cell(runid)="data">
+            <b class="text-info">{{ data.value.toUpperCase() }}</b>
+          </template>
+          </b-table>
         </div>
       </div>
     </div>
@@ -35,7 +41,8 @@ export default {
       sampleID: "",
       selectedSample: "",
       items: [],
-      fields: ["sampleid"],
+      fields: [{key: "runid", label: "Run id"}, 
+              {key: "sampleid", label: "Sample id"}],
     };
   },
   methods: {

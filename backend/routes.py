@@ -15,10 +15,13 @@ sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
 #sys.path.insert(0, '/fullFres/db')
 ### settings.json gir path til dbutils og vcfutils
 from dbutils import list_samples
+from dbutils import list_all_samples
 from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
 from dbutils import list_all_variants
 from dbutils import list_sample_variants
+from dbutils import list_interpretation
+
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -118,13 +121,18 @@ def api(current_user, query):
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = list_sample_variants(db_path, query.split("_")[1])
+            variants = list_interpretation(db_path, query.split("_")[1])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
             print("Sender alle varianter")
             allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
+            return response
+        elif query == "allsamples":
+            print("Sender alle prøver")
+            allsamples = list_all_samples(db_path)
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)

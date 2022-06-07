@@ -2,6 +2,9 @@
   <div  id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <p>Click a row to start interpreting that Variant:</p>
+    <br>
+    <p>Gene List:{{geneList}} </p>
+    <p>% Tumor: </p>
     <b-table
       selectable
       select-mode="single"
@@ -9,6 +12,7 @@
       striped
       hover
       outlined
+      fixed
       :items="variants"
       :fields="fields"
       :small="small"
@@ -80,19 +84,23 @@
           </b-col>
         </b-row>
         <b-row>
-          <pre>Select which criterions apply to this variant:</pre>
+          <pre>Please select which criterions apply to this variant:</pre>
           <b-col cols="12">
           <h5>Available evidence types </h5>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
             <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
           </span>
             <br>
+            <br>
             <div>
-            Oncoscore:
+            <h5>Oncoscore: {{ oncoScore }}</h5>
             </div>
-            {{ oncoScore }}
+            <h5></h5>
 
             <br>
+            <div>
+            <h5>Chosen evidence types</h5>
+            </div>
         <div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
           <!-- content -->
           {{item.tag}}
@@ -132,9 +140,10 @@
       </b-container>
     </b-modal>
       <p>When interpretation is done, please sign off here:</p>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-info btn-lg"> SIGN OFF </b-button>
+      <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button>
 
     <!--  -->
+    <br>
     <br>
     Class: {{variants[0].class}}
   </div>
@@ -170,14 +179,14 @@ export default {
       fields: [
         'Nr',
         {key: "Type", label: "Type"},
-        {key: "gene", label: "Gene"},
-        {key: "CHROM", label: "Chromosome"},
-        {key: "POS", label: "Position"},
+        {key: "gene"},
+        {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "FILTER", label: "Filter"},
+        {key: "class"},        
         {key: "Info"}
         ],
     };

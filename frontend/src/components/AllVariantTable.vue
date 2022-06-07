@@ -9,10 +9,18 @@
       striped
       hover
       outlined
+      fixed
+      label-sort-asc=""
+      label-sort-desc=""
+      label-sort-clear=""
       :items="variants"
       :fields="fields"
       :small="small"
     >
+    <!-- Formatting Type column -->
+    <template #cell(Type)="data">
+      <b class="text-info">{{ data.value.toUpperCase() }}</b>
+    </template>
 
      <template #cell(Info)="row">
           <b-button
@@ -96,7 +104,7 @@
         <b-row>
           <b-col>
           <pre>  
-          <b-button v-b-toggle.variant_info_full_collapse variant="primary">Show full variant info</b-button>
+          <b-button v-b-toggle.variant_info_full_collapse variant="info">Show full variant info</b-button>
             <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
             <table class="table-hover">
@@ -160,14 +168,16 @@ export default {
       sampleID: this.$route.params.id,
       selectedVariant: "",
       fields: [
-        {key: "CHROM",
-        label: "Kromosom",
-        sortable: true },
-        {key: "POS",sortable: true},
-        {key: "ALTEND",sortable: true},
-        {key: "COUNT(*)",sortable: true},
-        {key: "Type"},
-        {key: "gene"},
+        {key: "Type", label: "Type", sortable: true},
+        {key: "gene", sortable: true},
+        {key: "CHROM", label: "Chrom", sortable: true},
+        {key: "POS", label: "Pos", sortable: true},
+        {key: "REF", label: "Ref", sortable: true},        
+        {key: "ALTEND", label: "Alt / End", sortable: true},
+        {key: "Frequency", sortable: true, sortDirection: 'desc'},
+        {key: "oncomineGeneClass", sortable: true},
+        {key: "oncomineVariantClass", sortable: true},
+        {key: "class", sortable: true},
         {key: "Info"}
         ],
     };

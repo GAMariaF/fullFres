@@ -4,8 +4,9 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
      <b-navbar-nav>
         <b-nav-item to="/samples">Samples</b-nav-item>
+        <b-nav-item to="/control">Control</b-nav-item>        
         <b-nav-item to="/allvariants">All variants</b-nav-item>
-        <b-nav-item to="/control">Control</b-nav-item>
+        <b-nav-item to="/allsamples">All samples</b-nav-item>        
         <b-nav-item to="/login">Login</b-nav-item>
         
           <b-nav-item-dropdown right>

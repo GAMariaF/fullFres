@@ -306,14 +306,27 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 def list_samples(db):
 	#list all samples ready for interpretation
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT sampleid \
+	stmt = "SELECT DISTINCT sampleid, runid \
 				FROM interpretation \
-				WHERE DATO_SIGNOFF IS NULL \
-				UNION \
-				SELECT DISTINCT sampleid \
-				FROM sample \
-				WHERE sampleid \
-				NOT IN (select sampleid from interpretation);"
+				WHERE DATO_SIGNOFF IS NULL;"
+	with engine.connect() as conn:
+		samplelist = pd.read_sql_query(text(stmt), con = conn)
+	samplelist_json = samplelist.to_dict('records')
+	return samplelist_json
+
+def list_all_samples(db):
+	#list all samples ready for interpretation
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "SELECT DISTINCT sample.runid, sample.sampleid, \
+			interpretation.DATO_SIGNOFF, \
+			interpretation.DATO_GODKJENNING, \
+		from sample \
+			left join variant \
+			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
+			left join interpretation \
+			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
+			and sample.runid = interpretation.runid \
+			and sample.sampleid = interpretation.sampleid;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -322,7 +335,7 @@ def list_samples(db):
 def list_signoff_samples(db):
 	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT sampleid \
+	stmt = "SELECT sampleid, runid \
 				FROM interpretation \
 				WHERE DATO_SIGNOFF IS NOT NULL \
 				AND DATO_GODKJENNING IS NULL;"
@@ -334,7 +347,7 @@ def list_signoff_samples(db):
 def list_approved_samples(db):
 	#list all approved samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT sampleid \
+	stmt = "SELECT sampleid, runid \
 				FROM interpretation \
 				WHERE DATO_GODKJENNING IS NOT NULL;"
 	with engine.connect() as conn:
@@ -348,7 +361,7 @@ def list_all_variants(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT COUNT(*) as Frequency\
 		, v.gene, v.Type, v.oncomineGeneClass, \
-		v.oncomineVariantClass, v.CHROM, v.POS, v.ALTEND \
+		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, v.class \
 		FROM sample s, variant v \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		GROUP BY s.chrom_pos_altend_date;"
@@ -362,7 +375,7 @@ def list_sample_variants(db,sampleid):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT s.sampleid, s.runid, v.gene, v.Type, \
 		v.oncomineGeneClass, v.oncomineVariantClass, \
-		v.CHROM, v.POS, v.REF, v.ALTEND, s.FILTER \
+		v.CHROM, v.POS, v.REF, v.ALTEND, v.class, s.FILTER \
 		FROM sample s, variant v \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		AND sampleid='"+sampleid+"';"
@@ -371,7 +384,7 @@ def list_sample_variants(db,sampleid):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-def list_interpretation(db,runid,sampleid):
+def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select sample.runid, sample.sampleid, interpretation.Genliste,	\
@@ -380,7 +393,7 @@ def list_interpretation(db,runid,sampleid):
 		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
 		interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, \
 		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
-		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, variant.gene, \
+		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, sample.FILTER, variant.gene, \
 		variant.chrom || ':' || variant.pos as Locus, variant.protein, variant.ref, \
 		variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
 		variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
@@ -398,8 +411,7 @@ def list_interpretation(db,runid,sampleid):
 			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
 			and sample.runid = interpretation.runid \
 			and sample.sampleid = interpretation.sampleid \
-			WHERE sample.runid='"+runid+"' \
-			AND sample.sampleid='"+sampleid+"';"
+			WHERE sample.sampleid='"+sampleid+"';"
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')
