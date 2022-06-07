@@ -129,8 +129,6 @@ def api(current_user, query):
     elif request.method == 'POST':
         if query == "updatevariants":
             print("---")
-            
-            
             j = json.loads(json.dumps(request.json))
             
             print(j["sampleid"])
