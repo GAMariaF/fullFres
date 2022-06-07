@@ -1,5 +1,5 @@
 <template>
-  <div  id="app" class="container-fluid">
+  <div id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <p>Click a row to start interpreting that Variant:</p>
     <b-table
@@ -13,16 +13,18 @@
       :fields="fields"
       :small="small"
     >
-
-     <template #cell(Info)="row">
-          <b-button
-            size="sm"
-            @click="openInfoModal(row.item, row.index, $event.target)"
-            class="mr-1"
-          >
-            Info
-          </b-button>
-        </template>
+       <template #cell(Type)="data">
+        <b class="text-info">{{ data.value.toUpperCase() }}</b>
+     </template>
+      <template #cell(Info)="row">
+        <b-button
+          size="sm"
+          @click="openInfoModal(row.item, row.index, $event.target)"
+          class="mr-1"
+        >
+          Info
+        </b-button>
+      </template>
     </b-table>
     {{ selectedVariant }}
 
@@ -33,37 +35,36 @@
       :title="infoModal.title"
       ok-only
       size="lg"
-      @hide="
-        resetInfoModal();
-        
-      "
+      @hide="resetInfoModal()"
     >
       <b-container fluid>
         <pre>Set comment and class for variant:</pre>
         <b-row class="mb-1">
           <b-col cols="10">
             <label>Comment</label>
-             <b-form-textarea 
-                id="textarea"
-                size="sm"
-                placeholder="Comment here: "
-                v-model="variants[selectedRowIndex].comment"
-                @change="updateVariants;setChanged()"
-                
-              ></b-form-textarea>
+            <b-form-textarea
+              id="textarea"
+              size="sm"
+              placeholder="Comment here: "
+              v-model="variants[selectedRowIndex].comment"
+              @change="
+                updateVariants;
+                setChanged();
+              "
+            ></b-form-textarea>
           </b-col>
           <b-col cols="2">
-              <label>Class</label>
-              <b-form-select
-                :options="options"
-                class="py-sm-0 form-control"
-                v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()"
-                
-              ></b-form-select>
-            </b-col>
-
-
+            <label>Class</label>
+            <b-form-select
+              :options="options"
+              class="py-sm-0 form-control"
+              v-model="variants[selectedRowIndex].class"
+              @change="
+                updateVariants;
+                setChanged();
+              "
+            ></b-form-select>
+          </b-col>
         </b-row>
         <hr />
         <b-row>
@@ -74,28 +75,39 @@
         <b-row>
           <pre>Select which criterions apply to this variant:</pre>
           <b-col cols="12">
-          <h5>Available evidence types </h5>
-          <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
-          </span>
-            <br>
+            <h5>Available evidence types</h5>
+            <span v-for="item in oncogenicitycriteria" :key="item.tag">
+              <b-button
+                v-on:click="oncogenicitySelected(item)"
+                v-b-tooltip.hover
+                type="button"
+                :title="item.title"
+                :class="item.class"
+                >{{ item.tag }}</b-button
+              ><span>&nbsp;</span>
+            </span>
+            <br />
             <div>
-            Oncoscore:
+              Oncoscore:
+              <span v-if="selectedoncogenicity_list.length != 0">
+                <span
+                  v-for="item in selectedoncogenicity_list"
+                  v-bind:key="item.id"
+                >
+                  <!-- content -->
+                  {{ item.tag }}
+                </span></span
+              >
+              <h4 v-if="oncoScore != 0">{{ oncoScore }}</h4>
             </div>
-            {{ oncoScore }}
 
-            <br>
-        <div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}}
-        </div>
-            
+            <br />
           </b-col>
         </b-row>
 
         <b-row>
           <b-col>
-          <pre>  
+            <pre>  
           <b-button v-b-toggle.variant_info_full_collapse variant="primary">Show full variant info</b-button>
             <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
@@ -117,38 +129,37 @@
 </b-collapse>
 
           </pre>
-
           </b-col>
         </b-row>
-
       </b-container>
     </b-modal>
-      <p>Når tolkning er ferdig, sign off her:</p>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
+    <p>Når tolkning er ferdig, sign off her:</p>
+    <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm"
+      >Sign off</b-button
+    >
 
     <!--  -->
-    <br>
-    Klasse: {{variants[0].class}}
+    <br />
+    Klasse: {{ variants[0].class }}
   </div>
 </template>
 <script>
-
-
-import { config } from '../config.js'
+import { config } from "../config.js";
 export default {
   name: "varianttable",
-  props: [ "loading" ],
+  props: ["loading"],
   data() {
     return {
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
       oncogenicityfields: [
-          {
-            key: 'evidence',
-            label: 'Available evidence types',
-            sortable: true
-      }],
+        {
+          key: "evidence",
+          label: "Available evidence types",
+          sortable: true,
+        },
+      ],
       options: config.classOptions,
       small: true,
       selectedRowIndex: 0,
@@ -160,57 +171,61 @@ export default {
       sampleID: this.$route.params.id,
       selectedVariant: "",
       fields: [
-        {key: "CHROM",
-        label: "Kromosom"},
-        {key: "POS"},
-        {key: "REF"},
-        {key: "ALT"},
-        {key: "FILTER"},
-        {key: "Info"}
-        ],
+        {key: "Type", label: "Type"},
+        { key: "CHROM", label: "Kromosom" },
+        { key: "POS" },
+        { key: "REF" },
+        { key: "ALTEND", label: "Alt / End" },
+        { key: "oncomineGeneClass" },
+        { key: "oncomineVariantClass" },
+        { key: "class" ,label: "Klasse:"},
+        { key: "comment", label: "Kommentar" },
+        { key: "Info" }
+      ],
     };
   },
   methods: {
-    updateVariants(){
-      this.$store.commit("SET_STORE", this.variants)
-      console.log("updateVariants")
+    updateVariants() {
+      this.$store.commit("SET_STORE", this.variants);
+      console.log("updateVariants");
     },
     oncoScoring(selectedoncogenicity_list) {
-    this.oncoScore = 0;
-    selectedoncogenicity_list.forEach(item => {
-    switch(item.default) {
-      case 'Very Strong':
-        this.oncoScore += 8
-        break;
-      case 'Strong':
-        this.oncoScore += 4
-        break;
-      case 'Moderate':
-        this.oncoScore += 2
-        break;
-      case 'Suporting':
-        this.oncoScore += 1
-        break;
-      }
-    })
+      this.oncoScore = 0;
+      selectedoncogenicity_list.forEach((item) => {
+        switch (item.default) {
+          case "Very Strong":
+            this.oncoScore += 8;
+            break;
+          case "Strong":
+            this.oncoScore += 4;
+            break;
+          case "Moderate":
+            this.oncoScore += 2;
+            break;
+          case "Suporting":
+            this.oncoScore += 1;
+            break;
+        }
+      });
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
+      this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
-      console.log("setChanged")
-      },
+      console.log("setChanged");
+    },
     oncogenicitySelected(items) {
-      console.log("selected row")
-      console.log("--")
-      console.log(items)
-      console.log("--")
+      console.log("selected row");
+      console.log("--");
+      console.log(items);
+      console.log("--");
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
       var index = this.selectedoncogenicity_list.indexOf(items);
       if (index !== -1) {
         // Fjern hvis tilstede
-        this.selectedoncogenicity_list.splice(index, 1);  
+        this.selectedoncogenicity_list.splice(index, 1);
       } else {
         // Legge til hvis ikke tilstede
         this.selectedoncogenicity_list.push(items);
@@ -219,68 +234,72 @@ export default {
       // Tabellen vises kun hvis lengden av this.selectedACMG != 0
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
-      if(items.length !== 0 | typeof items !== 'undefined') {
+      if ((items.length !== 0) | (typeof items !== "undefined")) {
         this.oncoScoring(this.selectedoncogenicity_list);
-      } 
+      }
     },
     rowSelected(items) {
-      if (items.length===1) {
+      if (items.length === 1) {
         this.selectedVariant = items[0].Variant;
-        
-      } else if (items.length===0) {
+      } else if (items.length === 0) {
         this.selectedVariant = "";
-        console.log("unselected")
+        console.log("unselected");
       }
     },
     openInfoModal(item, index, button) {
-      console.log("openInfoModal")
+      console.log("openInfoModal");
       this.selectedRowIndex = index;
       this.infoModal.title = `Row index: ${index}`;
-      this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
+      this.$root.$emit("bv::show::modal", this.infoModal.id, button);
     },
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
-      console.log("infomodal lukket")
+      console.log("infomodal lukket");
     },
     signOff() {
-      console.log("Sign off method")
+      console.log("Sign off method");
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
 
-      this.$http.post(
-            baseURI,
-            {
-              sampleid: this.$route.params.id,
-              variants: this.variants
-            },
-            {
-              withCredentials: true,
-              // headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              headers: { "Content-Type": "application/json" },
-              
-
-            }
-          ).then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
-
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            variants: this.variants,
+          },
+          {
+            withCredentials: true,
+            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
     },
-    sendVariantsToPost() {
-    },
+    sendVariantsToPost() {},
   },
-  created: function() {
-    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
+  created: function () {
+    this.$store.dispatch("initVariantStore", {
+      sample_id: this.$route.params.id,
+      selected: "empty",
+      allVariants: false,
+    });
     return this.$store.getters.variants;
   },
   computed: {
     variants: {
-      get() {return this.$store.getters.variants;},
-      set(value) {this.$store.commit("SET_STORE", value)}
-    }
-  }
-
+      get() {
+        return this.$store.getters.variants;
+      },
+      set(value) {
+        this.$store.commit("SET_STORE", value);
+      },
+    },
+  },
 };
 </script>
 

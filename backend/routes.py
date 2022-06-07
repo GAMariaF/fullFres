@@ -1,4 +1,6 @@
+from ast import stmt
 from random import sample
+from signal import valid_signals
 from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
@@ -22,7 +24,7 @@ from dbutils import list_sample_variants
 
 # Imports som er brukt for aa teste db
 import sqlite3
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, update
 from sqlalchemy import text
 import pandas as pd
 import json
@@ -61,12 +63,14 @@ def run_q(db, query):
             variants = pd.read_sql_query(text(stmt), con= conn)
         return variants.to_dict('records')
     
-def insert_interp(db):
-    pass
-
-
-
-insert_interp(db_path)
+def insert_interp(db, id, vclass, vcomment, ):
+    engine = create_engine("sqlite:///"+db, echo=False, future=True)
+    stmt = "UPDATE variant SET class=" +str(vclass)+",comment='"+ vcomment +"' WHERE CHROM_POS_ALTEND_DATE='" + id +"'"
+    with engine.connect() as conn:
+        conn.execute(text(stmt))
+        conn.commit()
+        
+    
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -116,6 +120,7 @@ def api(current_user, query):
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
             variants = run_q(db_path, query)
+
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
@@ -133,9 +138,16 @@ def api(current_user, query):
             
             print(j["sampleid"])
             for i in j["variants"]:
-                print(i["runid"])
-                print(i["class"])
-            
+                if i["changed"]==True:
+                    # Insert into db:
+                    _id         =   i["CHROM_POS_ALTEND_DATE"]
+                    _class      =   i["class"]
+                    _comment    =   i["comment"]
+                    insert_interp(db_path, _id ,_class ,_comment  )
+                    print("inserted")
+                    
+                    
+
             print("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response
