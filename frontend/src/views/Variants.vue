@@ -1,8 +1,12 @@
 <template>
   <div>
+  
     <variant-table  :loading="loading"   />
   </div>
 </template>
+
+
+
 <script>
 import VariantTable from "../components/VariantTable";
 

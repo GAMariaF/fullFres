@@ -13,6 +13,14 @@
       :fields="fields"
       :small="small"
     >
+     <!-- Adding index column -->
+     <template #cell(Nr)="data">
+        {{ data.index + 1 }}
+     </template>
+     <!-- Formatting Type column -->
+     <template #cell(Type)="data">
+        <b class="text-info">{{ data.value.toUpperCase() }}</b>
+     </template>
 
      <template #cell(Info)="row">
           <b-button
@@ -96,7 +104,7 @@
         <b-row>
           <b-col>
           <pre>  
-          <b-button v-b-toggle.variant_info_full_collapse variant="primary">Show full variant info</b-button>
+          <b-button v-b-toggle.variant_info_full_collapse variant="info">Show full variant info</b-button>
             <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
             <table class="table-hover">
@@ -123,12 +131,12 @@
 
       </b-container>
     </b-modal>
-      <p>Når tolkning er ferdig, sign off her:</p>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-sm">Sign off</b-button>
+      <p>When interpretation is done, please sign off here:</p>
+      <b-button v-on:click="signOff" class="btn mr-1 btn-info btn-lg"> SIGN OFF </b-button>
 
     <!--  -->
     <br>
-    Klasse: {{variants[0].class}}
+    Class: {{variants[0].class}}
   </div>
 </template>
 <script>
@@ -160,12 +168,16 @@ export default {
       sampleID: this.$route.params.id,
       selectedVariant: "",
       fields: [
-        {key: "CHROM",
-        label: "Kromosom"},
-        {key: "POS"},
-        {key: "REF"},
-        {key: "ALT"},
-        {key: "FILTER"},
+        'Nr',
+        {key: "Type", label: "Type"},
+        {key: "gene", label: "Gene"},
+        {key: "CHROM", label: "Chromosome"},
+        {key: "POS", label: "Position"},
+        {key: "REF", label: "Ref"},
+        {key: "ALTEND", label: "Alt / End"},
+        {key: "oncomineGeneClass"},
+        {key: "oncomineVariantClass"},
+        {key: "FILTER", label: "Filter"},
         {key: "Info"}
         ],
     };
