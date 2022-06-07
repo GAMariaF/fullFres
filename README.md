@@ -69,6 +69,8 @@ cd frontend; sh start_frontend.sh
 - [ ] Lage test-mappe og script
 - [x] Lage dockerfiles
 
+
+
 #### Info om diverse installeringer etc
 ```sh
 # Installer node:

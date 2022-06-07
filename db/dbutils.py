@@ -19,8 +19,6 @@ def generate_db(db):
 		Key_Variant TEXT, \
 		Oncomine_Reporter_Evidence TEXT, \
 		Type TEXT, \
-		Oncomine_Gene_Class TEXT, \
-		Oncomine_Variant_Class TEXT, \
 		Call TEXT, \
 		Call_Details TEXT, \
 		Phred_QUAL_Score TEXT, \
@@ -137,6 +135,7 @@ def generate_db(db):
 		codon TEXT, \
 		coding TEXT, \
 		transcript TEXT, \
+		annotation_variant TEXT, \
 		function TEXT, \
 		protein TEXT, \
 		location TEXT, \
@@ -148,6 +147,10 @@ def generate_db(db):
 		polyphen TEXT, \
 		sift TEXT, \
 		grantham TEXT, \
+		changed TEXT, \
+		visibility TEXT, \
+		class TEXT, \
+		comment TEXT, \
 		PRIMARY KEY (CHROM, POS, ALTEND, DATE) \
         )"))
 		result_interpretation = conn.execute(text("CREATE TABLE IF NOT EXISTS interpretation ( \
@@ -156,12 +159,6 @@ def generate_db(db):
 		sampleid TEXT, \
 		Genliste TEXT, \
 		Perc_Tumor TEXT, \
-		Gen TEXT, \
-		Transkript TEXT, \
-		Annotering_variant TEXT, \
-		Reads TEXT, \
-		Copy_Number TEXT, \
-		Allelfraksjon TEXT, \
 		COSMIC TEXT, \
 		Svares_ut TEXT, \
 		Populasjonsdata TEXT, \
@@ -187,15 +184,6 @@ def generate_db(db):
 		KOLONNE11 TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
 		)"))
-#		stmt = "create view if not exists all_data as select * \
-#			from vcf \
-#			left join variant \
-#			on vcf.chrom_pos_ref_alt_date = variant.chrom_pos_ref_alt_date \
-#			left join interpret \
-#			on vcf.chrom_pos_ref_alt_date = interpret.chrom_pos_ref_alt_date \
-#			and vcf.runid = interpret.runid \
-#			and vcf.sampleid = interpret.sampleid;"
-#		result_all = conn.execute(text(stmt))
 	
 def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
 	# add variants to table sample and add variants if new to table variant
@@ -267,7 +255,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
 
 		dfvcf_copy = dfvcf_copy.drop(columns=['CHROM','POS', \
-						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE'], \
+						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE', \
+						'Oncomine Gene Class','Oncomine Variant Class'], \
 						errors='ignore')
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
@@ -275,8 +264,6 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				'Variant Name': 'Variant_Name', \
 				'Key Variant': 'Key_Variant', \
 				'Oncomine Reporter Evidence': 'Oncomine_Reporter_Evidence', \
-				'Oncomine Gene Class': 'Oncomine_Gene_Class', \
-				'Oncomine Variant Class': 'Oncomine_Variant_Class', \
 				'Call Details': 'Call_Details', \
 				'Phred QUAL Score': 'Phred_QUAL_Score', \
 				'P-Value': 'P_Value', \
@@ -386,21 +373,36 @@ def list_sample_variants(db,runid,sampleid):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-
-##### TOLKNINGSSKJEMA ###################
-#select sample.runid, sample.sampleid, interpretation.Genliste,	interpretation.Perc_Tumor, variant.gene, variant.transcript, 
-#	variant.transcript || ':' || variant.coding || ' ' || substr(variant.protein,1,2) || '(' || substr(variant.protein,3,50) || ')',
-#	sample.FAO || ' / ' || sample.FDP, sample.Copy_Number, sample.AF, interpretation.COSMIC, interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, 
-#	sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, sample.Type, sample.Oncomine_Gene_Class, sample.Oncomine_Variant_Class, variant.gene, 
-#	variant.chrom || ':' || variant.pos,
-#	variant.protein, variant.ref, variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, sample.Oncomine_Driver_Gene,
-#	sample.Copy_Number, sample.CNV_Confidence, sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, interpretation.Funksjonsstudier, interpretation.Prediktive_data,
-#	interpretation.Cancer_hotspots, interpretation.Computational_evidens, interpretation.Konservering, interpretation.ClinVar, sample.CLSF, interpretation.Andre_DB, interpretation.Kommentar,
-#	interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar
-#			from sample 
-#			left join variant 
-#			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date 
-#			left join interpretation 
-#			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date 
-#			and sample.runid = interpretation.runid 
-#			and sample.sampleid = interpretation.sampleid;
+def list_interpretation(db,runid,sampleid):
+	#list "tolkningsskjema"
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "select sample.runid, sample.sampleid, interpretation.Genliste,	\
+		interpretation.Perc_Tumor, variant.gene, variant.transcript, \
+		variant.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
+		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
+		interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, \
+		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
+		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, variant.gene, \
+		variant.chrom || ':' || variant.pos as Locus, variant.protein, variant.ref, \
+		variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
+		variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
+		sample.Oncomine_Driver_Gene, sample.Copy_Number, sample.CNV_Confidence, \
+		sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, \
+		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
+		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
+		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, \
+		interpretation.Andre_DB, interpretation.Kommentar, \
+		interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar \
+			from sample \
+			left join variant \
+			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
+			left join interpretation \
+			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
+			and sample.runid = interpretation.runid \
+			and sample.sampleid = interpretation.sampleid \
+			WHERE sample.runid='"+runid+"' \
+			AND sample.sampleid='"+sampleid+"';"
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json

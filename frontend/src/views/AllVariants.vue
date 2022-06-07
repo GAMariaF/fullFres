@@ -1,6 +1,5 @@
 <template>
   <div>
-      <h1>hei</h1>
     <all-variant-table  :loading="loading"   />
   </div>
 </template>
