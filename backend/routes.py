@@ -30,7 +30,7 @@ import pandas as pd
 import json
 
 
-db_path = "/illumina/analysis/dev/2022/fullFres/db/variantdb.db"
+db_path = "/fullFres/db/variantdb.db"
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
