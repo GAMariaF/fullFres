@@ -44,6 +44,6 @@ RUN cd /fullFres && pip3 uninstall -y setuptools
 RUN cd /fullFres && pip3 install setuptools 
 RUN cd /fullFres && python3 -m pip install -r requirements.txt
 # Run like:
-# docker run -v /illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db:/db/variantdb.db -p 5000:5000 -p 8080:8080 -it --rm fullfres
+# docker run -p 5000:5000 -p 8080:8080 -it --rm fullfres
 
 CMD ["sh", "fullFres/docker_startup_cmd.sh"]
