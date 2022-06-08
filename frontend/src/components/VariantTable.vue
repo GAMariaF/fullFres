@@ -1,10 +1,11 @@
 <template>
   <div  id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
-    <p>Click a row to start interpreting that Variant:</p>
     <br>
-    <p>Gene List:{{geneList}} </p>
-    <p>% Tumor: </p>
+    <h5><i>Click a row to start interpreting that Variant</i></h5>
+    <br>
+    <h5>Gene List: <b>{{geneList}}</b> | Tumor %: <b>{{percTumor}}</b></h5>
+    <br>
     <b-table
       selectable
       select-mode="single"
@@ -34,7 +35,7 @@
           >
             Info
           </b-button>
-        </template>
+      </template>
     </b-table>
     {{ selectedVariant }}
 
@@ -51,32 +52,149 @@
       "
     >
       <b-container fluid>
-        <pre>Set comment and class for variant:</pre>
+        <pre></pre>
+
         <b-row class="mb-1">
-          <b-col cols="10">
-            <label>Comment</label>
+          <b-col cols="6">
+              <b-form-checkbox
+                id="checkbox-1"
+                v-model="variants[selectedRowIndex].Svares_ut"
+                name="checkbox-1"
+                value="Yes"
+                unchecked-value=""
+                size="default"                
+              >
+              ' Check for reply (Svares ut)
+              </b-form-checkbox>
+            </b-col>
+        </b-row>    
+        <br>
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>Population Data</label>
              <b-form-textarea 
                 id="textarea"
                 size="sm"
-                placeholder="Comment here: "
-                v-model="variants[selectedRowIndex].comment"
+                v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
                 
               ></b-form-textarea>
           </b-col>
+          <b-col cols="4">
+            <label>Functional Studies</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Funksjonsstudier"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Predictive Data</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Prediktive_data"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+        </b-row>    
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>Cancer Hotspots</label>
+              <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Cancer_hotspots"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Computational evidence</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Computational_evidens"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Conservation</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Konservering"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+        </b-row>    
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>ClinVar</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].ClinVar"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Other DB</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Andre_DB"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Tier</label>
+             <b-form-textarea 
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Tier"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+        </b-row>    
+
+        <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Comment</label>
+             <b-form-textarea 
+                id="textarea"
+                size="default"
+                placeholder=""
+                rows=4
+                v-model="variants[selectedRowIndex].Kommentar"
+                @change="updateVariants;setChanged()"
+                
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
           <b-col cols="2">
               <label>Class</label>
               <b-form-select
-                :options="options"
+                :options="classOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()"
-                
+                @change="updateVariants;setChanged()" 
               ></b-form-select>
             </b-col>
-
-
         </b-row>
+
         <hr />
         <b-row>
           <b-col cols="10">
@@ -84,7 +202,6 @@
           </b-col>
         </b-row>
         <b-row>
-          <pre>Please select which criterions apply to this variant:</pre>
           <b-col cols="12">
           <h5>Available evidence types </h5>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
@@ -93,7 +210,7 @@
             <br>
             <br>
             <div>
-            <h5>Oncoscore: {{ oncoScore }}</h5>
+            <h5>Oncogenicity: {{ oncoScore }}</h5>
             </div>
             <h5></h5>
 
@@ -108,12 +225,10 @@
             
           </b-col>
         </b-row>
-
+        <b-table striped hover :allvariantmodal="allvariantmodal"></b-table>
         <b-row>
           <b-col>
           <pre>  
-          <b-button v-b-toggle.variant_info_full_collapse variant="info">Show full variant info</b-button>
-            <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
@@ -130,16 +245,16 @@
               </tbody>
             </table>   
           </div>
-</b-collapse>
-
           </pre>
-
           </b-col>
         </b-row>
 
       </b-container>
     </b-modal>
-      <p>When interpretation is done, please sign off here:</p>
+      <br>
+      <br>
+      <h5>When interpretation is done, please sign off here</h5>
+      <br>
       <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button>
 
     <!--  -->
@@ -157,6 +272,8 @@ export default {
   props: [ "loading" ],
   data() {
     return {
+      geneList: "",
+      percTumor: "",
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -166,7 +283,7 @@ export default {
             label: 'Available evidence types',
             sortable: true
       }],
-      options: config.classOptions,
+      classOptions: config.classOptions,
       small: true,
       selectedRowIndex: 0,
       infoModal: {
@@ -186,9 +303,17 @@ export default {
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "FILTER", label: "Filter"},
+        {key: "Oncogenicity"},        
         {key: "class"},        
+        {key: "Svares_ut", label: "Reply"},        
         {key: "Info"}
         ],
+      allvariantmodal: [
+        {key: "Type", label: "Type"},
+        {key: "gene"},
+        {key: "Locus"},
+        ],
+
     };
   },
   methods: {
@@ -247,7 +372,7 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
-        
+
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -293,13 +418,19 @@ export default {
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
+    this.geneList = this.variants[0].Genliste;
+    this.percTumor = this.variants[0].Perc_Tumor;
     return this.$store.getters.variants;
+    
+    
   },
   computed: {
     variants: {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
     }
+    
+    
   }
 
 };

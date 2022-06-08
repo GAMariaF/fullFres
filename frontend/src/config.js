@@ -8,6 +8,8 @@ config = {
 	classOptions: [
 		// Obs - dont use 0 (it is reserved)
 		{ value: null, text: 'Please select an option' },
+		{ value: 'Not Relevant', text: 'Not Relevant' },
+		{ value: 'Technical', text: 'Technical' },
 		{ value: 1, text: '1' },
 		{ value: 2, text: '2' },
 		{ value: 3, text: '3' },

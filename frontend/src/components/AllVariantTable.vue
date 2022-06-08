@@ -1,7 +1,7 @@
 <template>
   <div  id="app" class="container-fluid">
     <h1>All variants</h1>
-    <p>Click a row to start interpreting that Variant:</p>
+    <br>
     <b-table
       selectable
       select-mode="single"
@@ -238,6 +238,7 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
+        console.log("test")
         
       } else if (items.length===0) {
         this.selectedVariant = "";
