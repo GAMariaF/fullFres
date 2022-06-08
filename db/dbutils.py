@@ -319,8 +319,8 @@ def list_all_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sample.runid, sample.sampleid, \
 			interpretation.DATO_SIGNOFF, \
-			interpretation.DATO_GODKJENNING, \
-		from sample \
+			interpretation.DATO_GODKJENNING \
+			from sample \
 			left join variant \
 			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
 			left join interpretation \
