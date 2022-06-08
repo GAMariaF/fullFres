@@ -225,9 +225,8 @@
             
           </b-col>
         </b-row>
-        <b-table striped hover :allvariantmodal="allvariantmodal"></b-table>
         <b-row>
-          <b-col>
+          <b-col >
           <pre>  
           <div class="table-responsive">
             <table class="table-hover">
@@ -237,7 +236,7 @@
                     <th>Value</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody >
                 <tr v-for="(value, name) in variants[selectedRowIndex]" :key="name">
                     <td>{{ name }}</td>
                     <td>{{ value }}</td>
@@ -267,6 +266,7 @@
 
 
 import { config } from '../config.js'
+//import { util_funcs } from '../appUtils.js'
 export default {
   name: "varianttable",
   props: [ "loading" ],
@@ -308,12 +308,6 @@ export default {
         {key: "Svares_ut", label: "Reply"},        
         {key: "Info"}
         ],
-      allvariantmodal: [
-        {key: "Type", label: "Type"},
-        {key: "gene"},
-        {key: "Locus"},
-        ],
-
     };
   },
   methods: {

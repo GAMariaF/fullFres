@@ -6,7 +6,12 @@ var util_funcs = {
         const baseURI = url + '/api/' + query
         return axios.get(baseURI)
         .then(function (response) {return response.data});      
+    },
+    sort_by_list(variant) {
+        print('hei')
+        return variant;
     }
+
 };
 
 export default util_funcs;
