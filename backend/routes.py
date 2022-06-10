@@ -31,7 +31,7 @@ import pandas as pd
 import json
 
 
-db_path = "/illumina/analysis/dev/2022/fullFres/db/variantdb.db"
+db_path = "/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db"
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
@@ -117,6 +117,10 @@ def api(current_user, query):
     if request.method == 'GET':
         if query == "samples":
             samples = list_samples(db_path)
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+            return response
+        if query == "signoff_samples":
+            samples = list_signoff_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):

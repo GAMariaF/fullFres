@@ -1,10 +1,11 @@
+import util_funcs from '../appUtils'
 <template>
   <div  id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
     <h5><i>Click a row to start interpreting that Variant</i></h5>
     <br>
-    <h5>Gene List: <b>{{geneList}}</b> | Tumor %: <b>{{percTumor}}</b></h5>
+    <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
     <br>
     <b-table
       selectable
@@ -64,8 +65,9 @@
                 unchecked-value=""
                 size="default"                
               >
-              ' Check for reply (Svares ut)
+              <h6>&nbsp; Check for reply (Svares ut)</h6>
               </b-form-checkbox>
+              
             </b-col>
         </b-row>    
         <br>
@@ -218,12 +220,12 @@
             <div>
             <h5>Chosen evidence types</h5>
             </div>
-        <div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
+        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
           <!-- content -->
-          {{item.tag}}
-        </div>
+          {{item.tag}} &nbsp;
+        </span>
             
-          </b-col>
+        </b-col>
         </b-row>
         <b-row>
           <b-col >
@@ -264,9 +266,7 @@
 </template>
 <script>
 
-
 import { config } from '../config.js'
-//import { util_funcs } from '../appUtils.js'
 export default {
   name: "varianttable",
   props: [ "loading" ],
@@ -305,7 +305,7 @@ export default {
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
-        {key: "Svares_ut", label: "Reply"},        
+        {key: "Svares_ut", label: "Reply (Svares ut)"},        
         {key: "Info"}
         ],
     };
@@ -366,7 +366,6 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
-
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -375,7 +374,7 @@ export default {
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
-      this.infoModal.title = `Row index: ${index}`;
+      this.infoModal.title = `Variant: ${index +1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
     },
     resetInfoModal() {
@@ -412,11 +411,10 @@ export default {
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    this.geneList = this.variants[0].Genliste;
-    this.percTumor = this.variants[0].Perc_Tumor;
-    return this.$store.getters.variants;
+    //this.geneList = this.variants[0].Genliste;
+    //this.percTumor = this.variants[0].Perc_Tumor;
     
-    
+    return this.$store.getters.variants;    
   },
   computed: {
     variants: {

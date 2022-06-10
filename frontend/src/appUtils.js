@@ -8,8 +8,7 @@ var util_funcs = {
         .then(function (response) {return response.data});      
     },
     sort_by_list(variant) {
-        print('hei')
-        return variant;
+        return variant
     }
 
 };

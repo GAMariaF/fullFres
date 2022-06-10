@@ -1,11 +1,12 @@
 <template>
   <div>
-    {{ loggedInStatus }}
-    <h1>Select the sample to interpret</h1>
-    <br>
     <div class="container" id="login">
       <div class="row row justify-content-center">
         <div class="col-md-10">
+        <b-col cols="6">
+          {{ loggedInStatus }}
+          <h1>Select sample for interpretation</h1>
+          <br>
           <b-table
             selectable
             select-mode="single"
@@ -22,6 +23,7 @@
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
           </template>
           </b-table>
+        </b-col>
         </div>
       </div>
     </div>
@@ -49,6 +51,7 @@ export default {
     rowSelected(items) {
       if (items.length === 1) {
         this.selectedSample = items[0].sampleid;
+
       } else if (items.length === 0) {
         this.selectedSample = "";
       }
