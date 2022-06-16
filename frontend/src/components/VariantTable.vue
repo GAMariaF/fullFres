@@ -238,9 +238,10 @@ export default {
         this.oncoScoring(this.selectedoncogenicity_list);
       }
     },
-    rowSelected(items) {
+    rowSelected(items, index) {
       if (items.length === 1) {
         this.selectedVariant = items[0].Variant;
+        //this.$root.$emit("bv::show::modal", this.infoModal.id);
       } else if (items.length === 0) {
         this.selectedVariant = "";
         console.log("unselected");

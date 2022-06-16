@@ -124,8 +124,8 @@
       </b-container>
     </b-modal>
     
-    
-
+    <!--  test -->
+<b-button v-on:click="sortTable(variants)" type="button">Testklikk sorter</b-button><span>&nbsp;</span>
     <!--  -->
     
     
@@ -135,6 +135,7 @@
 
 
 import { config } from '../config.js'
+import util_funcs from "@/appUtils";
 export default {
   name: "allvarianttable",
   props: [ "loading" ],
@@ -251,8 +252,13 @@ export default {
     },
     sendVariantsToPost() {
         console.log()
-
     },
+    sortTable() {
+      this.variants = util_funcs.sort_table(this.variants);
+      this.$store.commit("SET_STORE", this.variants)
+      console.log("variants have been sorted")
+
+    }
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": true});
