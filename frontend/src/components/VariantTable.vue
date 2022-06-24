@@ -1,6 +1,6 @@
 import util_funcs from '../appUtils'
 <template>
-  <div  id="app" class="container-fluid">
+  <div id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
     <h5><i>Click a row to start interpreting that Variant</i></h5>
@@ -47,10 +47,7 @@ import util_funcs from '../appUtils'
       :title="infoModal.title"
       ok-only
       size="lg"
-      @hide="
-        resetInfoModal();
-        
-      "
+      @hide="resetInfoModal()"
     >
       <b-container fluid>
         <pre></pre>
@@ -63,46 +60,46 @@ import util_funcs from '../appUtils'
                 name="checkbox-1"
                 value="Yes"
                 unchecked-value=""
-                size="default"                
+                size="default"
               >
               <h6>&nbsp; Check for reply (Svares ut)</h6>
               </b-form-checkbox>
-              
+
             </b-col>
-        </b-row>    
+        </b-row>
         <br>
         <b-row class="mb-1">
           <b-col cols="4">
             <label>Population Data</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Functional Studies</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Funksjonsstudier"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Predictive Data</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Prediktive_data"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
-        </b-row>    
+        </b-row>
 
         <b-row class="mb-1">
           <b-col cols="4">
@@ -112,75 +109,75 @@ import util_funcs from '../appUtils'
                 size="sm"
                 v-model="variants[selectedRowIndex].Cancer_hotspots"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Computational evidence</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Conservation</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
-        </b-row>    
+        </b-row>
 
         <b-row class="mb-1">
           <b-col cols="4">
             <label>ClinVar</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Other DB</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="4">
             <label>Tier</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Tier"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
-        </b-row>    
+        </b-row>
 
         <b-row class="mb-1">
           <b-col cols="12">
             <label>Comment</label>
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="default"
                 placeholder=""
                 rows=4
                 v-model="variants[selectedRowIndex].Kommentar"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
         </b-row>
@@ -192,7 +189,7 @@ import util_funcs from '../appUtils'
                 :options="classOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants;setChanged()"
               ></b-form-select>
             </b-col>
         </b-row>
@@ -224,12 +221,12 @@ import util_funcs from '../appUtils'
           <!-- content -->
           {{item.tag}} &nbsp;
         </span>
-            
+
         </b-col>
         </b-row>
         <b-row>
           <b-col >
-          <pre>  
+          <pre>
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
@@ -239,17 +236,16 @@ import util_funcs from '../appUtils'
                 </tr>
               </thead>
               <tbody >
-                <tr v-for="name in sortedIndex" :key="name"> 
+                <tr v-for="name in sortedIndex" :key="name">
                     <td>{{ name }}</td>
                     <td>{{ variants[selectedRowIndex][name] }}</td>
                 </tr>
               </tbody>
-            </table>   
+            </table>
           </div>
           </pre>
           </b-col>
         </b-row>
-
       </b-container>
     </b-modal>
       <br>
@@ -269,7 +265,7 @@ import util_funcs from '../appUtils'
 import { config } from '../config.js'
 export default {
   name: "varianttable",
-  props: [ "loading" ],
+  props: ["loading"],
   data() {
     return {
       sortedIndex: [ 'runid',
@@ -320,7 +316,7 @@ export default {
                     'Kommentar',
                     'Oncogenicity',
                     'Tier'
-                  ],      
+                  ],
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -350,17 +346,17 @@ export default {
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "FILTER", label: "Filter"},
-        {key: "Oncogenicity"},        
-        {key: "class"},        
-        {key: "Svares_ut", label: "Reply (Svares ut)"},        
+        {key: "Oncogenicity"},
+        {key: "class"},
+        {key: "Svares_ut", label: "Reply (Svares ut)"},
         {key: "Info"}
         ],
     };
   },
   methods: {
-    updateVariants(){
-      this.$store.commit("SET_STORE", this.variants)
-      console.log("updateVariants")
+    updateVariants() {
+      this.$store.commit("SET_STORE", this.variants);
+      console.log("updateVariants");
     },
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
@@ -384,21 +380,22 @@ export default {
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
+      this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
-      console.log("setChanged")
-      },
+      console.log("setChanged");
+    },
     oncogenicitySelected(items) {
-      console.log("selected row")
-      console.log("--")
-      console.log(items)
-      console.log("--")
+      console.log("selected row");
+      console.log("--");
+      console.log(items);
+      console.log("--");
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
       var index = this.selectedoncogenicity_list.indexOf(items);
       if (index !== -1) {
         // Fjern hvis tilstede
-        this.selectedoncogenicity_list.splice(index, 1);  
+        this.selectedoncogenicity_list.splice(index, 1);
       } else {
         // Legge til hvis ikke tilstede
         this.selectedoncogenicity_list.push(items);
@@ -407,9 +404,9 @@ export default {
       // Tabellen vises kun hvis lengden av this.selectedACMG != 0
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
-      if(items.length !== 0 | typeof items !== 'undefined') {
+      if ((items.length !== 0) | (typeof items !== "undefined")) {
         this.oncoScoring(this.selectedoncogenicity_list);
-      } 
+      }
     },
     rowSelected(items) {
       if (items.length===1) {
@@ -417,62 +414,58 @@ export default {
         console.log(items)
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected")
+        console.log("unselected");
       }
     },
     openInfoModal(item, index, button) {
-      console.log("openInfoModal")
+      console.log("openInfoModal");
       this.selectedRowIndex = index;
       this.infoModal.title = `Variant: ${index +1}`;
-      this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
+      this.$root.$emit("bv::show::modal", this.infoModal.id, button);
     },
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
-      console.log("infomodal lukket")
+      console.log("infomodal lukket");
     },
     signOff() {
-      console.log("Sign off method")
+      console.log("Sign off method");
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
 
-      this.$http.post(
-            baseURI,
-            {
-              sampleid: this.$route.params.id,
-              variants: this.variants
-            },
-            {
-              withCredentials: true,
-              // headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              headers: { "Content-Type": "application/json" },
-              
-
-            }
-          ).then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
-
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            variants: this.variants,
+          },
+          {
+            withCredentials: true,
+            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
     },
-    sendVariantsToPost() {
-    },
+    sendVariantsToPost() {},
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    
-    return this.$store.getters.variants;    
+
+    return this.$store.getters.variants;
   },
   computed: {
     variants: {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
     }
-    
-    
+
+
   }
 
 };
 </script>
-
-
