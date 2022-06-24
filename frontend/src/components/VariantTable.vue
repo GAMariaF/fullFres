@@ -321,8 +321,6 @@ export default {
                     'Oncogenicity',
                     'Tier'
                   ],      
-      //geneList: "",
-      //percTumor: "",
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -382,6 +380,7 @@ export default {
         break;
       }
     })
+    this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
@@ -461,8 +460,6 @@ export default {
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    //this.geneList = this.variants[0].Genliste;
-    //this.percTumor = this.variants[0].Perc_Tumor;
     
     return this.$store.getters.variants;    
   },

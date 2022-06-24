@@ -169,8 +169,6 @@ export default {
         // Get variants for that sample:
         this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty', "allVariants": false});
         this.variants =  this.$store.getters.variants;
-        //this.geneList = this.variants[0].Genliste;
-        //this.percTumor = this.variants[0].Perc_Tumor;
       } else if (items.length === 0) {
         console.log("linje 175")
         this.selectedSample = "";
