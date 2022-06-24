@@ -27,7 +27,7 @@
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br><br>
-          <h5>Gene List: <b>{{geneList}}</b> | Tumor %: <b>{{percTumor}}</b></h5>
+          <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
           <br>          
           <b-table
             selectable
@@ -123,7 +123,6 @@ export default {
         content: "",
       },
       items: [],
-      variants: [],
       fields: [
         {key: "runid", label: "Run id"}, 
         {key: "sampleid", label: "Sample id"}
@@ -141,8 +140,7 @@ export default {
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
-        {key: "Svares_ut", label: "Reply"},
-        {key: "Toggle"},            
+        {key: "Svares_ut", label: "Reply"},           
         {key: "Info"}
         ],
       filter: "true",
@@ -152,6 +150,7 @@ export default {
   created: function () {
     this.$store.dispatch("initStore"); // hent state for logged in?
     this.getsamples();
+    
   },
   methods: {
     rowSelected(items) {
@@ -166,13 +165,14 @@ export default {
     sampleRowSelected(items) {
       if (items.length === 1) {
         this.selectedSample = items[0].sampleid;
+        console.log(this.selectedSample)
         // Get variants for that sample:
         this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty', "allVariants": false});
-        console.log(this.$store.getters.variants)
         this.variants =  this.$store.getters.variants;
-        this.geneList = this.variants[0].Genliste;
-        this.percTumor = this.variants[0].Perc_Tumor;
+        //this.geneList = this.variants[0].Genliste;
+        //this.percTumor = this.variants[0].Perc_Tumor;
       } else if (items.length === 0) {
+        console.log("linje 175")
         this.selectedSample = "";
       }
     },
@@ -211,6 +211,10 @@ export default {
     },
   },
   computed: {
+    variants: {
+     get() {return this.$store.getters.variants;},
+     set(value) {this.$store.commit("SET_STORE", value)}
+   },
     state() {
       return this.$store.getters.loggedInStatus;
     },

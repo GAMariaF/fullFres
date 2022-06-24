@@ -7,10 +7,18 @@ var util_funcs = {
         return axios.get(baseURI)
         .then(function (response) {return response.data});      
     },
-    sort_by_list(variant) {
-        return variant
+    sort_table(objects){
+        console.log("sort_table")
+        // const order = ["Locus","Ref","ALTEND","gene"];
+        // const orderIndex = {}
+        // order.forEach((value,index) => orderIndex[value]=index);
+        // console.log(orderIndex)
+        // // //const sortable = Object.entries(objects)
+        //console.log(objects[sortable])
+        // Sort
+        //objects.sort((a,b) => orderIndex[a.CHROM] - orderIndex[b.CHROM]);
+        return objects
     }
-
 };
 
 export default util_funcs;

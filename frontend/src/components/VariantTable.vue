@@ -234,14 +234,14 @@ import util_funcs from '../appUtils'
             <table class="table-hover">
               <thead>
                 <tr>
-                    <th>Key</th>
+                    <th>Name</th>
                     <th>Value</th>
                 </tr>
               </thead>
               <tbody >
-                <tr v-for="(value, name) in variants[selectedRowIndex]" :key="name">
+                <tr v-for="name in sortedIndex" :key="name"> 
                     <td>{{ name }}</td>
-                    <td>{{ value }}</td>
+                    <td>{{ variants[selectedRowIndex][name] }}</td>
                 </tr>
               </tbody>
             </table>   
@@ -272,8 +272,57 @@ export default {
   props: [ "loading" ],
   data() {
     return {
-      geneList: "",
-      percTumor: "",
+      sortedIndex: [ 'runid',
+                    'sampleid',
+                    'Genliste',
+                    'Perc_Tumor',
+                    'gene',
+                    'transcript',
+                    'annotation_variant',
+                    'Reads',
+                    'FILTER',
+                    'AF',
+                    'COSMIC',
+                    'Svares_ut',
+                    'User_Classification',
+                    'class',
+                    'Variant_ID',
+                    'Variant_Name',
+                    'Key_Variant',
+                    'Oncomine_Reporter_Evidence',
+                    'Type',
+                    'oncomineGeneClass',
+                    'oncomineVariantClass',
+                    'Locus',
+                    'protein',
+                    'REF',
+                    'ALTEND',
+                    'Call',
+                    'DP',
+                    'FDP',
+                    'FAO',
+                    'coding',
+                    'P_Value',
+                    'Read_Counts_Per_Million',
+                    'Oncomine_Driver_Gene',
+                    'Copy_Number',
+                    'CNV_Confidence',
+                    'Valid_CNV_Amplicons',
+                    'Populasjonsdata',
+                    'Funksjonsstudier',
+                    'Prediktive_data',
+                    'Cancer_hotspots',
+                    'Computational_evidens',
+                    'Konservering',
+                    'ClinVar',
+                    'CLSF',
+                    'Andre_DB',
+                    'Kommentar',
+                    'Oncogenicity',
+                    'Tier'
+                  ],      
+      //geneList: "",
+      //percTumor: "",
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -365,7 +414,8 @@ export default {
     },
     rowSelected(items) {
       if (items.length===1) {
-        this.selectedVariant = items[0].Variant;
+        this.selectedVariant = items;
+        console.log(items)
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")

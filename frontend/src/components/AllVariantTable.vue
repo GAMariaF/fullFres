@@ -51,21 +51,21 @@
         <b-row class="mb-1">
           <b-col cols="10">
             <label>Comment</label>
+             <!-- v-model="variants[selectedRowIndex].Kommentar" -->
              <b-form-textarea 
                 id="textarea"
                 size="sm"
-                placeholder="Comment here: "
-                v-model="variants[selectedRowIndex].comment"
+                placeholder="Comment here: not connected to database "
                 @change="updateVariants;setChanged()"
                 
               ></b-form-textarea>
           </b-col>
           <b-col cols="2">
               <label>Class</label>
+              <!-- v-model="variants[selectedRowIndex].class" -->
               <b-form-select
                 :options="options"
                 class="py-sm-0 form-control"
-                v-model="variants[selectedRowIndex].class"
                 @change="updateVariants;setChanged()"
                 
               ></b-form-select>
@@ -109,15 +109,15 @@
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
-                <tr>
-                    <th>Key</th>
+                <tr>              
+                    <th>Name</th>
                     <th>Value</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(value, name) in variants[selectedRowIndex]" :key="name">
-                    <td>{{ name }}</td>
-                    <td>{{ value }}</td>
+                <tr v-for="name in sortedIndex" :key="name"> 
+                    <td>{{name}}</td>
+                    <td>{{variants[selectedRowIndex][name]}}</td>
                 </tr>
               </tbody>
             </table>   
@@ -143,6 +143,7 @@
 
 
 import { config } from '../config.js'
+//import util_funcs from '@/appUtils'
 export default {
   name: "allvarianttable",
   props: [ "loading" ],
@@ -180,6 +181,8 @@ export default {
         {key: "class", sortable: true},
         {key: "Info"}
         ],
+      sortedIndex: [ "Type","gene","CHROM","POS","REF","ALTEND","Frequency",
+                  "oncomineGeneClass", "oncomineVariantClass" ],      
     };
   },
   methods: {
@@ -237,7 +240,7 @@ export default {
     },
     rowSelected(items) {
       if (items.length===1) {
-        this.selectedVariant = items[0].Variant;
+        this.selectedVariant = items;
         console.log("test")
         
       } else if (items.length===0) {
@@ -248,8 +251,10 @@ export default {
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
-      this.infoModal.title = `Row index: ${index}`;
-      this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
+      this.infoModal.title = `Variant row: ${index +1}`;
+      this.$root.$emit("bv::show::modal", this.infoModal.id, button);
+      //this.variants = util_funcs.sort_table(this.variants);
+      //this.$store.commit("SET_STORE",this.variants)
     },
     resetInfoModal() {
       this.infoModal.title = "";
@@ -263,6 +268,12 @@ export default {
     sendVariantsToPost() {
         console.log()
 
+    },
+    sortTable(sortedIndex){
+      console.log(sortedIndex)
+      return sortedIndex
+      // this.variants = util_funcs.sort_table(this.variants);
+      // this.$store.commit("SET_STORE",this.variants)
     },
   },
   created: function() {
