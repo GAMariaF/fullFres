@@ -43,7 +43,7 @@
       size="lg"
       @hide="
         resetInfoModal();
-        
+
       "
     >
       <b-container fluid>
@@ -52,12 +52,12 @@
           <b-col cols="10">
             <label>Comment</label>
              <!-- v-model="variants[selectedRowIndex].Kommentar" -->
-             <b-form-textarea 
+             <b-form-textarea
                 id="textarea"
                 size="sm"
                 placeholder="Comment here: not connected to database "
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-textarea>
           </b-col>
           <b-col cols="2">
@@ -67,7 +67,7 @@
                 :options="options"
                 class="py-sm-0 form-control"
                 @change="updateVariants;setChanged()"
-                
+
               ></b-form-select>
             </b-col>
 
@@ -97,30 +97,30 @@
           <!-- content -->
           {{item.tag}}
         </div>
-            
+
           </b-col>
         </b-row>
 
         <b-row>
           <b-col>
-          <pre>  
+          <pre>
           <b-button v-b-toggle.variant_info_full_collapse variant="info">Show full variant info</b-button>
             <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
-                <tr>              
+                <tr>
                     <th>Name</th>
                     <th>Value</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="name in sortedIndex" :key="name"> 
+                <tr v-for="name in sortedIndex" :key="name">
                     <td>{{name}}</td>
                     <td>{{variants[selectedRowIndex][name]}}</td>
                 </tr>
               </tbody>
-            </table>   
+            </table>
           </div>
 </b-collapse>
 
@@ -131,19 +131,19 @@
 
       </b-container>
     </b-modal>
-    
-    
 
+    <!--  test -->
+<b-button v-on:click="sortTable(variants)" type="button">Testklikk sorter</b-button><span>&nbsp;</span>
     <!--  -->
-    
-    
+
+
   </div>
 </template>
 <script>
 
 
 import { config } from '../config.js'
-//import util_funcs from '@/appUtils'
+import util_funcs from "@/appUtils";
 export default {
   name: "allvarianttable",
   props: [ "loading" ],
@@ -173,7 +173,7 @@ export default {
         {key: "gene", sortable: true},
         {key: "CHROM", label: "Chrom", sortable: true},
         {key: "POS", label: "Pos", sortable: true},
-        {key: "REF", label: "Ref", sortable: true},        
+        {key: "REF", label: "Ref", sortable: true},
         {key: "ALTEND", label: "Alt / End", sortable: true},
         {key: "Frequency", sortable: true, sortDirection: 'desc'},
         {key: "oncomineGeneClass", sortable: true},
@@ -182,7 +182,7 @@ export default {
         {key: "Info"}
         ],
       sortedIndex: [ "Type","gene","CHROM","POS","REF","ALTEND","Frequency",
-                  "oncomineGeneClass", "oncomineVariantClass" ],      
+                  "oncomineGeneClass", "oncomineVariantClass" ],
     };
   },
   methods: {
@@ -225,7 +225,7 @@ export default {
       var index = this.selectedoncogenicity_list.indexOf(items);
       if (index !== -1) {
         // Fjern hvis tilstede
-        this.selectedoncogenicity_list.splice(index, 1);  
+        this.selectedoncogenicity_list.splice(index, 1);
       } else {
         // Legge til hvis ikke tilstede
         this.selectedoncogenicity_list.push(items);
@@ -236,13 +236,13 @@ export default {
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if(items.length !== 0 | typeof items !== 'undefined') {
         this.oncoScoring(this.selectedoncogenicity_list);
-      } 
+      }
     },
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items;
         console.log("test")
-        
+
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -267,14 +267,13 @@ export default {
     },
     sendVariantsToPost() {
         console.log()
+    },
+    sortTable() {
+      this.variants = util_funcs.sort_table(this.variants);
+      this.$store.commit("SET_STORE", this.variants)
+      console.log("variants have been sorted")
 
-    },
-    sortTable(sortedIndex){
-      console.log(sortedIndex)
-      return sortedIndex
-      // this.variants = util_funcs.sort_table(this.variants);
-      // this.$store.commit("SET_STORE",this.variants)
-    },
+    }
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": true});
@@ -289,5 +288,3 @@ export default {
 
 };
 </script>
-
-
