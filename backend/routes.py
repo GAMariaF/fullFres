@@ -11,8 +11,8 @@ from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
 import sys
-sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/backend')
-sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/db')
+sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
+sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
 #sys.path.insert(0, '/fullFres/backend')
 #sys.path.insert(0, '/fullFres/db')
 ### settings.json gir path til dbutils og vcfutils
