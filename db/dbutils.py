@@ -402,7 +402,7 @@ def list_interpretation(db,sampleid):
 		sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, \
 		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
 		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
-		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, \
+		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, variant.class, \
 		interpretation.Andre_DB, interpretation.Kommentar, \
 		interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar \
 			from sample \

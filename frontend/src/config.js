@@ -10,13 +10,24 @@ config = {
 		{ value: null, text: 'Please select an option' },
 		{ value: 'Not Relevant', text: 'Not Relevant' },
 		{ value: 'Technical', text: 'Technical' },
-		{ value: 1, text: '1' },
-		{ value: 2, text: '2' },
-		{ value: 3, text: '3' },
-		{ value: 4, text: '4' },
-		{ value: 5, text: '5' },
+		{ value: '1', text: '1' },
+		{ value: '2', text: '2' },
+		{ value: '3', text: '3' },
+		{ value: '4', text: '4' },
+		{ value: '5', text: '5' },
 		{ value: '6', text: '6' }
 	],
+	tierOptions: [
+		// Obs - dont use 0 (it is reserved)
+		{ value: null, text: 'Please select an option' },
+		{ value: 'I A', text: 'I A' },
+		{ value: 'I B', text: 'I B' },		
+		{ value: 'II C', text: 'II C' },
+		{ value: 'II D', text: 'II D' },		
+		{ value: 'III', text: 'III' },
+		{ value: 'VI', text: 'IV' }
+	],
+
 	oncogenicitycriteria: [
 		{tag: "OVS1", class: 'btn mr-1 btn-danger btn-sm', 	title: 'Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single-exon or multiexon deletion) in a bona fide tumor suppressor gene.', default: "Very Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
 		{tag: "OS1",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Same amino acid change as a previously established oncogenic variant (using this standard) regardless of nucleotide change. Example: Val→Leu caused by either G>C or G>T in the same codon.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },

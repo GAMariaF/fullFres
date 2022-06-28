@@ -158,17 +158,29 @@ import util_funcs from '../appUtils'
                 
               ></b-form-textarea>
           </b-col>
-          <b-col cols="4">
-            <label>Tier</label>
-             <b-form-textarea 
-                id="textarea"
-                size="sm"
-                v-model="variants[selectedRowIndex].Tier"
-                @change="updateVariants;setChanged()"
-                
-              ></b-form-textarea>
-          </b-col>
         </b-row>    
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+              <label>Class</label>
+              <b-form-select
+                :options="classOptions"
+                class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].class"
+                @change="updateVariants;setChanged()" 
+              >
+              </b-form-select>
+          </b-col>
+          <b-col cols="4">
+              <label>Tier</label>
+              <b-form-select
+                :options="tierOptions"
+                class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].Tier"              
+                @change="updateVariants;setChanged()" 
+              ></b-form-select>
+            </b-col>
+        </b-row>
 
         <b-row class="mb-1">
           <b-col cols="12">
@@ -183,18 +195,6 @@ import util_funcs from '../appUtils'
                 
               ></b-form-textarea>
           </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
-          <b-col cols="2">
-              <label>Class</label>
-              <b-form-select
-                :options="classOptions"
-                class="py-sm-0 form-control"
-                v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()" 
-              ></b-form-select>
-            </b-col>
         </b-row>
 
         <hr />
@@ -224,12 +224,11 @@ import util_funcs from '../appUtils'
           <!-- content -->
           {{item.tag}} &nbsp;
         </span>
-            
         </b-col>
         </b-row>
+        <hr />        
         <b-row>
           <b-col >
-          <pre>  
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
@@ -246,7 +245,6 @@ import util_funcs from '../appUtils'
               </tbody>
             </table>   
           </div>
-          </pre>
           </b-col>
         </b-row>
 
@@ -330,9 +328,10 @@ export default {
             label: 'Available evidence types',
             sortable: true
       }],
-      classOptions: config.classOptions,
       small: true,
       selectedRowIndex: 0,
+      classOptions: config.classOptions,
+      tierOptions: config.tierOptions,
       infoModal: {
         id: "info-modal",
         title: "",
