@@ -53,7 +53,7 @@ cd frontend; sh start_frontend.sh
 - [x] Lage db schema
 - [x] Lage funksjon for å generere DB
 - [ ] Lage test-mappe og script
-- [ ] Lage dockerfiles
+- [x] Lage dockerfiles
 
 
 
