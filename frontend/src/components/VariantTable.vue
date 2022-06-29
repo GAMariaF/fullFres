@@ -3,8 +3,6 @@ import util_funcs from '../appUtils'
   <div id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
-    <h5><i>Click a row to start interpreting that Variant</i></h5>
-    <br>
     <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
     <br>
     <b-table
@@ -50,8 +48,6 @@ import util_funcs from '../appUtils'
       @hide="resetInfoModal()"
     >
       <b-container fluid>
-        <pre></pre>
-
         <b-row class="mb-1">
           <b-col cols="6">
               <b-form-checkbox

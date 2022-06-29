@@ -76,26 +76,199 @@
     "
     >
       <b-container fluid>
-          <b-row class="mb-1">
-            <b-col cols="6">
-              <pre>  
+        <b-row class="mb-1">
+          <b-col cols="6">
+              <b-form-checkbox
+                id="checkbox-1"
+                v-model="variants[selectedRowIndex].Svares_ut"
+                name="checkbox-1"
+                value="Yes"
+                unchecked-value=""
+                size="default"
+              >
+              <h6>&nbsp; Check for reply (Svares ut)</h6>
+              </b-form-checkbox>
+
+            </b-col>
+        </b-row>
+        <br>
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>Population Data</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Populasjonsdata"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Functional Studies</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Funksjonsstudier"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Predictive Data</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Prediktive_data"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>Cancer Hotspots</label>
+              <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Cancer_hotspots"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Computational evidence</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Computational_evidens"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Conservation</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Konservering"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>ClinVar</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].ClinVar"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Other DB</label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Andre_DB"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>    
+
+        <b-row class="mb-1">
+          <b-col cols="4">
+              <label>Class</label>
+              <b-form-select
+                :options="classOptions"
+                class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].class"
+                @change="updateVariants;setChanged()" 
+              >
+              </b-form-select>
+          </b-col>
+          <b-col cols="4">
+              <label>Tier</label>
+              <b-form-select
+                :options="tierOptions"
+                class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].Tier"              
+                @change="updateVariants;setChanged()" 
+              ></b-form-select>
+            </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Comment</label>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                placeholder=""
+                rows=4
+                v-model="variants[selectedRowIndex].Kommentar"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+
+        <hr />
+        <b-row>
+          <b-col cols="10">
+            <p>Gene Info:</p>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+          <h5>Available evidence types </h5>
+          <span v-for="item in oncogenicitycriteria" :key="item.tag">
+            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+          </span>
+            <br>
+            <br>
+            <div>
+            <h5>Oncogenicity: {{ oncoScore }}</h5>
+            </div>
+            <h5></h5>
+
+            <br>
+            <div>
+            <h5>Chosen evidence types</h5>
+            </div>
+        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
+          <!-- content -->
+          {{item.tag}} &nbsp;
+        </span>
+        </b-col>
+        </b-row>
+        <hr />        
+
+
+
+          <b-row>
+            <b-col>
                 <div class="table-responsive">
                   <table class="table-hover">
                     <thead>
                       <tr>
-                        <th>Key</th>
+                        <th>Name</th>
                         <th>Value</th>
                       </tr>
                     </thead>
                     <tbody >
-                      <tr v-for="(value, name) in variants[selectedRowIndex]" :key="name">
+                      <tr v-for="name in sortedIndex" :key="name">
                         <td>{{ name }}</td>
-                        <td>{{ value }}</td>
+                        <td>{{ variants[selectedRowIndex][name] }}</td>
                       </tr>
                     </tbody>
                   </table>   
-                </div>
-              </pre>                            
+                </div>                          
             </b-col>
           </b-row>    
       </b-container>
@@ -110,13 +283,71 @@ export default {
   components: {},
   data() {
     return {
-      geneList: "",
-      percTumor: "",
+      sortedIndex: [ 'runid',
+                    'sampleid',
+                    'Genliste',
+                    'Perc_Tumor',
+                    'gene',
+                    'transcript',
+                    'annotation_variant',
+                    'Reads',
+                    'FILTER',
+                    'AF',
+                    'COSMIC',
+                    'Svares_ut',
+                    'User_Classification',
+                    'class',
+                    'Variant_ID',
+                    'Variant_Name',
+                    'Key_Variant',
+                    'Oncomine_Reporter_Evidence',
+                    'Type',
+                    'oncomineGeneClass',
+                    'oncomineVariantClass',
+                    'Locus',
+                    'protein',
+                    'REF',
+                    'ALTEND',
+                    'Call',
+                    'DP',
+                    'FDP',
+                    'FAO',
+                    'coding',
+                    'P_Value',
+                    'Read_Counts_Per_Million',
+                    'Oncomine_Driver_Gene',
+                    'Copy_Number',
+                    'CNV_Confidence',
+                    'Valid_CNV_Amplicons',
+                    'Populasjonsdata',
+                    'Funksjonsstudier',
+                    'Prediktive_data',
+                    'Cancer_hotspots',
+                    'Computational_evidens',
+                    'Konservering',
+                    'ClinVar',
+                    'CLSF',
+                    'Andre_DB',
+                    'Kommentar',
+                    'Oncogenicity',
+                    'Tier'
+                  ],
+      oncoScore: 0,
+      selectedoncogenicity_list: [],
+      oncogenicitycriteria: config.oncogenicitycriteria,
+      oncogenicityfields: [
+          {
+            key: 'evidence',
+            label: 'Available evidence types',
+            sortable: true
+      }],
       loggedInStatus: false,
       small: true,
       sampleID: "",
       selectedSample: "",
       selectedRowIndex: 0,
+      classOptions: config.classOptions,
+      tierOptions: config.tierOptions,
       infoModal: {
         id: "info-modal",
         title: "",
@@ -125,7 +356,8 @@ export default {
       items: [],
       fields: [
         {key: "runid", label: "Run id"}, 
-        {key: "sampleid", label: "Sample id"}
+        {key: "sampleid", label: "Sample id"},
+        {key: "DATO_SIGNOFF", label: "Date Sign off"}        
         ],
       variantFields: [
         {key: "Nr"},        
@@ -172,6 +404,60 @@ export default {
       } else if (items.length === 0) {
         console.log("linje 175")
         this.selectedSample = "";
+      }
+    },
+    updateVariants() {
+      this.$store.commit("SET_STORE", this.variants);
+      console.log("updateVariants");
+    },
+    oncoScoring(selectedoncogenicity_list) {
+    this.oncoScore = 0;
+    selectedoncogenicity_list.forEach(item => {
+    switch(item.default) {
+      case 'Very Strong':
+        this.oncoScore += 8
+        break;
+      case 'Strong':
+        this.oncoScore += 4
+        break;
+      case 'Moderate':
+        this.oncoScore += 2
+        break;
+      case 'Suporting':
+        this.oncoScore += 1
+        break;
+      }
+    })
+    this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+    },
+    setChanged() {
+      this.variants[this.selectedRowIndex].visibility = true;
+      this.variants[this.selectedRowIndex].changed = true;
+      this.updateVariants();
+      console.log("setChanged");
+    },
+    oncogenicitySelected(items) {
+      console.log("selected row");
+      console.log("--");
+      console.log(items);
+      console.log("--");
+
+      // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
+      // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
+      var index = this.selectedoncogenicity_list.indexOf(items);
+      if (index !== -1) {
+        // Fjern hvis tilstede
+        this.selectedoncogenicity_list.splice(index, 1);
+      } else {
+        // Legge til hvis ikke tilstede
+        this.selectedoncogenicity_list.push(items);
+      }
+      // Legg til en tabell hvor default styrke er valgt
+      // Tabellen vises kun hvis lengden av this.selectedACMG != 0
+      // Regn ut oncoscore
+      // Utfør kun om det faktisk er valgt en rad (length !== 0)
+      if ((items.length !== 0) | (typeof items !== "undefined")) {
+        this.oncoScoring(this.selectedoncogenicity_list);
       }
     },
     openInfoModal(item, index, button) {

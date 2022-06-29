@@ -335,7 +335,7 @@ def list_all_samples(db):
 def list_signoff_samples(db):
 	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT DISTINCT sampleid, runid \
+	stmt = "SELECT DISTINCT sampleid, runid, DATO_SIGNOFF \
 				FROM interpretation \
 				WHERE DATO_SIGNOFF IS NOT NULL \
 				AND DATO_GODKJENNING IS NULL;"
