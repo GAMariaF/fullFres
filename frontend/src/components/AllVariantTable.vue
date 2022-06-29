@@ -47,65 +47,8 @@
       "
     >
       <b-container fluid>
-        <pre>Set comment and class for variant:</pre>
-        <b-row class="mb-1">
-          <b-col cols="10">
-            <label>Comment</label>
-             <!-- v-model="variants[selectedRowIndex].Kommentar" -->
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                placeholder="Comment here: not connected to database "
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="2">
-              <label>Class</label>
-              <!-- v-model="variants[selectedRowIndex].class" -->
-              <b-form-select
-                :options="options"
-                class="py-sm-0 form-control"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-select>
-            </b-col>
-
-
-        </b-row>
-        <hr />
-        <b-row>
-          <b-col cols="10">
-            <p>Gene Info:</p>
-          </b-col>
-        </b-row>
-        <b-row>
-          <pre>Select which criterions apply to this variant:</pre>
-          <b-col cols="12">
-          <h5>Available evidence types </h5>
-          <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
-          </span>
-            <br>
-            <div>
-            Oncoscore:
-            </div>
-            {{ oncoScore }}
-
-            <br>
-        <div v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}}
-        </div>
-
-          </b-col>
-        </b-row>
-
         <b-row>
           <b-col>
-          <pre>
-          <b-button v-b-toggle.variant_info_full_collapse variant="info">Show full variant info</b-button>
-            <b-collapse id="variant_info_full_collapse" class="mt-2">
           <div class="table-responsive">
             <table class="table-hover">
               <thead>
@@ -115,17 +58,13 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="name in sortedIndex" :key="name">
-                    <td>{{name}}</td>
-                    <td>{{variants[selectedRowIndex][name]}}</td>
-                </tr>
+                      <tr v-for="name in sortedIndex" :key="name">
+                        <td>{{ name }}</td>
+                        <td>{{ variants[selectedRowIndex][name] }}</td>
+                      </tr>
               </tbody>
             </table>
           </div>
-</b-collapse>
-
-          </pre>
-
           </b-col>
         </b-row>
 
@@ -181,8 +120,55 @@ export default {
         {key: "class", sortable: true},
         {key: "Info"}
         ],
-      sortedIndex: [ "Type","gene","CHROM","POS","REF","ALTEND","Frequency",
-                  "oncomineGeneClass", "oncomineVariantClass" ],
+      sortedIndex: [ 'runid',
+                    'sampleid',
+                    'Genliste',
+                    'Perc_Tumor',
+                    'gene',
+                    'transcript',
+                    'annotation_variant',
+                    'Reads',
+                    'FILTER',
+                    'AF',
+                    'COSMIC',
+                    'Svares_ut',
+                    'User_Classification',
+                    'class',
+                    'Variant_ID',
+                    'Variant_Name',
+                    'Key_Variant',
+                    'Oncomine_Reporter_Evidence',
+                    'Type',
+                    'oncomineGeneClass',
+                    'oncomineVariantClass',
+                    'Locus',
+                    'protein',
+                    'REF',
+                    'ALTEND',
+                    'Call',
+                    'DP',
+                    'FDP',
+                    'FAO',
+                    'coding',
+                    'P_Value',
+                    'Read_Counts_Per_Million',
+                    'Oncomine_Driver_Gene',
+                    'Copy_Number',
+                    'CNV_Confidence',
+                    'Valid_CNV_Amplicons',
+                    'Populasjonsdata',
+                    'Funksjonsstudier',
+                    'Prediktive_data',
+                    'Cancer_hotspots',
+                    'Computational_evidens',
+                    'Konservering',
+                    'ClinVar',
+                    'CLSF',
+                    'Andre_DB',
+                    'Kommentar',
+                    'Oncogenicity',
+                    'Tier'
+                  ],
     };
   },
   methods: {
@@ -251,7 +237,7 @@ export default {
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
-      this.infoModal.title = `Variant row: ${index +1}`;
+      this.infoModal.title = `Variant: ${index +1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       //this.variants = util_funcs.sort_table(this.variants);
       //this.$store.commit("SET_STORE",this.variants)

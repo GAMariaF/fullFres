@@ -28,6 +28,8 @@
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br><br>
           <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+          <br>
+          <h2><p style="text-align:left;">Classified variants</p></h2>
           <br>          
           <b-table
             selectable
@@ -36,7 +38,7 @@
             striped
             hover
             outlined
-            :items="variants"
+            :items="filteredClass"
             :fields="variantFields"
             :small="small"
           >
@@ -58,6 +60,39 @@
               </b-button>
             </template>
           </b-table>
+          <br>
+          <h2><p style="text-align:left;">Not Relevant and Technical variants</p></h2>
+          <br>          
+          <b-table
+            selectable
+            select-mode="single"
+            @row-selected="rowSelected"
+            striped
+            hover
+            outlined
+            :items="filteredNotClass"
+            :fields="variantFields"
+            :small="small"
+          >
+            <!-- Adding index column -->
+            <template #cell(Nr)="data">
+              {{ data.index + 1 }}
+            </template>
+            <!-- Formatting Type column -->
+            <template #cell(Type)="data">
+              <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <template #cell(Info)="row">
+              <b-button
+                size="sm"
+                @click="openInfoModal(row.item, row.index, $event.target)"
+                class="mr-1"
+              >
+                Info
+              </b-button>
+            </template>
+          </b-table>
+                    
           <br><br>
             <b-button v-on:click="approve" class="btn mr-1 btn-info"> Approve </b-button>
           <br><br>
@@ -71,9 +106,7 @@
     :title="infoModal.title"
     ok-only
     size="lg"
-    @hide="
-    resetInfoModal();
-    "
+    @hide="resetInfoModal();"
     >
       <b-container fluid>
         <b-row class="mb-1">
@@ -283,6 +316,8 @@ export default {
   components: {},
   data() {
     return {
+      //classVariants: [],
+      //notClassVariants: [],
       sortedIndex: [ 'runid',
                     'sampleid',
                     'Genliste',
@@ -377,6 +412,8 @@ export default {
         ],
       filter: "true",
       filterOn: ["visibility"],
+      Technical: ["Technical"],
+      NotRelevant: ["Not Relevant"],
     };
   },
   created: function () {
@@ -462,7 +499,6 @@ export default {
     },
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
-      console.log(index)
       this.selectedRowIndex = index;
       this.infoModal.title = `Variant: ${index + 1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
@@ -484,7 +520,7 @@ export default {
     },
     approve() {
       // Sending approval date to database
-    }
+    },
   },
   watch: {
     state(newState, oldState) {
@@ -505,6 +541,22 @@ export default {
     user() {
       return this.$store.getters.username;
     },
+    filteredClass() {
+      let classVariants = this.variants
+      classVariants = classVariants.filter((item) => {
+        return (item.class != this.Technical && item.class != this.NotRelevant)
+      })
+      return classVariants;
+    },
+    filteredNotClass() {
+      let notClassVariants = this.variants
+    
+      notClassVariants = notClassVariants.filter((item) => {
+        return (item.class == this.Technical || item.class == this.NotRelevant)
+      })
+      return notClassVariants;
+    },
+
   },
 };
 </script>
