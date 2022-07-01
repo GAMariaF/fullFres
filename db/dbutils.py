@@ -169,19 +169,13 @@ def generate_db(db):
 		Konservering TEXT, \
 		ClinVar TEXT, \
 		Andre_DB TEXT, \
-		Kommentar TEXT, \
+		Comment TEXT, \
 		Oncogenicity TEXT, \
 		Tier TEXT, \
-		Kommentar2 TEXT, \
-		DATO TEXT, \
-		BRUKER TEXT, \
-		DATO_SIGNOFF TEXT, \
-		KONTROLL TEXT, \
-		DATO_GODKJENNING TEXT, \
-		KOLONNE8 TEXT, \
-		KOLONNE9 TEXT, \
-		KOLONNE10 TEXT, \
-		KOLONNE11 TEXT, \
+		User_Signoff TEXT, \
+		Date_Signoff TEXT, \
+		User_Approval TEXT, \
+		Date_Approval TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
 		)"))
 	
@@ -308,7 +302,7 @@ def list_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sampleid, runid \
 				FROM interpretation \
-				WHERE DATO_SIGNOFF IS NULL;"
+				WHERE Date_Signoff IS NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -318,8 +312,8 @@ def list_all_samples(db):
 	#list all samples ready for interpretation
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sample.runid, sample.sampleid, \
-			interpretation.DATO_SIGNOFF, \
-			interpretation.DATO_GODKJENNING \
+			interpretation.Date_Signoff, \
+			interpretation.Date_Approval \
 			from sample \
 			left join variant \
 			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
@@ -335,10 +329,10 @@ def list_all_samples(db):
 def list_signoff_samples(db):
 	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT DISTINCT sampleid, runid, DATO_SIGNOFF \
+	stmt = "SELECT DISTINCT sampleid, runid, Date_Signoff \
 				FROM interpretation \
-				WHERE DATO_SIGNOFF IS NOT NULL \
-				AND DATO_GODKJENNING IS NULL;"
+				WHERE Date_Signoff IS NOT NULL \
+				AND Date_Approval IS NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -349,7 +343,7 @@ def list_approved_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid, runid \
 				FROM interpretation \
-				WHERE DATO_GODKJENNING IS NOT NULL;"
+				WHERE Date_Approval IS NOT NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -403,8 +397,8 @@ def list_interpretation(db,sampleid):
 		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
 		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
 		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, variant.class, \
-		interpretation.Andre_DB, interpretation.Kommentar, \
-		interpretation.Oncogenicity, interpretation.Tier, interpretation.Kommentar \
+		interpretation.Andre_DB, interpretation.Comment, \
+		interpretation.Oncogenicity, interpretation.Tier, interpretation.Comment \
 			from sample \
 			left join variant \
 			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \

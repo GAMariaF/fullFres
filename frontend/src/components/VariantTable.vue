@@ -183,7 +183,7 @@ import util_funcs from '../appUtils'
                 size="default"
                 placeholder=""
                 rows=4
-                v-model="variants[selectedRowIndex].Kommentar"
+                v-model="variants[selectedRowIndex].Comment"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -307,7 +307,7 @@ export default {
                     'ClinVar',
                     'CLSF',
                     'Andre_DB',
-                    'Kommentar',
+                    'Comment',
                     'Oncogenicity',
                     'Tier'
                   ],

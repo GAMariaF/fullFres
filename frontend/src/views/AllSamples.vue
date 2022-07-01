@@ -43,8 +43,8 @@ export default {
       items: [],
       fields: [{key: "runid", label: "Run id"}, 
               {key: "sampleid", label: "Sample id"},
-              {key: "DATO_SIGNOFF", label: "Date Sign off"},
-              {key: "DATO_GODKJENNING", label: "Date Approval"}],
+              {key: "Date_Signoff", label: "Date Sign off"},
+              {key: "Date_Approval", label: "Date Approval"}],
     };
   },
   methods: {

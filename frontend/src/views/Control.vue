@@ -244,7 +244,7 @@
                 size="default"
                 placeholder=""
                 rows=4
-                v-model="variants[selectedRowIndex].Kommentar"
+                v-model="variants[selectedRowIndex].Comment"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -363,7 +363,7 @@ export default {
                     'ClinVar',
                     'CLSF',
                     'Andre_DB',
-                    'Kommentar',
+                    'Comment',
                     'Oncogenicity',
                     'Tier'
                   ],
@@ -392,7 +392,7 @@ export default {
       fields: [
         {key: "runid", label: "Run id"}, 
         {key: "sampleid", label: "Sample id"},
-        {key: "DATO_SIGNOFF", label: "Date Sign off"}        
+        {key: "Date_Signoff", label: "Date Sign off"}        
         ],
       variantFields: [
         {key: "Nr"},        

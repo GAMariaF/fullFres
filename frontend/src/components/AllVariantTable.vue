@@ -165,7 +165,7 @@ export default {
                     'ClinVar',
                     'CLSF',
                     'Andre_DB',
-                    'Kommentar',
+                    'Comment',
                     'Oncogenicity',
                     'Tier'
                   ],
