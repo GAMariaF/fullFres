@@ -68,7 +68,7 @@ def run_q(db, query):
 
 def insert_interp(db, id, vclass, vcomment, ):
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
-    stmt = "UPDATE variant SET class=" +str(vclass)+",comment='"+ vcomment +"' WHERE CHROM_POS_ALTEND_DATE='" + id +"'"
+    stmt = "UPDATE classification SET class=" +str(vclass)+",comment='"+ vcomment +"' WHERE CHROM_POS_ALTEND_DATE='" + id +"'"
     with engine.connect() as conn:
         conn.execute(text(stmt))
         conn.commit()

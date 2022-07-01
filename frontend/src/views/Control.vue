@@ -27,7 +27,7 @@
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br><br>
-          <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+          <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
           <br>
           <h2><p style="text-align:left;">Classified variants</p></h2>
           <br>          
@@ -320,7 +320,7 @@ export default {
       //notClassVariants: [],
       sortedIndex: [ 'runid',
                     'sampleid',
-                    'Genliste',
+                    'Genelist',
                     'Perc_Tumor',
                     'gene',
                     'transcript',

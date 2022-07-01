@@ -3,7 +3,7 @@ import util_funcs from '../appUtils'
   <div id="app" class="container-fluid">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
-    <h5>Gene List: <b>{{this.variants[0].Genliste}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+    <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
     <br>
     <b-table
       selectable
@@ -264,7 +264,7 @@ export default {
     return {
       sortedIndex: [ 'runid',
                     'sampleid',
-                    'Genliste',
+                    'Genelist',
                     'Perc_Tumor',
                     'gene',
                     'transcript',

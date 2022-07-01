@@ -9,10 +9,12 @@ from sqlalchemy import text
 def generate_db(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
-		result_sample = conn.execute(text("CREATE TABLE IF NOT EXISTS sample ( \
+		result_variantspersample = conn.execute(text("CREATE TABLE IF NOT EXISTS VariantsPerSample ( \
 		runid TEXT, \
 		sampleid TEXT, \
 		CHROM_POS_ALTEND_DATE TEXT, \
+		DATE_CHANGED_VARIANT_BROWSER TEXT, \
+		Reply, \
 		User_Classification TEXT, \
 		Variant_ID TEXT, \
 		Variant_Name TEXT, \
@@ -113,7 +115,7 @@ def generate_db(db):
 		MISC TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
         )"))
-		result_variant = conn.execute(text("CREATE TABLE IF NOT EXISTS variant ( \
+		result_variants = conn.execute(text("CREATE TABLE IF NOT EXISTS Variants ( \
 		CHROM_POS_ALTEND_DATE TEXT, \
 		CHROM TEXT, \
 		POS TEXT, \
@@ -147,20 +149,25 @@ def generate_db(db):
 		polyphen TEXT, \
 		sift TEXT, \
 		grantham TEXT, \
-		changed TEXT, \
-		visibility TEXT, \
-		class TEXT, \
-		comment TEXT, \
 		PRIMARY KEY (CHROM, POS, ALTEND, DATE) \
         )"))
-		result_interpretation = conn.execute(text("CREATE TABLE IF NOT EXISTS interpretation ( \
-		CHROM_POS_ALTEND_DATE TEXT, \
+		result_samples = conn.execute(text("CREATE TABLE IF NOT EXISTS Samples ( \
 		runid TEXT, \
 		sampleid TEXT, \
-		Genliste TEXT, \
+		Genelist TEXT, \
 		Perc_Tumor TEXT, \
+		User_Signoff TEXT, \
+		Date_Signoff TEXT, \
+		User_Approval TEXT, \
+		Date_Approval TEXT, \
+		PRIMARY KEY (runid, sampleid) \
+		)"))
+		result_classification = conn.execute(text("CREATE TABLE IF NOT EXISTS Classification ( \
+		CHROM_POS_ALTEND_DATE TEXT, \
+		DATE_CHANGED_VARIANT_BROWSER TEXT, \
+		runid TEXT, \
+		sampleid TEXT, \
 		COSMIC TEXT, \
-		Reply TEXT, \
 		Populasjonsdata TEXT, \
 		Funksjonsstudier TEXT, \
 		Prediktive_data TEXT, \
@@ -172,20 +179,18 @@ def generate_db(db):
 		Comment TEXT, \
 		Oncogenicity TEXT, \
 		Tier TEXT, \
-		User_Signoff TEXT, \
-		Date_Signoff TEXT, \
-		User_Approval TEXT, \
-		Date_Approval TEXT, \
+		class TEXT, \
+		changed TEXT, \
+		visibility TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
 		)"))
 	
 def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
-	# add variants to table sample and add variants if new to table variant
+	# add variants to table sample and add variants if new to table Variants
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
-		print("Missing data to import to tables Variant and Vcf")
+		print("Missing data to import to tables Variants, VariantsPerSample and Samples")
 		return
-
 	dfvcf_copy = dfvcf.copy(deep=True)
 	dfvariant_copy = dfvariant.copy(deep=True)
 	# add chrom_pos_altend_date column
@@ -200,19 +205,16 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 	dfvariant_copy.CHROM_POS_ALTEND_DATE = \
 		dfvariant_copy[["CHROM", "POS", "ALTEND", "DATE"]] \
 			.agg("".join, axis=1)
-
 	# Connecting to sqlite database
 	with engine.connect() as conn:
-		#BRUK kombinasjon chrom,pos,alt (/end for CNV) og sjekk om denne er med i variant-tabell 
+		#BRUK kombinasjon chrom,pos,alt (/end for CNV) og sjekk om denne er med i Variants-tabell 
 		for row in range(len(dfvcf_copy)):
-			stmt = "select * from variant \
+			stmt = "select * from Variants \
 				where CHROM = '"+dfvariant_copy.CHROM[row]+"' \
 					AND POS = '"+dfvariant_copy.POS[row]+"' \
 					AND ALTEND = '"+dfvariant_copy.ALTEND[row]+"';"
 			dfdb_variant = pd.read_sql_query(text(stmt), con = conn)
-
 			#hvis med: sjekk hvis den er lik den som skal legges in
-
 			if not dfdb_variant.empty:
 				dfdb_variant_latest = dfdb_variant[ dfdb_variant.CHROM_POS_ALTEND_DATE == \
 					dfdb_variant.CHROM_POS_ALTEND_DATE.max() ]
@@ -225,12 +227,12 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				variantindb = dfdb_variant_latest.reset_index(drop=True)[cols].equals( \
 					dfvariant_copy.loc[[row]].reset_index(drop=True)[cols])
 				if variantindb:
-					# if in db: use key in variant table (chrom_pos_ref_alt_date) as key to vcf table
-					# do not add variant to table variant
-					# if sample, run and variant already in sample database don't add
+					# if in db: use key in Variants table (chrom_pos_ref_alt_date) as key to vcf table
+					# do not add variant to table Variants
+					# if sample, run and variant already in VariantsPerSample database don't add
 					dfvariant_copy = dfvariant_copy.drop(row)
 					dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]
-					stmtvcf = "select * from sample \
+					stmtvcf = "select * from VariantsPerSample \
 						where runid = '"+dfvcf_copy.runid.loc[row]+"' \
 							AND sampleid = '"+dfvcf_copy.sampleid.loc[row]+"' \
 							AND CHROM_POS_ALTEND_DATE = '"+dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row]+"';"
@@ -243,11 +245,9 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				else:
 					# if FUNC not in db, i.e existing variant but with new FUNC
 					dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
-
 			else:
 				# if variant not previously in database, add new variant
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
-
 		dfvcf_copy = dfvcf_copy.drop(columns=['CHROM','POS', \
 						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE', \
 						'Oncomine Gene Class','Oncomine Variant Class'], \
@@ -271,37 +271,31 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				'Valid CNV Amplicons': 'Valid_CNV_Amplicons', \
 				'Non-Targeted': 'Non_Targeted' \
 				})
-		# Data to table interpretation
-		dfinterpretation = pd.DataFrame()
-		dfinterpretation = dfinterpretation.assign(runid = dfvcf_copy['runid'],
-								sampleid = dfvcf_copy['sampleid'], 
-								CHROM_POS_ALTEND_DATE = dfvcf_copy['CHROM_POS_ALTEND_DATE'])
-		dfinterpretation = dfinterpretation.assign( \
-								Perc_Tumor = percent_tumor, \
-								Genliste = sample_diseasetype)
+		# Data to table Samples
+		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
+		print(run_id,sample_id,percent_tumor,sample_diseasetype)
 		# Transfer data to database
-		dfvcf_copy.to_sql('sample', con=conn, if_exists='append', index=False)
+		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
-			dfvariant_copy.to_sql('variant', con=conn, if_exists='append', index=False)
-		dfinterpretation.to_sql('interpretation', con=conn, if_exists='append', index=False)
-		conn.commit()	
+			dfvariant_copy.to_sql('Variants', engine, if_exists='append', index=False)
+		dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
 
-#BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i variant-tabell 
+#BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i Variants-tabell 
 #	hvis med 
 #		sjekk hvis den er lik den som skal legges in
 #			hvis lik
-#				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
+#				bruk key (chrom_pos_ref_alt_date) som nokkel i VariantsPerSample-tabell
 #			hvis forskjellig
 #				lag chrom_pos_ref_alt_date
-#				legg inn ny post i variant-tabell med key (chrom_pos_ref_alt_date)
-#				bruk key (chrom_pos_ref_alt_date) som nokkel i sample-tabell
+#				legg inn ny post i Variants-tabell med key (chrom_pos_ref_alt_date)
+#				bruk key (chrom_pos_ref_alt_date) som nokkel i VariantsPerSample-tabell
 
 def list_samples(db):
 	#list all samples ready for interpretation
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sampleid, runid \
-				FROM interpretation \
+				FROM Samples \
 				WHERE Date_Signoff IS NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
@@ -311,16 +305,12 @@ def list_samples(db):
 def list_all_samples(db):
 	#list all samples ready for interpretation
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT DISTINCT sample.runid, sample.sampleid, \
-			interpretation.Date_Signoff, \
-			interpretation.Date_Approval \
-			from sample \
-			left join variant \
-			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
-			left join interpretation \
-			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
-			and sample.runid = interpretation.runid \
-			and sample.sampleid = interpretation.sampleid;"
+	stmt = "SELECT s.runid, s.sampleid, \
+			s.Date_Signoff, \
+			s.Date_Approval \
+			FROM Samples s \
+			WHERE Date_Signoff IS NULL \
+			AND Date_Approval IS NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -330,7 +320,7 @@ def list_signoff_samples(db):
 	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sampleid, runid, Date_Signoff \
-				FROM interpretation \
+				FROM Samples \
 				WHERE Date_Signoff IS NOT NULL \
 				AND Date_Approval IS NULL;"
 	with engine.connect() as conn:
@@ -342,7 +332,7 @@ def list_approved_samples(db):
 	#list all approved samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT sampleid, runid \
-				FROM interpretation \
+				FROM Samples \
 				WHERE Date_Approval IS NOT NULL;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
@@ -355,9 +345,9 @@ def list_all_variants(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT COUNT(*) as Frequency\
 		, v.gene, v.Type, v.oncomineGeneClass, \
-		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, v.class, \
+		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, c.class, \
 		group_concat(s.sampleid,', ') Samples \
-		FROM sample s, variant v \
+		FROM sample s, Variants v, Classification c \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
@@ -371,7 +361,7 @@ def list_sample_variants(db,sampleid):
 	stmt = "SELECT s.sampleid, s.runid, v.gene, v.Type, \
 		v.oncomineGeneClass, v.oncomineVariantClass, \
 		v.CHROM, v.POS, v.REF, v.ALTEND, v.class, s.FILTER \
-		FROM sample s, variant v \
+		FROM sample s, Variants v \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		AND sampleid='"+sampleid+"';"
 	with engine.connect() as conn:
@@ -382,26 +372,26 @@ def list_sample_variants(db,sampleid):
 def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "select sample.runid, sample.sampleid, interpretation.Genliste,	\
-		interpretation.Perc_Tumor, variant.gene, variant.transcript, \
-		variant.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
+	stmt = "select sample.runid, sample.sampleid, interpretation.Genelist,	\
+		interpretation.Perc_Tumor, Variants.gene, Variants.transcript, \
+		Variants.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
 		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
 		interpretation.Reply, sample.User_Classification, sample.Variant_ID, \
 		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
-		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, sample.FILTER, variant.gene, \
-		variant.chrom || ':' || variant.pos as Locus, variant.protein, variant.ref, \
-		variant.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
-		variant.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
+		sample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, sample.FILTER, Variants.gene, \
+		Variants.chrom || ':' || Variants.pos as Locus, Variants.protein, Variants.ref, \
+		Variants.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
+		Variants.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
 		sample.Oncomine_Driver_Gene, sample.Copy_Number, sample.CNV_Confidence, \
 		sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, \
 		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
 		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
-		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, variant.class, \
+		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, Variants.class, \
 		interpretation.Andre_DB, interpretation.Comment, \
 		interpretation.Oncogenicity, interpretation.Tier, interpretation.Comment \
 			from sample \
-			left join variant \
-			on sample.chrom_pos_altend_date = variant.chrom_pos_altend_date \
+			left join Variants \
+			on sample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \
 			left join interpretation \
 			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
 			and sample.runid = interpretation.runid \

@@ -122,7 +122,7 @@ export default {
         ],
       sortedIndex: [ 'runid',
                     'sampleid',
-                    'Genliste',
+                    'Genelist',
                     'Perc_Tumor',
                     'gene',
                     'transcript',
