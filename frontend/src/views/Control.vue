@@ -85,7 +85,7 @@
             <template #cell(Info)="row">
               <b-button
                 size="sm"
-                @click="openInfoModalNotClass(row.item, row.index, $event.target)"
+                @click="openInfoModal(row.item, row.index, $event.target)"
                 class="mr-1"
               >
                 Info
@@ -101,8 +101,6 @@
         {{ user }}
       </b-col>
     </b-row>
-
-    <!-- Modal for Classified Variants  -->
     <b-modal
     :id="infoModal.id"
     :title="infoModal.title"
@@ -115,12 +113,11 @@
           <b-col cols="6">
               <b-form-checkbox
                 id="checkbox-1"
-                v-model="filteredClass[selectedRowIndex].Svares_ut"
+                v-model="variants[selectedRowIndex].Svares_ut"
                 name="checkbox-1"
                 value="Yes"
                 unchecked-value=""
                 size="default"
-                @change="updateVariants;setChanged()"
               >
               <h6>&nbsp; Check for reply (Svares ut)</h6>
               </b-form-checkbox>
@@ -134,7 +131,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Populasjonsdata"
+                v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -144,7 +141,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Funksjonsstudier"
+                v-model="variants[selectedRowIndex].Funksjonsstudier"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -154,7 +151,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Prediktive_data"
+                v-model="variants[selectedRowIndex].Prediktive_data"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -167,7 +164,7 @@
               <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Cancer_hotspots"
+                v-model="variants[selectedRowIndex].Cancer_hotspots"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -177,7 +174,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Computational_evidens"
+                v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -187,7 +184,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Konservering"
+                v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -200,7 +197,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].ClinVar"
+                v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -210,7 +207,7 @@
              <b-form-textarea
                 id="textarea"
                 size="sm"
-                v-model="filteredClass[selectedRowIndex].Andre_DB"
+                v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -223,7 +220,7 @@
               <b-form-select
                 :options="classOptions"
                 class="py-sm-0 form-control"
-                v-model="filteredClass[selectedRowIndex].class"
+                v-model="variants[selectedRowIndex].class"
                 @change="updateVariants;setChanged()" 
               >
               </b-form-select>
@@ -233,7 +230,7 @@
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
-                v-model="filteredClass[selectedRowIndex].Tier"              
+                v-model="variants[selectedRowIndex].Tier"              
                 @change="updateVariants;setChanged()" 
               ></b-form-select>
             </b-col>
@@ -247,7 +244,7 @@
                 size="default"
                 placeholder=""
                 rows=4
-                v-model="filteredClass[selectedRowIndex].Kommentar"
+                v-model="variants[selectedRowIndex].Kommentar"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -300,7 +297,7 @@
                     <tbody >
                       <tr v-for="name in sortedIndex" :key="name">
                         <td>{{ name }}</td>
-                        <td>{{ filteredClass[selectedRowIndex][name] }}</td>
+                        <td>{{ variants[selectedRowIndex][name] }}</td>
                       </tr>
                     </tbody>
                   </table>   
@@ -309,216 +306,6 @@
           </b-row>    
       </b-container>
   </b-modal>
-
-  <!-- Modal for Not relevant and Technical Variants  -->
-  <b-modal
-    :id="infoModalNotClass.id"
-    :title="infoModalNotClass.title"
-    ok-only
-    size="lg"
-    @hide="resetInfoModalNotClass();"
-    >
-      <b-container fluid>
-        <b-row class="mb-1">
-          <b-col cols="6">
-              <b-form-checkbox
-                id="checkbox-1"
-                v-model="filteredNotClass[selectedRowIndex].Svares_ut"
-                name="checkbox-1"
-                value="Yes"
-                unchecked-value=""
-                size="default"
-                @change="updateVariants;setChanged()"
-              >
-              <h6>&nbsp; Check for reply (Svares ut)</h6>
-              </b-form-checkbox>
-
-            </b-col>
-        </b-row>
-        <br>
-        <b-row class="mb-1">
-          <b-col cols="4">
-            <label>Population Data</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Populasjonsdata"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Functional Studies</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Funksjonsstudier"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Predictive Data</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Prediktive_data"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
-          <b-col cols="4">
-            <label>Cancer Hotspots</label>
-              <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Cancer_hotspots"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Computational evidence</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Computational_evidens"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Conservation</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Konservering"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
-          <b-col cols="4">
-            <label>ClinVar</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].ClinVar"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Other DB</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="filteredNotClass[selectedRowIndex].Andre_DB"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>    
-
-        <b-row class="mb-1">
-          <b-col cols="4">
-              <label>Class</label>
-              <b-form-select
-                :options="classOptions"
-                class="py-sm-0 form-control"
-                v-model="filteredNotClass[selectedRowIndex].class"
-                @change="updateVariants;setChanged()" 
-              >
-              </b-form-select>
-          </b-col>
-          <b-col cols="4">
-              <label>Tier</label>
-              <b-form-select
-                :options="tierOptions"
-                class="py-sm-0 form-control"
-                v-model="filteredNotClass[selectedRowIndex].Tier"              
-                @change="updateVariants;setChanged()" 
-              ></b-form-select>
-            </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
-          <b-col cols="12">
-            <label>Comment</label>
-             <b-form-textarea
-                id="textarea"
-                size="default"
-                placeholder=""
-                rows=4
-                v-model="filteredNotClass[selectedRowIndex].Kommentar"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>
-
-        <hr />
-        <b-row>
-          <b-col cols="10">
-            <p>Gene Info:</p>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="12">
-          <h5>Available evidence types </h5>
-          <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
-          </span>
-            <br>
-            <br>
-            <div>
-            <h5>Oncogenicity: {{ oncoScore }}</h5>
-            </div>
-            <h5></h5>
-
-            <br>
-            <div>
-            <h5>Chosen evidence types</h5>
-            </div>
-        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}} &nbsp;
-        </span>
-        </b-col>
-        </b-row>
-        <hr />        
-
-
-
-          <b-row>
-            <b-col>
-                <div class="table-responsive">
-                  <table class="table-hover">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Value</th>
-                      </tr>
-                    </thead>
-                    <tbody >
-                      <tr v-for="name in sortedIndex" :key="name">
-                        <td>{{ name }}</td>
-                        <td>{{ filteredNotClass[selectedRowIndex][name] }}</td>
-                      </tr>
-                    </tbody>
-                  </table>   
-                </div>                          
-            </b-col>
-          </b-row>    
-      </b-container>
-  </b-modal>
-
-
   </b-container>
 </template>
 <script>
@@ -598,11 +385,6 @@ export default {
       tierOptions: config.tierOptions,
       infoModal: {
         id: "info-modal",
-        title: "",
-        content: "",
-      },
-      infoModalNotClass: {
-        id: "info-modal-not-class",
         title: "",
         content: "",
       },
@@ -725,17 +507,6 @@ export default {
       this.infoModal.title = "";
       this.infoModal.content = "";
       console.log("infomodal lukket")
-    },
-    openInfoModalNotClass(item, index, button) {
-      console.log("openInfoModalNotClass")
-      this.selectedRowIndex = index;
-      this.infoModalNotClass.title = `Variant: ${index + 1}`;
-      this.$root.$emit("bv::show::modal", this.infoModalNotClass.id, button);  
-    },
-    resetInfoModalNotClass() {
-      this.infoModalNotClass.title = "";
-      this.infoModalNotClass.content = "";
-      console.log("infoModalNotClass lukket")
     },
     getsamples() {
       // Funksjon for å få samples fra backenc
