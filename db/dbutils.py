@@ -160,7 +160,7 @@ def generate_db(db):
 		Genliste TEXT, \
 		Perc_Tumor TEXT, \
 		COSMIC TEXT, \
-		Svares_ut TEXT, \
+		Reply TEXT, \
 		Populasjonsdata TEXT, \
 		Funksjonsstudier TEXT, \
 		Prediktive_data TEXT, \
@@ -386,7 +386,7 @@ def list_interpretation(db,sampleid):
 		interpretation.Perc_Tumor, variant.gene, variant.transcript, \
 		variant.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
 		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
-		interpretation.Svares_ut, sample.User_Classification, sample.Variant_ID, \
+		interpretation.Reply, sample.User_Classification, sample.Variant_ID, \
 		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
 		sample.Type, variant.oncomineGeneClass, variant.oncomineVariantClass, sample.FILTER, variant.gene, \
 		variant.chrom || ':' || variant.pos as Locus, variant.protein, variant.ref, \

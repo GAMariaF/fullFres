@@ -113,7 +113,7 @@
           <b-col cols="6">
               <b-form-checkbox
                 id="checkbox-1"
-                v-model="variants[selectedRowIndex].Svares_ut"
+                v-model="variants[selectedRowIndex].Reply"
                 name="checkbox-1"
                 value="Yes"
                 unchecked-value=""
@@ -329,7 +329,7 @@ export default {
                     'FILTER',
                     'AF',
                     'COSMIC',
-                    'Svares_ut',
+                    'Reply',
                     'User_Classification',
                     'class',
                     'Variant_ID',
@@ -407,7 +407,7 @@ export default {
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
-        {key: "Svares_ut", label: "Reply"},           
+        {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
       filter: "true",

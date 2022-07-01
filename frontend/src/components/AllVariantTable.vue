@@ -131,7 +131,7 @@ export default {
                     'FILTER',
                     'AF',
                     'COSMIC',
-                    'Svares_ut',
+                    'Reply',
                     'User_Classification',
                     'class',
                     'Variant_ID',
