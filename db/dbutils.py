@@ -344,10 +344,10 @@ def list_all_variants(db):
 	stmt = "SELECT COUNT(*) as Frequency\
 		, v.gene, v.Type, v.oncomineGeneClass, \
 		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, \
+		v.chrom_pos_altend_date, \
 		group_concat(s.sampleid,', ') VariantsPerSample \
 		FROM VariantsPerSample s, Variants v \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
-		AND s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
@@ -364,7 +364,9 @@ def list_sample_variants(db,sampleid):
 					Variants.oncomineVariantClass, \
 					Variants.CHROM, Variants.POS, Variants.REF, \
 					Variants.ALTEND, Classification.class, \
-					VariantsPerSample.FILTER \
+					VariantsPerSample.FILTER, \
+					VariantsPerSample.chrom_pos_altend_date, \
+					VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER \
 			FROM VariantsPerSample \
 			LEFT JOIN Variants \
 			ON VariantsPerSample.CHROM_POS_ALTEND_DATE = \
@@ -403,8 +405,12 @@ def list_interpretation(db,sampleid):
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
 		Classification.class, \
-		Classification.Andre_DB, Classification.Comment, \
-		Classification.Oncogenicity, Classification.Tier, Classification.Comment \
+		Classification.Andre_DB, Classification.Oncogenicity, \
+		Classification.Tier, Classification.Comment, \
+		VariantsPerSample.chrom_pos_altend_date, \
+		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER, \
+		Classification.changed, \
+		Classification.visibility \
 			from VariantsPerSample \
 			left join Variants \
 			on VariantsPerSample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \

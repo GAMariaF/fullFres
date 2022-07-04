@@ -39,7 +39,6 @@ db_path = "/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db"
 # Hent ut unike samples:
 #SELECT DISTINCT(sampleid) FROM sample
 
-
 def run_q(db, query):
     #list all variants including frequency
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
@@ -144,20 +143,17 @@ def api(current_user, query):
             return response
     elif request.method == 'POST':
         if query == "updatevariants":
-            print("---")
+            print("---")          
             j = json.loads(json.dumps(request.json))
-
             print(j["sampleid"])
-            for i in j["variants"]:
+            for i in j["variants"]:               
                 if i["changed"]==True:
                     # Insert into db:
                     _id         =   i["CHROM_POS_ALTEND_DATE"]
                     _class      =   i["class"]
-                    _comment    =   i["comment"]
+                    _comment    =   i["Comment"]
                     insert_interp(db_path, _id ,_class ,_comment  )
                     print("inserted")
-
-
 
             print("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
