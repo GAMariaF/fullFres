@@ -165,8 +165,6 @@ def generate_db(db):
 		result_classification = conn.execute(text("CREATE TABLE IF NOT EXISTS Classification ( \
 		CHROM_POS_ALTEND_DATE TEXT, \
 		DATE_CHANGED_VARIANT_BROWSER TEXT, \
-		runid TEXT, \
-		sampleid TEXT, \
 		COSMIC TEXT, \
 		Populasjonsdata TEXT, \
 		Funksjonsstudier TEXT, \
@@ -182,7 +180,7 @@ def generate_db(db):
 		class TEXT, \
 		changed TEXT, \
 		visibility TEXT, \
-		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
+		PRIMARY KEY (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER) \
 		)"))
 	
 def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
@@ -303,14 +301,12 @@ def list_samples(db):
 	return samplelist_json
 
 def list_all_samples(db):
-	#list all samples ready for interpretation
+	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT s.runid, s.sampleid, \
 			s.Date_Signoff, \
 			s.Date_Approval \
-			FROM Samples s \
-			WHERE Date_Signoff IS NULL \
-			AND Date_Approval IS NULL;"
+			FROM Samples s;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -347,8 +343,9 @@ def list_all_variants(db):
 		, v.gene, v.Type, v.oncomineGeneClass, \
 		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, c.class, \
 		group_concat(s.sampleid,', ') Samples \
-		FROM sample s, Variants v, Classification c \
+		FROM Sample s, Variants v, Classification c \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
+		AND s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)

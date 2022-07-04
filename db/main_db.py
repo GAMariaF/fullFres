@@ -14,14 +14,15 @@ from vcfutils import get_sample_diseasetype
 from dbutils import generate_db
 from dbutils import populate_thermo_variantdb
 from dbutils import list_samples
+from dbutils import list_all_samples
 from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
 from dbutils import list_all_variants
 from dbutils import list_sample_variants
 from dbutils import list_interpretation
 
-vcffile = './tests/vcfs/22shk04823_Oncomine_Extended_516_filtered.vcf'
-excelfile = './tests/vcfs/22shk04823_variants.xlsx'
+vcffile = './tests/vcfs/22skh06417_Oncomine_Extended_516_filtered.vcf'
+excelfile = './tests/vcfs/22skh06417_variants.xlsx'
 db = '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/newvariantdb.db'
 run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
@@ -44,6 +45,7 @@ populate_thermo_variantdb(db, df, dfvariant, \
     run_id, sample_id, percent_tumor, sample_diseasetype)
 
 list_samples(db)
+list_all_samples(db)
 list_signoff_samples(db)
 list_approved_samples(db)
 list_all_variants(db)
