@@ -277,7 +277,10 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
 			dfvariant_copy.to_sql('Variants', engine, if_exists='append', index=False)
-		dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
+		try:			
+			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
+		except:
+			print('There is an error trying to add '+run_id+','+sample_id+' to table Samples. Is it already in database?')
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i Variants-tabell 
 #	hvis med 
@@ -335,15 +338,14 @@ def list_approved_samples(db):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-
 def list_all_variants(db):
 	#list all variants including frequency
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT COUNT(*) as Frequency\
 		, v.gene, v.Type, v.oncomineGeneClass, \
-		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, c.class, \
-		group_concat(s.sampleid,', ') Samples \
-		FROM Sample s, Variants v, Classification c \
+		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, \
+		group_concat(s.sampleid,', ') VariantsPerSample \
+		FROM VariantsPerSample s, Variants v \
 		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		AND s.chrom_pos_altend_date = v.chrom_pos_altend_date \
 		GROUP BY s.chrom_pos_altend_date;"
@@ -355,12 +357,24 @@ def list_all_variants(db):
 def list_sample_variants(db,sampleid):
 	#list all variants for specific sample
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT s.sampleid, s.runid, v.gene, v.Type, \
-		v.oncomineGeneClass, v.oncomineVariantClass, \
-		v.CHROM, v.POS, v.REF, v.ALTEND, v.class, s.FILTER \
-		FROM sample s, Variants v \
-		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
-		AND sampleid='"+sampleid+"';"
+	stmt = "SELECT VariantsPerSample.sampleid, \
+					VariantsPerSample.runid, \
+					Variants.gene, Variants.Type, \
+					Variants.oncomineGeneClass, \
+					Variants.oncomineVariantClass, \
+					Variants.CHROM, Variants.POS, Variants.REF, \
+					Variants.ALTEND, Classification.class, \
+					VariantsPerSample.FILTER \
+			FROM VariantsPerSample \
+			LEFT JOIN Variants \
+			ON VariantsPerSample.CHROM_POS_ALTEND_DATE = \
+						Variants.CHROM_POS_ALTEND_DATE \
+			LEFT JOIN Classification \
+			ON VariantsPerSample.chrom_pos_altend_date = \
+						Classification.chrom_pos_altend_date \
+			AND VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER = \
+						Classification.DATE_CHANGED_VARIANT_BROWSER \
+			WHERE VariantsPerSample.sampleid='"+sampleid+"';"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -369,31 +383,39 @@ def list_sample_variants(db,sampleid):
 def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "select sample.runid, sample.sampleid, interpretation.Genelist,	\
-		interpretation.Perc_Tumor, Variants.gene, Variants.transcript, \
-		Variants.annotation_variant, sample.FAO || ' / ' || sample.FDP as Reads, \
-		sample.Copy_Number, sample.AF, interpretation.COSMIC, \
-		interpretation.Reply, sample.User_Classification, sample.Variant_ID, \
-		sample.Variant_Name, sample.Key_Variant, sample.Oncomine_Reporter_Evidence, \
-		sample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, sample.FILTER, Variants.gene, \
+	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
+		Samples.Perc_Tumor, Variants.gene, Variants.transcript, \
+		Variants.annotation_variant, VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
+		VariantsPerSample.Copy_Number, VariantsPerSample.AF, Classification.COSMIC, \
+		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \
+		VariantsPerSample.Variant_Name, VariantsPerSample.Key_Variant, VariantsPerSample.Oncomine_Reporter_Evidence, \
+		VariantsPerSample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, \
+		VariantsPerSample.FILTER, Variants.gene, \
 		Variants.chrom || ':' || Variants.pos as Locus, Variants.protein, Variants.ref, \
-		Variants.altend, sample.Call, sample.DP, sample.FDP, sample.FAO, \
-		Variants.coding, sample.AF, sample.P_Value, sample.Read_Counts_Per_Million, \
-		sample.Oncomine_Driver_Gene, sample.Copy_Number, sample.CNV_Confidence, \
-		sample.Valid_CNV_Amplicons, interpretation.Populasjonsdata, \
-		interpretation.Funksjonsstudier, interpretation.Prediktive_data, \
-		interpretation.Cancer_hotspots, interpretation.Computational_evidens, \
-		interpretation.Konservering, interpretation.ClinVar, sample.CLSF, Variants.class, \
-		interpretation.Andre_DB, interpretation.Comment, \
-		interpretation.Oncogenicity, interpretation.Tier, interpretation.Comment \
-			from sample \
+		Variants.altend, VariantsPerSample.Call, VariantsPerSample.DP, \
+		VariantsPerSample.FDP, VariantsPerSample.FAO, \
+		Variants.coding, VariantsPerSample.AF, \
+		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
+		VariantsPerSample.Oncomine_Driver_Gene, VariantsPerSample.Copy_Number, \
+		VariantsPerSample.CNV_Confidence, \
+		VariantsPerSample.Valid_CNV_Amplicons, Classification.Populasjonsdata, \
+		Classification.Funksjonsstudier, Classification.Prediktive_data, \
+		Classification.Cancer_hotspots, Classification.Computational_evidens, \
+		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
+		Classification.class, \
+		Classification.Andre_DB, Classification.Comment, \
+		Classification.Oncogenicity, Classification.Tier, Classification.Comment \
+			from VariantsPerSample \
 			left join Variants \
-			on sample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \
-			left join interpretation \
-			on sample.chrom_pos_altend_date = interpretation.chrom_pos_altend_date \
-			and sample.runid = interpretation.runid \
-			and sample.sampleid = interpretation.sampleid \
-			WHERE sample.sampleid='"+sampleid+"';"
+			on VariantsPerSample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \
+			left join Classification \
+			on VariantsPerSample.chrom_pos_altend_date = Classification.chrom_pos_altend_date \
+			AND VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER = \
+											Classification.DATE_CHANGED_VARIANT_BROWSER \
+			LEFT JOIN Samples \
+			on VariantsPerSample.runid = Samples.runid \
+			and VariantsPerSample.sampleid = Samples.sampleid \
+			WHERE VariantsPerSample.sampleid='"+sampleid+"';"
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')
