@@ -23,6 +23,7 @@ from dbutils import list_approved_samples
 from dbutils import list_all_variants
 from dbutils import list_sample_variants
 from dbutils import list_interpretation
+from dbutils import insert_variants
 
 
 # Imports som er brukt for aa teste db
@@ -152,9 +153,8 @@ def api(current_user, query):
                     _id         =   i["CHROM_POS_ALTEND_DATE"]
                     _class      =   i["class"]
                     _comment    =   i["Comment"]
-                    insert_interp(db_path, _id ,_class ,_comment  )
+                    insert_variants(db_path,i)
                     print("inserted")
-
             print("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response

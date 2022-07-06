@@ -426,3 +426,62 @@ def list_interpretation(db,sampleid):
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')
 	return list_json
+
+def insert_variants(db, variant_dict):
+	# update DATE_CHANGED_VARIANT_BROWSER !!!
+    # Check if classification has a copy in database 
+    # if true: pick that DATE_CHANGED_VARIANT_BROWSER and
+    # set it into Classification and VariantsPerSample
+    # if false: set new DATE_CHANGED_VARIANT_BROWSER and
+    # set it into Classification and VariantsPerSample
+	dfVariant = pd.DataFrame(variant_dict,index=[0])
+	colClassification = ["CHROM_POS_ALTEND_DATE",\
+										"DATE_CHANGED_VARIANT_BROWSER", \
+										"Comment",\
+										"class"]
+
+	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
+										"DATE_CHANGED_VARIANT_BROWSER"]
+	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
+	dfVarVariantsPerSample =  pd.DataFrame(dfVariant, columns = colVariantsPerSample)
+	print(dfVarClassification.CHROM_POS_ALTEND_DATE[0])
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "select * from Classification \
+				where CHROM_POS_ALTEND_DATE = '" \
+					+dfVarClassification.CHROM_POS_ALTEND_DATE[0]+"' \
+					AND class = '"+dfVarClassification["class"][0]+"' \
+					AND Comment = '"+dfVarClassification.Comment[0]+"';"
+	with engine.connect() as conn:
+		dfInDB = pd.read_sql_query(text(stmt), con=conn)
+	if dfInDB.empty:
+		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+		dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0] = \
+		dateChangedVariantBrowser
+		# Since Classification not in table it has to be added
+		engine = create_engine("sqlite:///"+db, echo=False, future=True)
+		with engine.connect() as conn:
+			dfVarClassification.to_sql('Classification', engine, if_exists='append', index=False)
+			conn.commit()
+	else:
+		dateChangedVariantBrowser = \
+			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
+	print(dateChangedVariantBrowser)
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	with engine.connect() as conn:
+		stmtVPS = "UPDATE VariantsPerSample set \
+					DATE_CHANGED_VARIANT_BROWSER = \
+						'"+dateChangedVariantBrowser+"'\
+				WHERE \
+					runid = \
+						'"+dfVarVariantsPerSample.runid[0]+"'\
+					AND sampleid = \
+						'"+dfVarVariantsPerSample.sampleid[0]+"'\
+					AND CHROM_POS_ALTEND_DATE = \
+						'"+dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]+"';"
+		result = conn.execute(text(stmtVPS))
+		conn.commit()
+		conn.close()
+
+		#!!!!!!!!!!??????????????!!!!!!!!!!!!!!!!
+
+
