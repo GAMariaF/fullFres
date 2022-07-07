@@ -150,9 +150,9 @@ def api(current_user, query):
             for i in j["variants"]:               
                 if i["changed"]==True:
                     # Insert into db:
-                    _id         =   i["CHROM_POS_ALTEND_DATE"]
-                    _class      =   i["class"]
-                    _comment    =   i["Comment"]
+                    #_id         =   i["CHROM_POS_ALTEND_DATE"]
+                    #_class      =   i["class"]
+                    #_comment    =   i["Comment"]
                     insert_variants(db_path,i)
                     print("inserted")
             print("Variants posted for update in database")

@@ -458,8 +458,6 @@ export default {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
     }
-
-
   }
 
 };
