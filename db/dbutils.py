@@ -1,6 +1,7 @@
 import pandas as pd
 import sqlite3
 import sqlalchemy
+from sqlalchemy import update
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import text
@@ -297,7 +298,10 @@ def list_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sampleid, runid \
 				FROM Samples \
-				WHERE Date_Signoff IS NULL;"
+				WHERE (Date_Signoff IS NULL \
+				OR Date_Signoff IS '') \
+				AND (Date_Approval IS Null \
+				OR Date_Approval is '');"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -320,8 +324,10 @@ def list_signoff_samples(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT DISTINCT sampleid, runid, Date_Signoff \
 				FROM Samples \
-				WHERE Date_Signoff IS NOT NULL \
-				AND Date_Approval IS NULL;"
+				WHERE (Date_Signoff IS NOT NULL \
+				AND Date_Signoff IS NOT '') \
+				AND (Date_Approval IS NULL \
+				OR Date_Approval IS '');"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -436,42 +442,70 @@ def insert_variants(db, variant_dict):
     # set it into Classification and VariantsPerSample
 	dfVariant = pd.DataFrame(variant_dict,index=[0])
 	colClassification = ["CHROM_POS_ALTEND_DATE",\
-										"DATE_CHANGED_VARIANT_BROWSER", \
-										"Comment",\
-										"class"]
-
+								"DATE_CHANGED_VARIANT_BROWSER", \
+								"COSMIC", \
+								"Populasjonsdata", \
+								"Funksjonsstudier", \
+								"Prediktive_data", \
+								"Cancer_hotspots", \
+								"Computational_evidens", \
+								"Konservering", \
+								"ClinVar", \
+								"Andre_DB", \
+								"Comment", \
+								"Oncogenicity", \
+								"Tier", \
+								"class", \
+								"changed", \
+								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-										"DATE_CHANGED_VARIANT_BROWSER"]
+								"DATE_CHANGED_VARIANT_BROWSER"]
 	colSamples = ["runid", "sampleid", \
-					"User_Signoff", "Date_Signoff", \
-					"User_Approval", "Date_Approval"]
+								"User_Signoff", "Date_Signoff", \
+								"User_Approval", "Date_Approval"]
+	# Dataframe to table Classification
 	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
-	dfVarClassification = dfVarClassification.fillna('NULL')
+	dfVarClassification = dfVarClassification.fillna('')
+	# Dataframe to table VariantsPerSample
 	dfVarVariantsPerSample = pd.DataFrame(dfVariant, columns = colVariantsPerSample)
-	dfVarVariantsPerSample = dfVarVariantsPerSample.fillna('NULL')
+	dfVarVariantsPerSample = dfVarVariantsPerSample.fillna('')
+	# Dataframe to table Samples
 	dfVarSamples = pd.DataFrame(dfVariant, columns = colSamples)
-	dfVarSamples = dfVarSamples.fillna('NULL')
+	dfVarSamples = dfVarSamples.fillna('')
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	print(dfVarClassification)
 	stmt = "select * from Classification \
-				where CHROM_POS_ALTEND_DATE = '" \
-					+dfVarClassification.CHROM_POS_ALTEND_DATE[0]+"' \
-					AND class = '"+dfVarClassification["class"][0]+"' \
-					AND Comment = '"+dfVarClassification.Comment[0]+"';"
+				where CHROM_POS_ALTEND_DATE = '"+dfVarClassification['CHROM_POS_ALTEND_DATE'][0]+"' \
+				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]+"' \
+				AND COSMIC='"+dfVarClassification['COSMIC'][0]+"' \
+				AND Populasjonsdata='"+dfVarClassification['Populasjonsdata'][0]+"' \
+				AND Funksjonsstudier='"+dfVarClassification['Funksjonsstudier'][0]+"' \
+				AND Prediktive_data='"+dfVarClassification['Prediktive_data'][0]+"' \
+				AND Cancer_hotspots='"+dfVarClassification['Cancer_hotspots'][0]+"' \
+				AND Computational_evidens='"+dfVarClassification['Computational_evidens'][0]+"' \
+				AND Konservering='"+dfVarClassification['Konservering'][0]+"' \
+				AND ClinVar='"+dfVarClassification['ClinVar'][0]+"' \
+				AND Andre_DB='"+dfVarClassification['Andre_DB'][0]+"' \
+				AND Comment='"+dfVarClassification['Comment'][0]+"' \
+				AND Oncogenicity='"+dfVarClassification['Oncogenicity'][0].astype(str)+"' \
+				AND Tier='"+dfVarClassification['Tier'][0]+"' \
+				AND class='"+dfVarClassification['class'][0]+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
 	if dfInDB.empty:
 		# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date
+		print('new classifiction')
 		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 		dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0] = \
 		dateChangedVariantBrowser
 		# Since Classification not in table it has to be added
 		engine = create_engine("sqlite:///"+db, echo=False, future=True)
 		with engine.connect() as conn:
-			dfVarClassification.to_sql('Classification', engine, if_exists='append', index=False)
+			dfVarClassification.to_sql('Classification', engine, \
+				if_exists='append', index=False)
 			conn.commit()
 	else:
-		# If already in DB chose most reason entry DATE_CHANGED_VARIANT_BROWSER
+		print('not new in classification')
+		# If already in DB chose most recent entry DATE_CHANGED_VARIANT_BROWSER
 		dateChangedVariantBrowser = \
 			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
 	print(dateChangedVariantBrowser)
@@ -489,6 +523,7 @@ def insert_variants(db, variant_dict):
 					AND CHROM_POS_ALTEND_DATE = \
 						'"+dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]+"';"
 		result = conn.execute(text(stmtVPS))
+		conn.commit()
 	# Update table Samples with data for User and Date (Sign_off)
 	# and User and Date (Approval)
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
@@ -508,8 +543,5 @@ def insert_variants(db, variant_dict):
 					AND sampleid = \
 						'"+dfVarSamples.sampleid[0]+"';"
 		result = conn.execute(text(stmtS))
-
-
-
-
-
+		conn.commit()
+		
