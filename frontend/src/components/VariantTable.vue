@@ -1,6 +1,6 @@
 import util_funcs from '../appUtils'
 <template>
-  <div id="app" class="container-fluid">
+  <div id="app" class="container-fluid" v-if="!loading">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
     <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
@@ -253,16 +253,18 @@ import util_funcs from '../appUtils'
     <br>
     <br>
     Class: {{variants[0].class}}
+  {{ loading }}
   </div>
+  
 </template>
 <script>
 
 import { config } from '../config.js'
 export default {
   name: "varianttable",
-  props: ["loading"],
   data() {
     return {
+      loading: true,
       sortedIndex: [ 'runid',
                     'sampleid',
                     'Genelist',
@@ -447,17 +449,14 @@ export default {
         .then((data) => {
           console.log(data);
         });
-        
         this.$router.push({
         name: "Samples"
         });
-
     },
     sendVariantsToPost() {},
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-
     return this.$store.getters.variants;
   },
   computed: {
@@ -465,7 +464,12 @@ export default {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
     }
+  },
+  watch: {
+      variants(newVars, oldVars) {
+      console.log(`Changed from ${oldVars} to ${newVars}`);
+      this.loading = false;
+    },
   }
-
 };
 </script>

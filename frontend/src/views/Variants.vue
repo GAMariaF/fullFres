@@ -1,7 +1,7 @@
 <template>
   <div>
   
-    <variant-table  :loading="loading"   />
+    <variant-table    />
   </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       sampleid: this.$route.params.id,
-      loading:  false
+    
     };
   },
   created: function () {
