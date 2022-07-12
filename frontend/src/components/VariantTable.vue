@@ -427,7 +427,6 @@ export default {
       console.log("Sign off method");
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
-
       this.$http
         .post(
           baseURI,
@@ -445,6 +444,11 @@ export default {
         .then((data) => {
           console.log(data);
         });
+        
+        this.$router.push({
+        name: "Samples"
+        });
+
     },
     sendVariantsToPost() {},
   },
