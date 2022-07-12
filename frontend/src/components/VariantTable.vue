@@ -41,6 +41,7 @@ import util_funcs from '../appUtils'
     <!--  -->
 
     <b-modal
+
       :id="infoModal.id"
       :title="infoModal.title"
       ok-only
@@ -421,6 +422,8 @@ export default {
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
+      this.selectedoncogenicity_list = [];
+      this.oncoScore = 0;
       console.log("infomodal lukket");
     },
     signOff() {
