@@ -27,6 +27,7 @@ from dbutils import list_sample_variants
 from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
+from dbutils import insert_approvedate
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -171,6 +172,13 @@ def api(current_user, query):
             j = json.loads(json.dumps(request.json))
             insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Signed off sample!'})
+            return response
+        elif query == "approve":
+            print("running approve")
+            j = json.loads(json.dumps(request.json))
+            insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            
+            response = jsonify({'message': 'Approved sample!'})
             return response
 
 @app.route('/chklogin')

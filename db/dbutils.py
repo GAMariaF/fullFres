@@ -438,13 +438,27 @@ def insert_signoffdate(db, user, date, sampleid):
 	'''
 	When hitting the signoff-button in the browser - set signoff date and signoff user
 	'''
-	print("running insert_signoffdate")
+	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	print(sampleid)
 	stmt = "UPDATE Samples set User_Signoff = '"+user+"' ,Date_Signoff = '"+date+"' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
+
+def insert_approvedate(db, user, date, sampleid):
+	''' 
+	When hitting the approve-button in the browser - set approved date and approved user
+	'''
+	print("running approve-date")
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "UPDATE Samples set User_Approval = '"+user+"', Date_Approval = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
+
+
 
 
 def insert_variants(db, variant_dict):
