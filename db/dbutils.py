@@ -433,6 +433,20 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
+
+def insert_signoffdate(db, user, date, sampleid):
+	'''
+	When hitting the signoff-button in the browser - set signoff date and signoff user
+	'''
+	print("running insert_signoffdate")
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	print(sampleid)
+	stmt = "UPDATE Samples set User_Signoff = '"+user+"' ,Date_Signoff = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
+
 def insert_variants(db, variant_dict):
 	# update DATE_CHANGED_VARIANT_BROWSER !!!
     # Check if classification has a copy in database 

@@ -511,7 +511,7 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      console.log("metode testaxios");
+      console.log("method to get signed off samples");
       const baseURI = config.$backend_url + "/api/signoff_samples";
       axios
         .get(baseURI)

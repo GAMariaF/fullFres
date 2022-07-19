@@ -253,7 +253,7 @@ import util_funcs from '../appUtils'
     <br>
     <br>
     Class: {{variants[0].class}}
-  {{ loading }}
+  
   </div>
   
 </template>
@@ -428,8 +428,8 @@ export default {
       this.oncoScore = 0;
       console.log("infomodal lukket");
     },
-    signOff() {
-      console.log("Sign off method");
+    sendVariants() {
+      // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
       this.$http
@@ -438,6 +438,32 @@ export default {
           {
             sampleid: this.$route.params.id,
             variants: this.variants,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+    },
+    signOff() {
+      // This if only for signing off the user when interpretation is done. 
+      console.log("Sign off method");
+      
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/signoff";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            variants: this.variants,
+            user: this.$store.getters.username,
           },
           {
             withCredentials: true,
@@ -453,7 +479,7 @@ export default {
         name: "Samples"
         });
     },
-    sendVariantsToPost() {},
+    
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});

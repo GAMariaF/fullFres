@@ -1,7 +1,7 @@
 <template>
   <div>
   
-    <variant-table    />
+    <variant-table />
   </div>
 </template>
 
