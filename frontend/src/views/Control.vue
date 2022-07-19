@@ -61,7 +61,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not Relevant and Technical variants</p></h2>
+          <h2><p style="text-align:left;">Not Relevant and Technical variants AND NOT INTERPRETED (empty class col)</p></h2>
           <br>          
           <b-table
             selectable
@@ -544,15 +544,14 @@ export default {
     filteredClass() {
       let classVariants = this.variants
       classVariants = classVariants.filter((item) => {
-        return (item.class != this.Technical && item.class != this.NotRelevant)
+        return (item.class != this.Technical && item.class != this.NotRelevant && !!item.class)
       })
       return classVariants;
     },
     filteredNotClass() {
       let notClassVariants = this.variants
-    
       notClassVariants = notClassVariants.filter((item) => {
-        return (item.class == this.Technical || item.class == this.NotRelevant)
+        return (!item.class || item.class == this.Technical || item.class == this.NotRelevant)
       })
       return notClassVariants;
     },
