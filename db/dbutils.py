@@ -457,10 +457,6 @@ def insert_approvedate(db, user, date, sampleid):
 		result = conn.execute(text(stmt))
 		conn.commit()
 
-
-
-
-
 def insert_variants(db, variant_dict):
 	# update DATE_CHANGED_VARIANT_BROWSER !!!
     # Check if classification has a copy in database 
@@ -502,21 +498,21 @@ def insert_variants(db, variant_dict):
 	dfVarSamples = dfVarSamples.fillna('')
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select * from Classification \
-				where CHROM_POS_ALTEND_DATE = '"+dfVarClassification['CHROM_POS_ALTEND_DATE'][0]+"' \
-				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]+"' \
-				AND COSMIC='"+dfVarClassification['COSMIC'][0]+"' \
-				AND Populasjonsdata='"+dfVarClassification['Populasjonsdata'][0]+"' \
-				AND Funksjonsstudier='"+dfVarClassification['Funksjonsstudier'][0]+"' \
-				AND Prediktive_data='"+dfVarClassification['Prediktive_data'][0]+"' \
-				AND Cancer_hotspots='"+dfVarClassification['Cancer_hotspots'][0]+"' \
-				AND Computational_evidens='"+dfVarClassification['Computational_evidens'][0]+"' \
-				AND Konservering='"+dfVarClassification['Konservering'][0]+"' \
-				AND ClinVar='"+dfVarClassification['ClinVar'][0]+"' \
-				AND Andre_DB='"+dfVarClassification['Andre_DB'][0]+"' \
-				AND Comment='"+dfVarClassification['Comment'][0]+"' \
-				AND Oncogenicity='"+dfVarClassification['Oncogenicity'][0].astype(str)+"' \
-				AND Tier='"+dfVarClassification['Tier'][0]+"' \
-				AND class='"+dfVarClassification['class'][0]+"';"
+				where CHROM_POS_ALTEND_DATE = '"+	dfVarClassification['CHROM_POS_ALTEND_DATE'][0]			+"' \
+				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]	+"' \
+				AND COSMIC='"+          			dfVarClassification['COSMIC'][0]						+"' \
+				AND Populasjonsdata='"+ 			dfVarClassification['Populasjonsdata'][0]				+"' \
+				AND Funksjonsstudier='"+			dfVarClassification['Funksjonsstudier'][0]				+"' \
+				AND Prediktive_data='"+ 			dfVarClassification['Prediktive_data'][0]				+"' \
+				AND Cancer_hotspots='"+ 			dfVarClassification['Cancer_hotspots'][0]				+"' \
+				AND Computational_evidens='"+		dfVarClassification['Computational_evidens'][0]			+"' \
+				AND Konservering='"+				dfVarClassification['Konservering'][0]					+"' \
+				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
+				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
+				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
+				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
+				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
+				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
 	if dfInDB.empty:

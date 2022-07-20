@@ -46,7 +46,7 @@ import util_funcs from '../appUtils'
       :title="infoModal.title"
       ok-only
       size="lg"
-      @hide="resetInfoModal()"
+      @hide="resetInfoModal();sendVariants()"
     >
       <b-container fluid>
         <b-row class="mb-1">
@@ -429,7 +429,16 @@ export default {
       console.log("infomodal lukket");
     },
     sendVariants() {
-      // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal
+      // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
+      // If any changed:
+      
+      
+      if (this.variants.filter(e => e.changed === true).length > 0) {
+        console.log("Something has changed - sending updated data to db")
+      
+
+
+
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
       this.$http
@@ -442,7 +451,6 @@ export default {
           },
           {
             withCredentials: true,
-            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
             headers: { "Content-Type": "application/json" },
           }
         )
@@ -450,6 +458,9 @@ export default {
         .then((data) => {
           console.log(data);
         });
+
+      } 
+      console.log("tester om sendvariants blir aktivert when leaving modal")
     },
     signOff() {
       // This if only for signing off the user when interpretation is done. 
