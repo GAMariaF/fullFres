@@ -569,3 +569,42 @@ def insert_variants(db, variant_dict):
 		result = conn.execute(text(stmtS))
 		conn.commit()
 		
+def db_to_vcf(db,outvcf='exported.vcf'):
+	''' 
+	import configparser, sys
+	config = configparser.ConfigParser()
+	config.read('backend/config.ini')
+
+	sys.path.insert(0, config['Paths']['backend_path'])
+	sys.path.insert(0, config['Paths']['db_path'])
+	from dbutils import db_to_vcf
+	db_to_vcf('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+
+	db 		-> the variantDB that is being exported
+	outvcf 	-> name of the output vcf
+	'''
+	vcf_header = '''
+	##fileformat=VCFv4.1
+	##fileDate=20090805
+	##source=myImputationProgramV3.1
+	##reference=file:///seq/references/1000GenomesPilot-NCBI36.fasta
+	##contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
+	##phasing=partial
+	##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples With Data">
+	##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+	##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+	##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
+	##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
+	##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
+	##FILTER=<ID=q10,Description="Quality below 10">
+	##FILTER=<ID=s50,Description="Less than 50% of samples have data">
+	##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+	##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+	##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+	##FORMAT=<ID=HQ,Number=2,Type=Integer,Description="Haplotype Quality">
+	#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA00001 NA00002 NA00003
+	'''
+	# Write header to file
+	
+	with open(outvcf, 'w') as f:
+		f.write(vcf_header)

@@ -41,7 +41,7 @@ db_path = config['Paths']['db_full_path']
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
-#SELECT DISTINCT(sampleid) FROM sample
+
 
 def run_q(db, query):
     #list all variants including frequency
