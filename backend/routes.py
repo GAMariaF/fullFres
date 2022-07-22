@@ -11,12 +11,13 @@ from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
 import sys
-#sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
-#sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
-sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/backend')
-sys.path.insert(0, '/illumina/analysis/dev/2022/fullFres/db')
-#sys.path.insert(0, '/fullFres/backend')
-#sys.path.insert(0, '/fullFres/db')
+import configparser
+config = configparser.ConfigParser()
+config.read('backend/config.ini')
+
+sys.path.insert(0, config['Paths']['backend_path'])
+sys.path.insert(0, config['Paths']['db_path'])
+
 ### settings.json gir path til dbutils og vcfutils
 from dbutils import list_samples
 from dbutils import list_all_samples
@@ -36,10 +37,7 @@ from sqlalchemy import text
 import pandas as pd
 import json
 
-
-#db_path = "/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db"
-db_path = "/illumina/analysis/dev/2022/fullFres/db/variantdb.db"
-
+db_path = config['Paths']['db_full_path']
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
@@ -47,7 +45,7 @@ db_path = "/illumina/analysis/dev/2022/fullFres/db/variantdb.db"
 
 def run_q(db, query):
     #list all variants including frequency
-    engine = create_engine("sqlite:///"+db, echo=False, future=True)
+    engine = create_engine("sqlite:///" + db, echo=False, future=True)
     if query == "samples":
         stmt = "SELECT DISTINCT(sampleid) FROM sample"
         with engine.connect() as conn:
@@ -77,8 +75,6 @@ def insert_interp(db, id, vclass, vcomment, ):
     with engine.connect() as conn:
         conn.execute(text(stmt))
         conn.commit()
-
-
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
