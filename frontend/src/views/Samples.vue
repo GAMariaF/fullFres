@@ -1,10 +1,13 @@
 <template>
   <div>
-    <div class="container" id="login">
+    <div class="container" id="login" v-if="items.length===0">
+    <h3>No samples ready for interpretation.<br> Go have a coffe!</h3> 
+    </div>
+    <div class="container" id="login" v-if="items.length!==0">
       <div class="row row justify-content-center">
         <div class="col-md-10">
         <b-col cols="6">
-          {{ loggedInStatus }}
+        
           <h1>Select sample for interpretation</h1>
           <br>
           <b-table

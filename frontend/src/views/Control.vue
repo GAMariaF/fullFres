@@ -61,7 +61,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not Relevant and Technical variants</p></h2>
+          <h2><p style="text-align:left;">Not Relevant and Technical variants AND NOT INTERPRETED (empty class col)</p></h2>
           <br>          
           <b-table
             selectable
@@ -309,7 +309,7 @@
   </b-container>
 </template>
 <script>
-import axios from "axios";
+// import axios from "axios";
 import { config } from "../config.js"
 
 export default {
@@ -511,15 +511,41 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      console.log("metode testaxios");
+      console.log("method to get signed off samples");
       const baseURI = config.$backend_url + "/api/signoff_samples";
-      axios
+      this.$http
         .get(baseURI)
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
     },
     approve() {
       // Sending approval date to database
+            // This if only for signing off the user when interpretation is done. 
+      console.log("Sign off method");
+      
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/approve";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.selectedSample,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+        this.$router.push({
+        name: "Samples"
+        });
+
+
     },
   },
   watch: {
@@ -544,15 +570,14 @@ export default {
     filteredClass() {
       let classVariants = this.variants
       classVariants = classVariants.filter((item) => {
-        return (item.class != this.Technical && item.class != this.NotRelevant)
+        return (item.class != this.Technical && item.class != this.NotRelevant && !!item.class)
       })
       return classVariants;
     },
     filteredNotClass() {
       let notClassVariants = this.variants
-    
       notClassVariants = notClassVariants.filter((item) => {
-        return (item.class == this.Technical || item.class == this.NotRelevant)
+        return (!item.class || item.class == this.Technical || item.class == this.NotRelevant)
       })
       return notClassVariants;
     },

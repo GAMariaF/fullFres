@@ -433,6 +433,30 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
+
+def insert_signoffdate(db, user, date, sampleid):
+	'''
+	When hitting the signoff-button in the browser - set signoff date and signoff user
+	'''
+	
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	print(sampleid)
+	stmt = "UPDATE Samples set User_Signoff = '"+user+"' ,Date_Signoff = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
+def insert_approvedate(db, user, date, sampleid):
+	''' 
+	When hitting the approve-button in the browser - set approved date and approved user
+	'''
+	print("running approve-date")
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "UPDATE Samples set User_Approval = '"+user+"', Date_Approval = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
 def insert_variants(db, variant_dict):
 	# update DATE_CHANGED_VARIANT_BROWSER !!!
     # Check if classification has a copy in database 
@@ -474,21 +498,21 @@ def insert_variants(db, variant_dict):
 	dfVarSamples = dfVarSamples.fillna('')
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select * from Classification \
-				where CHROM_POS_ALTEND_DATE = '"+dfVarClassification['CHROM_POS_ALTEND_DATE'][0]+"' \
-				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]+"' \
-				AND COSMIC='"+dfVarClassification['COSMIC'][0]+"' \
-				AND Populasjonsdata='"+dfVarClassification['Populasjonsdata'][0]+"' \
-				AND Funksjonsstudier='"+dfVarClassification['Funksjonsstudier'][0]+"' \
-				AND Prediktive_data='"+dfVarClassification['Prediktive_data'][0]+"' \
-				AND Cancer_hotspots='"+dfVarClassification['Cancer_hotspots'][0]+"' \
-				AND Computational_evidens='"+dfVarClassification['Computational_evidens'][0]+"' \
-				AND Konservering='"+dfVarClassification['Konservering'][0]+"' \
-				AND ClinVar='"+dfVarClassification['ClinVar'][0]+"' \
-				AND Andre_DB='"+dfVarClassification['Andre_DB'][0]+"' \
-				AND Comment='"+dfVarClassification['Comment'][0]+"' \
-				AND Oncogenicity='"+dfVarClassification['Oncogenicity'][0].astype(str)+"' \
-				AND Tier='"+dfVarClassification['Tier'][0]+"' \
-				AND class='"+dfVarClassification['class'][0]+"';"
+				where CHROM_POS_ALTEND_DATE = '"+	dfVarClassification['CHROM_POS_ALTEND_DATE'][0]			+"' \
+				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]	+"' \
+				AND COSMIC='"+          			dfVarClassification['COSMIC'][0]						+"' \
+				AND Populasjonsdata='"+ 			dfVarClassification['Populasjonsdata'][0]				+"' \
+				AND Funksjonsstudier='"+			dfVarClassification['Funksjonsstudier'][0]				+"' \
+				AND Prediktive_data='"+ 			dfVarClassification['Prediktive_data'][0]				+"' \
+				AND Cancer_hotspots='"+ 			dfVarClassification['Cancer_hotspots'][0]				+"' \
+				AND Computational_evidens='"+		dfVarClassification['Computational_evidens'][0]			+"' \
+				AND Konservering='"+				dfVarClassification['Konservering'][0]					+"' \
+				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
+				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
+				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
+				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
+				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
+				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
 	if dfInDB.empty:
@@ -545,3 +569,42 @@ def insert_variants(db, variant_dict):
 		result = conn.execute(text(stmtS))
 		conn.commit()
 		
+def db_to_vcf(db,outvcf='exported.vcf'):
+	''' 
+	import configparser, sys
+	config = configparser.ConfigParser()
+	config.read('backend/config.ini')
+
+	sys.path.insert(0, config['Paths']['backend_path'])
+	sys.path.insert(0, config['Paths']['db_path'])
+	from dbutils import db_to_vcf
+	db_to_vcf('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
+
+	db 		-> the variantDB that is being exported
+	outvcf 	-> name of the output vcf
+	'''
+	vcf_header = '''
+	##fileformat=VCFv4.1
+	##fileDate=20090805
+	##source=myImputationProgramV3.1
+	##reference=file:///seq/references/1000GenomesPilot-NCBI36.fasta
+	##contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
+	##phasing=partial
+	##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples With Data">
+	##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+	##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+	##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
+	##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
+	##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
+	##FILTER=<ID=q10,Description="Quality below 10">
+	##FILTER=<ID=s50,Description="Less than 50% of samples have data">
+	##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+	##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+	##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+	##FORMAT=<ID=HQ,Number=2,Type=Integer,Description="Haplotype Quality">
+	#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA00001 NA00002 NA00003
+	'''
+	# Write header to file
+	
+	with open(outvcf, 'w') as f:
+		f.write(vcf_header)

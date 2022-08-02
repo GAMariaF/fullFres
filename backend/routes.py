@@ -11,10 +11,13 @@ from backend import app
 from backend.users_db import Users
 from flask_cors import cross_origin
 import sys
-sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/backend')
-sys.path.insert(0, '/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db')
-#sys.path.insert(0, '/fullFres/backend')
-#sys.path.insert(0, '/fullFres/db')
+import configparser
+config = configparser.ConfigParser()
+config.read('backend/config.ini')
+
+sys.path.insert(0, config['Paths']['backend_path'])
+sys.path.insert(0, config['Paths']['db_path'])
+
 ### settings.json gir path til dbutils og vcfutils
 from dbutils import list_samples
 from dbutils import list_all_samples
@@ -24,7 +27,8 @@ from dbutils import list_all_variants
 from dbutils import list_sample_variants
 from dbutils import list_interpretation
 from dbutils import insert_variants
-
+from dbutils import insert_signoffdate
+from dbutils import insert_approvedate
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -33,16 +37,15 @@ from sqlalchemy import text
 import pandas as pd
 import json
 
-
-db_path = "/illumina/analysis/dev/2022/mfahls/fullFres/fullFres/db/variantdb.db"
+db_path = config['Paths']['db_full_path']
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
-#SELECT DISTINCT(sampleid) FROM sample
+
 
 def run_q(db, query):
     #list all variants including frequency
-    engine = create_engine("sqlite:///"+db, echo=False, future=True)
+    engine = create_engine("sqlite:///" + db, echo=False, future=True)
     if query == "samples":
         stmt = "SELECT DISTINCT(sampleid) FROM sample"
         with engine.connect() as conn:
@@ -72,8 +75,6 @@ def insert_interp(db, id, vclass, vcomment, ):
     with engine.connect() as conn:
         conn.execute(text(stmt))
         conn.commit()
-
-
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -121,12 +122,16 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         if query == "signoff_samples":
+            print("signoff_samples")
             samples = list_signoff_samples(db_path)
+            print("--")
+            print(samples)
+            print("--")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = list_interpretation(db_path, query.split("_")[1])
+            variants = list_interpretation(db_path, query.split("_")[1])          
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
@@ -147,7 +152,7 @@ def api(current_user, query):
             print("---")          
             j = json.loads(json.dumps(request.json))
             print(j["sampleid"])
-            for i in j["variants"]:               
+            for i in j["variants"]:
                 if i["changed"]==True:
                     # Insert into db:
                     #_id         =   i["CHROM_POS_ALTEND_DATE"]
@@ -155,10 +160,22 @@ def api(current_user, query):
                     #_comment    =   i["Comment"]
                     insert_variants(db_path,i)
                     print("inserted")
+
             print("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response
-
+        elif query == "signoff":
+            j = json.loads(json.dumps(request.json))
+            insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            response = jsonify({'message': 'Signed off sample!'})
+            return response
+        elif query == "approve":
+            print("running approve")
+            j = json.loads(json.dumps(request.json))
+            insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            
+            response = jsonify({'message': 'Approved sample!'})
+            return response
 
 @app.route('/chklogin')
 @token_required
@@ -173,12 +190,6 @@ def chklogin(current_user):
         response = make_response(jsonify(logstatus="true", username=current_user.name), 200)
     return response
 
-
-@app.route('/signoff', methods=['POST'])
-def signoff():
-    print(request.get_json())
-    response = jsonify({'message': 'Thanks for the data!'})
-    return response
 
 
 if __name__ == '__main__':

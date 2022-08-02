@@ -1,6 +1,6 @@
 import util_funcs from '../appUtils'
 <template>
-  <div id="app" class="container-fluid">
+  <div id="app" class="container-fluid" v-if="!loading">
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
     <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
@@ -41,11 +41,12 @@ import util_funcs from '../appUtils'
     <!--  -->
 
     <b-modal
+
       :id="infoModal.id"
       :title="infoModal.title"
       ok-only
       size="lg"
-      @hide="resetInfoModal()"
+      @hide="resetInfoModal();sendVariants()"
     >
       <b-container fluid>
         <b-row class="mb-1">
@@ -252,16 +253,18 @@ import util_funcs from '../appUtils'
     <br>
     <br>
     Class: {{variants[0].class}}
+  
   </div>
+  
 </template>
 <script>
 
 import { config } from '../config.js'
 export default {
   name: "varianttable",
-  props: ["loading"],
   data() {
     return {
+      loading: true,
       sortedIndex: [ 'runid',
                     'sampleid',
                     'Genelist',
@@ -421,19 +424,57 @@ export default {
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
+      this.selectedoncogenicity_list = [];
+      this.oncoScore = 0;
       console.log("infomodal lukket");
     },
-    signOff() {
-      console.log("Sign off method");
+    sendVariants() {
+      // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
+      // If any changed:
+      
+      
+      if (this.variants.filter(e => e.changed === true).length > 0) {
+        console.log("Something has changed - sending updated data to db")
+      
+
+
+
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
-
       this.$http
         .post(
           baseURI,
           {
             sampleid: this.$route.params.id,
             variants: this.variants,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+
+      } 
+      console.log("tester om sendvariants blir aktivert when leaving modal")
+    },
+    signOff() {
+      // This if only for signing off the user when interpretation is done. 
+      console.log("Sign off method");
+      
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/signoff";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            variants: this.variants,
+            user: this.$store.getters.username,
           },
           {
             withCredentials: true,
@@ -445,12 +486,14 @@ export default {
         .then((data) => {
           console.log(data);
         });
+        this.$router.push({
+        name: "Samples"
+        });
     },
-    sendVariantsToPost() {},
+    
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-
     return this.$store.getters.variants;
   },
   computed: {
@@ -458,7 +501,12 @@ export default {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
     }
+  },
+  watch: {
+      variants(newVars, oldVars) {
+      console.log(`Changed from ${oldVars} to ${newVars}`);
+      this.loading = false;
+    },
   }
-
 };
 </script>
