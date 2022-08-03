@@ -374,7 +374,7 @@ export default {
         break;
       }
     })
-    this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+    this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;

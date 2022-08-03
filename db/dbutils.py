@@ -1,3 +1,4 @@
+import xxlimited
 import pandas as pd
 import sqlite3
 import sqlalchemy
@@ -184,7 +185,8 @@ def generate_db(db):
 		PRIMARY KEY (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER) \
 		)"))
 	
-def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_tumor, sample_diseasetype):
+def populate_thermo_variantdb(db, dfvcf, dfvariant, \
+					run_id, sample_id, percent_tumor, sample_diseasetype):
 	# add variants to table sample and add variants if new to table Variants
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
@@ -196,6 +198,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 	dfvcf_copy.insert(0, 'runid', run_id, True)
 	dfvcf_copy.insert(1, 'sampleid', sample_id, True)
 	dfvcf_copy.insert(2, 'CHROM_POS_ALTEND_DATE', "" )
+	dfvcf_copy.insert(3, 'DATE_CHANGED_VARIANT_BROWSER', "" )
 	dfvariant_copy.insert( 0, 'CHROM_POS_ALTEND_DATE', "" )
 	# add date column
 	date=datetime.datetime.now().strftime("%y%m%d%H%M%S")
@@ -226,11 +229,24 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				variantindb = dfdb_variant_latest.reset_index(drop=True)[cols].equals( \
 					dfvariant_copy.loc[[row]].reset_index(drop=True)[cols])
 				if variantindb:
-					# if in db: use key in Variants table (chrom_pos_ref_alt_date) as key to vcf table
+					# if in db: use key in Variants table
+					# (chrom_pos_ref_alt_date) as key to 
+					# variantspersample (dfvcf_copy) table
 					# do not add variant to table Variants
-					# if sample, run and variant already in VariantsPerSample database don't add
 					dfvariant_copy = dfvariant_copy.drop(row)
 					dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]
+					# Find if in Classification table with CHROM_POS_ALTEND_DATE
+					# If present get max DATE_CHANGED_VARIANT_BROWSER and set in
+					# VariantsPerSample table
+					stmtClassification = "select * from Classification \
+						where CHROM_POS_ALTEND_DATE = '"\
+										+dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]+"';"
+					dfdbClassification = \
+						pd.read_sql_query(text(stmtClassification), con = conn)
+					if not dfdbClassification.empty:
+						dfvcf_copy.DATE_CHANGED_VARIANT_BROWSER.loc[row] = \
+							dfdbClassification.DATE_CHANGED_VARIANT_BROWSER.max()	
+					# if sample, run and variant already in VariantsPerSample database don't add
 					stmtvcf = "select * from VariantsPerSample \
 						where runid = '"+dfvcf_copy.runid.loc[row]+"' \
 							AND sampleid = '"+dfvcf_copy.sampleid.loc[row]+"' \
@@ -271,7 +287,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, run_id, sample_id, percent_t
 				'Non-Targeted': 'Non_Targeted' \
 				})
 		# Data to table Samples
-		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
+		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],\
+					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
 		print(run_id,sample_id,percent_tumor,sample_diseasetype)
 		# Transfer data to database
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
@@ -488,7 +505,7 @@ def insert_variants(db, variant_dict):
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER"]
+								"DATE_CHANGED_VARIANT_BROWSER","Reply"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -504,7 +521,6 @@ def insert_variants(db, variant_dict):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select * from Classification \
 				where CHROM_POS_ALTEND_DATE = '"+	dfVarClassification['CHROM_POS_ALTEND_DATE'][0]			+"' \
-				AND DATE_CHANGED_VARIANT_BROWSER='"+dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0]	+"' \
 				AND COSMIC='"+          			dfVarClassification['COSMIC'][0]						+"' \
 				AND Populasjonsdata='"+ 			dfVarClassification['Populasjonsdata'][0]				+"' \
 				AND Funksjonsstudier='"+			dfVarClassification['Funksjonsstudier'][0]				+"' \
@@ -543,7 +559,9 @@ def insert_variants(db, variant_dict):
 	with engine.connect() as conn:
 		stmtVPS = "UPDATE VariantsPerSample set \
 					DATE_CHANGED_VARIANT_BROWSER = \
-						'"+dateChangedVariantBrowser+"'\
+						'"+dateChangedVariantBrowser+"',\
+					Reply = \
+						'"+dfVarVariantsPerSample['Reply'][0]+"'\
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\
