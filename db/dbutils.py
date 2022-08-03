@@ -347,13 +347,18 @@ def list_approved_samples(db):
 def list_all_variants(db):
 	#list all variants including frequency
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT COUNT(*) as Frequency\
-		, v.gene, v.Type, v.oncomineGeneClass, \
-		v.oncomineVariantClass, v.CHROM, v.POS, v.REF, v.ALTEND, \
-		v.chrom_pos_altend_date, \
-		group_concat(s.sampleid,', ') VariantsPerSample \
-		FROM VariantsPerSample s, Variants v \
-		WHERE s.chrom_pos_altend_date = v.chrom_pos_altend_date \
+	stmt = "SELECT COUNT(*) as Frequency \
+		, *, \
+		group_concat(s.sampleid,', ') SamplesperVariants \
+		FROM VariantsPerSample s \
+		LEFT JOIN Variants v \
+		ON s.CHROM_POS_ALTEND_DATE = \
+			v.CHROM_POS_ALTEND_DATE \
+		LEFT JOIN Classification c \
+		ON s.CHROM_POS_ALTEND_DATE = \
+			c.CHROM_POS_ALTEND_DATE \
+		AND s.DATE_CHANGED_VARIANT_BROWSER = \
+			c.DATE_CHANGED_VARIANT_BROWSER \
 		GROUP BY s.chrom_pos_altend_date;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)

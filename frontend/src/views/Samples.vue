@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container" id="login" v-if="items.length===0">
-    <h3>No samples ready for interpretation.<br> Go have a coffe!</h3> 
+    <h3>No samples ready for interpretation.<br> Go have a coffee!</h3> 
     </div>
     <div class="container" id="login" v-if="items.length!==0">
       <div class="row row justify-content-center">
@@ -26,6 +26,11 @@
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
           </template>
           </b-table>
+          <br>
+          <br>
+          <h5> Import latest data from import folder </h5>
+          <br>
+          <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
         </b-col>
         </div>
       </div>
@@ -68,6 +73,10 @@ export default {
         .get(baseURI)
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
+    },
+    LoadData() {
+      // This is to import new data downloaded from Genexus GUI. 
+      console.log("Load new data")
     },
   },
   created: function () {

@@ -6,7 +6,6 @@ config.read('backend/config.ini')
 sys.path.insert(0, config['Paths']['backend_path'])
 sys.path.insert(0, config['Paths']['db_path'])
 from vcfutils import parse_thermo_vcf
-from vcfutils import filter_nocalls
 from vcfutils import explode_format_gt
 from vcfutils import explode_info
 from vcfutils import explode_func
