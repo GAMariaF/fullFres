@@ -366,7 +366,7 @@ def list_all_variants(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT COUNT(*) as Frequency \
 		, *, \
-		group_concat(s.sampleid,', ') SamplesperVariants \
+		group_concat(s.sampleid,', ') SamplesPerVariant \
 		FROM VariantsPerSample s \
 		LEFT JOIN Variants v \
 		ON s.CHROM_POS_ALTEND_DATE = \
