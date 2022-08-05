@@ -82,3 +82,8 @@ sudo make altinstall
 
 #### Info om Vue auth
 Jeg lager en relativt enkel login-løsning uten Oauth, og satser heller på en lokal mock backend ala: https://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example
+
+## Bruk av Variant Browser
+
+
+* Hvis flere prøver blir lastet opp samtidig og to eller flere av de har den samme varianten. Da vil alle få lagret data fra databasen for Classification. Hvis en av de så blir oppdatert med nye data til Classification, da vil ikke de andre prøvene som ble lastet inn samtidig få disse nye dataene.
