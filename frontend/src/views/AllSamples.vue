@@ -13,6 +13,9 @@
             striped
             hover
             outlined
+            label-sort-asc=""
+            label-sort-desc=""
+            label-sort-clear=""
             :items="items"
             :fields="fields"
             :small="small"
@@ -41,10 +44,10 @@ export default {
       sampleID: "",
       selectedSample: "",
       items: [],
-      fields: [{key: "runid", label: "Run id"}, 
-              {key: "sampleid", label: "Sample id"},
-              {key: "Date_Signoff", label: "Date Sign off"},
-              {key: "Date_Approval", label: "Date Approval"}],
+      fields: [{key: "runid", label: "Run id", sortable: true}, 
+              {key: "sampleid", label: "Sample id", sortable: true},
+              {key: "Date_Signoff", label: "Date Sign off", sortable: true},
+              {key: "Date_Approval", label: "Date Approval", sortable: true}],
     };
   },
   methods: {
