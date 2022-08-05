@@ -36,7 +36,7 @@ import axios from "axios";
 //import util_funcs from "@/appUtils";
 
 export default {
-  name: "varianttable",
+  name: "allsampletable",
   data() {
     return {
       loggedInStatus: false,

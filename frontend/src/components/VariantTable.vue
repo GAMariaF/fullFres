@@ -13,6 +13,9 @@ import util_funcs from '../appUtils'
       hover
       outlined
       fixed
+      label-sort-asc=""
+      label-sort-desc=""
+      label-sort-clear=""
       :items="variants"
       :fields="fields"
       :small="small"
@@ -270,6 +273,7 @@ export default {
                     'Genelist',
                     'Perc_Tumor',
                     'gene',
+                    'exon',
                     'transcript',
                     'annotation_variant',
                     'Reads',
@@ -336,9 +340,10 @@ export default {
       selectedVariant: "",
       fields: [
         'Nr',
-        {key: "Type", label: "Type"},
-        {key: "gene"},
-        {key: "Locus"},
+        {key: "Type", label: "Type", sortable: true},
+        {key: "gene", sortable: true},
+        {key: "exon"},
+        {key: "Locus", sortable: true},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
         {key: "oncomineGeneClass"},

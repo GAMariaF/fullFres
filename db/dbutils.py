@@ -365,7 +365,7 @@ def list_all_variants(db):
 	#list all variants including frequency
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT COUNT(*) as Frequency \
-		, *, \
+		, *,  max(s.DATE_CHANGED_VARIANT_BROWSER),\
 		group_concat(s.sampleid,', ') SamplesPerVariant \
 		FROM VariantsPerSample s \
 		LEFT JOIN Variants v \
@@ -387,7 +387,8 @@ def list_sample_variants(db,sampleid):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "SELECT VariantsPerSample.sampleid, \
 					VariantsPerSample.runid, \
-					Variants.gene, Variants.Type, \
+					Variants.gene, \
+					Variants.exon, Variants.Type, \
 					Variants.oncomineGeneClass, \
 					Variants.oncomineVariantClass, \
 					Variants.CHROM, Variants.POS, Variants.REF, \
@@ -414,7 +415,7 @@ def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Variants.gene, Variants.transcript, \
+		Samples.Perc_Tumor, Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, VariantsPerSample.AF, Classification.COSMIC, \
 		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \

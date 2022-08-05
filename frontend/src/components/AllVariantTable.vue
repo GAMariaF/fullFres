@@ -125,34 +125,15 @@ export default {
                     'gene',
                     'transcript',
                     'annotation_variant',
-                    'Reads',
-                    'FILTER',
-                    'AF',
                     'COSMIC',
-                    'User_Classification',
                     'class',
-                    'Variant_ID',
-                    'Variant_Name',
-                    'Key_Variant',
-                    'Oncomine_Reporter_Evidence',
-                    'Type',
                     'oncomineGeneClass',
                     'oncomineVariantClass',
                     'Locus',
                     'protein',
                     'REF',
                     'ALTEND',
-                    'Call',
-                    'DP',
-                    'FDP',
-                    'FAO',
                     'coding',
-                    'P_Value',
-                    'Read_Counts_Per_Million',
-                    'Oncomine_Driver_Gene',
-                    'Copy_Number',
-                    'CNV_Confidence',
-                    'Valid_CNV_Amplicons',
                     'Populasjonsdata',
                     'Funksjonsstudier',
                     'Prediktive_data',
@@ -160,7 +141,6 @@ export default {
                     'Computational_evidens',
                     'Konservering',
                     'ClinVar',
-                    'CLSF',
                     'Andre_DB',
                     'Comment',
                     'Oncogenicity',
@@ -234,7 +214,7 @@ export default {
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
-      this.infoModal.title = `Variant: ${index +1}`;
+      this.infoModal.title = `Variant: ${item.transcript}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       //this.variants = util_funcs.sort_table(this.variants);
       //this.$store.commit("SET_STORE",this.variants)
