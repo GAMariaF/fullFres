@@ -26,15 +26,27 @@
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
           </template>
           </b-table>
-          <br>
-          <br>
-          <h5> Import latest data from import folder </h5>
-          <br>
-          <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
+          
         </b-col>
         </div>
       </div>
     </div>
+    <br>
+          <br>
+          <h5> Import latest data from import folder </h5>
+          
+            <template>
+              <div>
+                <label for="importFolderInput">Current import folder is:</label>
+                <b-form-input id="importFolderInput" v-model="importFolder" :placeholder="importFolder"></b-form-input>
+                  <div class="mt-2"></div>
+                </div>
+            </template>
+
+
+
+          <br>
+          <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
   </div>
 </template>
 <script>
@@ -46,6 +58,7 @@ export default {
   name: "varianttable",
   data() {
     return {
+      importFolder: 'test',
       loggedInStatus: false,
       small: true,
       sampleID: "",
@@ -72,11 +85,18 @@ export default {
       axios
         .get(baseURI)
         .then((response) => response.data)
-        .then((data) => (this.items = data.data));
+        .then((data) => {
+          (this.items = data.data)
+          this.importFolder = data.message.replace("Success fetching samples. Import folder is: ", "");
+          });
+        
     },
-    LoadData() {
+    loadData() {
       // This is to import new data downloaded from Genexus GUI. 
       console.log("Load new data")
+      const baseURI = config.$backend_url + "/api/import";
+      axios
+        .get(baseURI, { params: [this.importFolder] })
     },
   },
   created: function () {

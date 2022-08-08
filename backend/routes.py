@@ -3,6 +3,7 @@ from random import sample
 from signal import valid_signals
 from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
+
 import uuid
 import jwt
 import datetime
@@ -29,6 +30,8 @@ from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
+
+from importutils import importVcfXls
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -117,9 +120,16 @@ def login_user():
 def api(current_user, query):
     print(query)
     if request.method == 'GET':
+        if query == 'import':
+            print("Running sample import function")
+            args = request.args
+            importfolder = args["0"]
+            importVcfXls(importfolder)
+            response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)
+            return response
         if query == "samples":
             samples = list_samples(db_path)
-            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+            response = make_response(jsonify(isError=False, message="Success fetching samples. Import folder is: {}".format(config['Paths']['db_test_path']), statusCode=200, data=samples), 200)
             return response
         if query == "signoff_samples":
             print("signoff_samples")
