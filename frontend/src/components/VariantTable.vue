@@ -61,6 +61,7 @@ import util_funcs from '../appUtils'
                 value="Yes"
                 unchecked-value=""
                 size="default"
+                @change="updateVariants;setChanged()"
               >
               <h6>&nbsp; Check for reply (Svares ut)</h6>
               </b-form-checkbox>
@@ -204,7 +205,7 @@ import util_funcs from '../appUtils'
           <b-col cols="12">
           <h5>Available evidence types </h5>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+            <b-button v-on:click="oncogenicitySelected(item);updateVariants;setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
           </span>
             <br>
             <br>
