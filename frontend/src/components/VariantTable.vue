@@ -378,6 +378,18 @@ export default {
       case 'Suporting':
         this.oncoScore += 1
         break;
+        case 'bVery Strong':
+        this.oncoScore += -8
+        break;
+      case 'bStrong':
+        this.oncoScore += -4
+        break;
+      case 'bModerate':
+        this.oncoScore += -2
+        break;
+      case 'bSuporting':
+        this.oncoScore += -1
+        break;
       }
     })
     this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
