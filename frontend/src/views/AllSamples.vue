@@ -6,6 +6,14 @@
     <div class="container" id="login">
       <div class="row row justify-content-center">
         <div class="col-md-10">
+          <b-col lg="6" class="my-1">
+           <b-input-group size="sm">
+              <b-input v-model="filter" placeholder="Filter table.."></b-input> 
+           </b-input-group>
+          </b-col>
+
+          
+          
           <b-table
             selectable
             select-mode="single"
@@ -19,6 +27,7 @@
             :items="items"
             :fields="fields"
             :small="small"
+            :filter="filter"
           >
           <!-- Formatting Type column -->
           <template #cell(runid)="data">
@@ -48,6 +57,7 @@ export default {
               {key: "sampleid", label: "Sample id", sortable: true},
               {key: "Date_Signoff", label: "Date Sign off", sortable: true},
               {key: "Date_Approval", label: "Date Approval", sortable: true}],
+      filter: '',
     };
   },
   methods: {

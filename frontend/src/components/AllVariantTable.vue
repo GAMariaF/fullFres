@@ -2,6 +2,12 @@
   <div  id="app" class="container-fluid">
     <h1>All variants</h1>
     <br>
+       
+        <b-col lg="6" class="my-1">
+           <b-input-group size="sm">
+              <b-input v-model="filter" placeholder="Filter table.."></b-input> 
+           </b-input-group>
+        </b-col>
     <b-table
       selectable
       select-mode="single"
@@ -16,6 +22,7 @@
       :items="variants"
       :fields="fields"
       :small="small"
+      :filter="filter"
     >
     <!-- Formatting Type column -->
     <template #cell(Type)="data">
@@ -146,6 +153,7 @@ export default {
                     'Oncogenicity',
                     'Tier'
                   ],
+      filter: '',
     };
   },
   methods: {
