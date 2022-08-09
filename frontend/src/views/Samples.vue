@@ -3,7 +3,24 @@
     <br>
     <br>
     <div class="container" id="login" v-if="items.length===0">
-    <h3>No samples ready for interpretation.<br> Go have a coffee!</h3> 
+      <b-col cols="6">
+        <h3>No samples ready for interpretation.<br> Go have a coffee!</h3> 
+        <template>
+          <br>
+          <h3>Or</h3> 
+          <br>
+          <br>
+          <div>
+            <label for="importFolderInput"><h3> Import latest samples from folder:</h3></label>
+            <br>
+            <br>
+            <b-form-input id="importFolderInput" v-model="importFolder" :placeholder="importFolder"></b-form-input>
+            <div class="mt-2"></div>
+            </div>
+        </template>
+        <br>
+        <b-button v-on:click="loadData" class="btn mr-1 btn-info"> IMPORT SAMPLES </b-button>
+      </b-col>
     </div>
     <div class="container" id="login" v-if="items.length!==0">
       <div class="row row justify-content-center">
