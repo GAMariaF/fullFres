@@ -150,6 +150,7 @@ export default {
                     'ClinVar',
                     'Andre_DB',
                     'Comment',
+                    'evidence_types',
                     'Oncogenicity',
                     'Tier'
                   ],

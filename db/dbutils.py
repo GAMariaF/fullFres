@@ -394,6 +394,7 @@ def list_sample_variants(db,sampleid):
 					Variants.oncomineVariantClass, \
 					Variants.CHROM, Variants.POS, Variants.REF, \
 					Variants.ALTEND, Classification.class, \
+					Classification.evidence_types, \
 					VariantsPerSample.FILTER, \
 					VariantsPerSample.chrom_pos_altend_date, \
 					VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER \
