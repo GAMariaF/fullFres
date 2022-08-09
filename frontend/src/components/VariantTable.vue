@@ -383,7 +383,7 @@ export default {
       case 'Moderate':
         this.oncoScore += 2
         break;
-      case 'Suporting':
+      case 'Supporting':
         this.oncoScore += 1
         break;
         case 'bVery Strong':
@@ -395,7 +395,7 @@ export default {
       case 'bModerate':
         this.oncoScore += -2
         break;
-      case 'bSuporting':
+      case 'bSupporting':
         this.oncoScore += -1
         break;
       }

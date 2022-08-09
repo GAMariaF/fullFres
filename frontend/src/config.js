@@ -10,11 +10,11 @@ config = {
 		{ value: null, text: 'Please select an option' },
 		{ value: 'Not Relevant', text: 'Not Relevant' },
 		{ value: 'Technical', text: 'Technical' },
-		{ value: '1', text: '1' },
-		{ value: '2', text: '2' },
-		{ value: '3', text: '3' },
-		{ value: '4', text: '4' },
-		{ value: '5', text: '5' },
+		{ value: '1 - Benign', text: '1 - Benign' },
+		{ value: '2 - Likely Benign', text: '2 - Likely Benign' },
+		{ value: '3 - VUS', text: '3 - VUS' },
+		{ value: '4 - Likely Ongogenic', text: '4 - Likely Ongogenic' },
+		{ value: '5 - Oncogenic', text: '5 - Oncogenic' },
 		{ value: '6', text: '6' }
 	],
 	tierOptions: [

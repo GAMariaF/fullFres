@@ -174,7 +174,7 @@ export default {
       case 'Moderate':
         this.oncoScore += 2
         break;
-      case 'Suporting':
+      case 'Supporting':
         this.oncoScore += 1
         break;
       }
