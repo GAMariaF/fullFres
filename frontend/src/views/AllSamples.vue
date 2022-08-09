@@ -91,7 +91,7 @@ export default {
     selectedSample: function () {
       this.$router.push({
         name: "Variants",
-        params: { id: this.selectedSample },
+        params: { id: this.selectedSample, locked: true },
       });
     },
   },

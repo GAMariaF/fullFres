@@ -97,6 +97,8 @@ export default {
       const baseURI = config.$backend_url + "/api/import";
       axios
         .get(baseURI, { params: [this.importFolder] })
+        .then( this.getsamples());
+     
     },
   },
   created: function () {
@@ -111,7 +113,7 @@ export default {
     selectedSample: function () {
       this.$router.push({
         name: "Variants",
-        params: { id: this.selectedSample },
+        params: { id: this.selectedSample, locked: false },
       });
     },
   },

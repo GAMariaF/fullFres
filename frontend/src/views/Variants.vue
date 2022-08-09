@@ -1,7 +1,8 @@
 <template>
   <div>
   
-    <variant-table />
+    <variant-table :locked="locked"/>
+    
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 import VariantTable from "../components/VariantTable";
 
 export default {
+  props: ['locked'],
   components: {
     VariantTable,
   },
