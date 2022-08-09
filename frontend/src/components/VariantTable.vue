@@ -52,6 +52,7 @@ import util_funcs from '../appUtils'
       @hide="resetInfoModal();sendVariants()"
     >
       <b-container fluid>
+        <div v-if="locked === false">
         <b-row class="mb-1">
           <b-col cols="6">
               <b-form-checkbox
@@ -224,7 +225,8 @@ import util_funcs from '../appUtils'
         </span>
         </b-col>
         </b-row>
-        <hr />        
+        <hr />     
+        </div>   
         <b-row>
           <b-col >
           <div class="table-responsive">
@@ -249,15 +251,18 @@ import util_funcs from '../appUtils'
     </b-modal>
       <br>
       <br>
+      <div v-if="locked === false">
       <h5>When interpretation is done, please sign off here</h5>
       <br>
       <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button>
-
+      </div>
     <!--  -->
     <br>
     <br>
     Class: {{variants[0].class}}
-  
+<br>
+Via props: {{this.locked}}
+  <br>
   </div>
   
 </template>
@@ -265,9 +270,11 @@ import util_funcs from '../appUtils'
 
 import { config } from '../config.js'
 export default {
+  props: ['locked'],
   name: "varianttable",
   data() {
     return {
+  
       loading: true,
       sortedIndex: [ 'runid',
                     'sampleid',
@@ -426,6 +433,7 @@ export default {
       }
     },
     rowSelected(items) {
+      
       if (items.length===1) {
         this.selectedVariant = items;
         console.log(items)
@@ -454,8 +462,6 @@ export default {
       
       if (this.variants.filter(e => e.changed === true).length > 0) {
         console.log("Something has changed - sending updated data to db")
-      
-
 
 
       // Metode for  sende inn dato, og tolkede varianter til backend.
@@ -513,9 +519,14 @@ export default {
   },
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
+    
     return this.$store.getters.variants;
+    
   },
   computed: {
+    currentRouteName() {
+        return this.$route.name;
+    },
     variants: {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
@@ -526,6 +537,6 @@ export default {
       console.log(`Changed from ${oldVars} to ${newVars}`);
       this.loading = false;
     },
-  }
+  },
 };
 </script>
