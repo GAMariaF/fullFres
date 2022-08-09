@@ -33,6 +33,7 @@ colClassification       = ["CHROM_POS_ALTEND_DATE",\
 								"Oncogenicity", \
 								"Tier", \
 								"class", \
+                                "evidence_types", \
 								"changed", \
 								"visibility"]
 colVariants             = [ "CHROM_POS_ALTEND_DATE", \

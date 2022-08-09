@@ -180,6 +180,7 @@ def generate_db(db):
 		Oncogenicity TEXT, \
 		Tier TEXT, \
 		class TEXT, \
+		evidence_types TEXT, \
 		changed TEXT, \
 		visibility TEXT, \
 		PRIMARY KEY (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER) \
@@ -434,6 +435,7 @@ def list_interpretation(db,sampleid):
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
 		Classification.class, \
+		Classification.evidence_types, \
 		Classification.Andre_DB, Classification.Oncogenicity, \
 		Classification.Tier, Classification.Comment, \
 		VariantsPerSample.chrom_pos_altend_date, \
@@ -503,6 +505,7 @@ def insert_variants(db, variant_dict):
 								"Oncogenicity", \
 								"Tier", \
 								"class", \
+								"evidence_types", \
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
@@ -533,6 +536,7 @@ def insert_variants(db, variant_dict):
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
 				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
+				AND evidence_types='"+					dfVarClassification['evidence_types'][0]						+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:

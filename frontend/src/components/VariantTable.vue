@@ -316,6 +316,7 @@ export default {
                     'CLSF',
                     'Andre_DB',
                     'Comment',
+                    'evidence_types',
                     'Oncogenicity',
                     'Tier'
                   ],
