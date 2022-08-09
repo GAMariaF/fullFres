@@ -1,5 +1,7 @@
 <template>
   <div>
+    <br>
+    <br>
     <div class="container" id="login" v-if="items.length===0">
     <h3>No samples ready for interpretation.<br> Go have a coffee!</h3> 
     </div>
@@ -26,27 +28,26 @@
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
           </template>
           </b-table>
+          <template>
+            <br>
+            <br>
+            <br>
+            <div>
+              <label for="importFolderInput"><h5> Import latest samples from folder:</h5></label>
+              <br>
+              <br>
+              <b-form-input id="importFolderInput" v-model="importFolder" :placeholder="importFolder"></b-form-input>
+              <div class="mt-2"></div>
+              </div>
+          </template>
+          <br>
+          <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
           
         </b-col>
         </div>
       </div>
     </div>
     <br>
-          <br>
-          <h5> Import latest data from import folder </h5>
-          
-            <template>
-              <div>
-                <label for="importFolderInput">Current import folder is:</label>
-                <b-form-input id="importFolderInput" v-model="importFolder" :placeholder="importFolder"></b-form-input>
-                  <div class="mt-2"></div>
-                </div>
-            </template>
-
-
-
-          <br>
-          <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
   </div>
 </template>
 <script>
