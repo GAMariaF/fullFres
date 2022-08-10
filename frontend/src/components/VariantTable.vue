@@ -211,7 +211,9 @@ import util_funcs from '../appUtils'
             <br>
             <br>
             <div>
-            <h5>Oncogenicity: {{ oncoScore }}</h5>
+            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
+            
+            
             </div>
             <h5></h5>
 
@@ -219,10 +221,13 @@ import util_funcs from '../appUtils'
             <div>
             <h5>Chosen evidence types</h5>
             </div>
-        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}} &nbsp;
-        </span>
+            {{this.variants[this.selectedRowIndex].evidence_types}}
+     
+
+
+
+
+
         </b-col>
         </b-row>
         <hr />     
@@ -260,9 +265,9 @@ import util_funcs from '../appUtils'
     <br>
     <br>
     Class: {{variants[0].class}}
-<br>
-Via props: {{this.locked}}
-  <br>
+
+
+
   </div>
   
 </template>
@@ -413,7 +418,7 @@ export default {
       console.log("--");
       console.log(items);
       console.log("--");
-
+  
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
       var index = this.selectedoncogenicity_list.indexOf(items);
@@ -430,10 +435,17 @@ export default {
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
         this.oncoScoring(this.selectedoncogenicity_list);
+        // Apply evidence to table:
+        var tmplist = []
+        this.selectedoncogenicity_list.forEach(function (arrayItem) {
+          tmplist.push(arrayItem.tag)
+        });
+        this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
-    rowSelected(items) {
-      
+
+
+    rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
         console.log(items)
@@ -442,6 +454,8 @@ export default {
         console.log("unselected");
       }
     },
+
+
     openInfoModal(item, index, button) {
       console.log("openInfoModal");
       this.selectedRowIndex = index;
