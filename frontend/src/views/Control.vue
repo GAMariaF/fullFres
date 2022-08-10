@@ -61,7 +61,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not Relevant and Technical variants AND NOT INTERPRETED (empty class col)</p></h2>
+          <h2><p style="text-align:left;">Not Relevant, Technical or not interpreted variants </p></h2>
           <br>          
           <b-table
             selectable

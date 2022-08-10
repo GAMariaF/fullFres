@@ -1,3 +1,40 @@
+# def generate_db(db): 
+# creates new database db
+
+# def populate_thermo_variantdb(db, dfvcf, dfvariant, \
+#		run_id, sample_id, percent_tumor, sample_diseasetype):
+# adds data to database db from dataframes dfvcf, dfvariant
+
+# def list_samples(db):
+# list all samples ready for interpretation
+
+# def list_all_samples(db):
+# list all samples
+
+# def list_signoff_samples(db):
+# list all signed off samples ready for approval
+
+# def list_approved_samples(db):
+# list all approved samples
+
+# def list_all_variants(db):
+# list all variants including frequency
+
+# def list_interpretation(db,sampleid):
+# list "tolkningsskjema"
+
+# def insert_signoffdate(db, user, date, sampleid):
+#	When hitting the signoff-button in the browser - set signoff date and signoff user
+
+#def insert_approvedate(db, user, date, sampleid):
+#	When hitting the approve-button in the browser - set approved date and approved user
+
+# def insert_variants(db, variant_dict):
+# insert variant into database
+
+# def db_to_vcf(db,outvcf='exported.vcf'):
+# create vcf from db data to upload to Genexus software
+
 import xxlimited
 import pandas as pd
 import sqlite3
@@ -383,6 +420,7 @@ def list_all_variants(db):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
+'''
 def list_sample_variants(db,sampleid):
 	#list all variants for specific sample
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
@@ -412,6 +450,7 @@ def list_sample_variants(db,sampleid):
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
+'''
 
 def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
