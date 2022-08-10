@@ -221,14 +221,11 @@ import util_funcs from '../appUtils'
             <div>
             <h5>Chosen evidence types</h5>
             </div>
-        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}} &nbsp;
-        </span>
+            {{this.variants[this.selectedRowIndex].evidence_types}}
+     
 
---
-{{ this.variants[this.selectedRowIndex].evidence_types }}
---
+
+
 
 
         </b-col>
@@ -268,9 +265,9 @@ import util_funcs from '../appUtils'
     <br>
     <br>
     Class: {{variants[0].class}}
-<br>
-Via props: {{this.locked}}
-  <br>
+
+
+
   </div>
   
 </template>
@@ -409,7 +406,6 @@ export default {
       }
     })
     this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
-    this.variants[this.selectedRowIndex].evidence_types = selectedoncogenicity_list.toString();
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
@@ -422,13 +418,7 @@ export default {
       console.log("--");
       console.log(items);
       console.log("--");
-      // Hvis evidence types fra database:
-      if (this.variants[this.selectedRowIndex].evidence_types.length !== 0) {
-        // Nullstill først
-        this.selectedoncogenicity_list = [];
-      } 
-
-
+  
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
       var index = this.selectedoncogenicity_list.indexOf(items);
@@ -445,10 +435,17 @@ export default {
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
         this.oncoScoring(this.selectedoncogenicity_list);
+        // Apply evidence to table:
+        var tmplist = []
+        this.selectedoncogenicity_list.forEach(function (arrayItem) {
+          tmplist.push(arrayItem.tag)
+        });
+        this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
-    rowSelected(items) {
-      
+
+
+    rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
         console.log(items)
@@ -457,6 +454,8 @@ export default {
         console.log("unselected");
       }
     },
+
+
     openInfoModal(item, index, button) {
       console.log("openInfoModal");
       this.selectedRowIndex = index;
