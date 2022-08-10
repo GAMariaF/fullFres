@@ -5,6 +5,12 @@ config = {
 	$signout_url: function() {
 		return this.$backend_url + '/newlogout';
 	},
+	replyOptions: [
+		// Obs - dont use 0 (it is reserved)
+		{ value: null, text: 'Please select an option' },
+		{ value: 'Yes', text: 'Yes' },
+		{ value: 'No', text: 'No' }
+	],
 	classOptions: [
 		// Obs - dont use 0 (it is reserved)
 		{ value: null, text: 'Please select an option' },

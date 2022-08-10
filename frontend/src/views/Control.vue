@@ -110,19 +110,16 @@
     >
       <b-container fluid>
         <b-row class="mb-1">
-          <b-col cols="6">
-              <b-form-checkbox
-                id="checkbox-1"
-                v-model="variants[selectedRowIndex].Reply"
-                name="checkbox-1"
-                value="Yes"
-                unchecked-value=""
-                size="default"
-              >
-              <h6>&nbsp; Check for reply (Svares ut)</h6>
-              </b-form-checkbox>
-
-            </b-col>
+          <b-col cols="4">
+            <label>Reply (Svares ut)</label>
+            <b-form-select
+              :options="replyOptions"
+              class="py-sm-0 form-control"
+              v-model="variants[selectedRowIndex].Reply"
+              @change="updateVariants;setChanged()" 
+            >
+            </b-form-select>
+          </b-col>            
         </b-row>
         <br>
         <b-row class="mb-1">
@@ -382,6 +379,7 @@ export default {
       sampleID: "",
       selectedSample: "",
       selectedRowIndex: 0,
+      replyOptions: config.replyOptions,
       classOptions: config.classOptions,
       tierOptions: config.tierOptions,
       infoModal: {
