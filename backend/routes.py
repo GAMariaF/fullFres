@@ -25,7 +25,7 @@ from dbutils import list_all_samples
 from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
 from dbutils import list_all_variants
-from dbutils import list_sample_variants
+#from dbutils import list_sample_variants
 from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
