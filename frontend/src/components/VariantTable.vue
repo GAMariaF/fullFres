@@ -68,11 +68,21 @@ import util_funcs from '../appUtils'
         <br>
         <b-row class="mb-1">
           <b-col cols="4">
-            <label>Population Data</label>
+            <label>Population Data<br><i>OP4: 2/152182 (+1)</i></label>
              <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
+                @change="updateVariants;setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
+          <b-col cols="4">
+            <label>Computational evidence<br><i>SBP1: 0,448 Benign (-1)</i></label>
+             <b-form-textarea
+                id="textarea"
+                size="sm"
+                v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
@@ -87,6 +97,9 @@ import util_funcs from '../appUtils'
 
               ></b-form-textarea>
           </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
           <b-col cols="4">
             <label>Predictive Data</label>
              <b-form-textarea
@@ -97,25 +110,12 @@ import util_funcs from '../appUtils'
 
               ></b-form-textarea>
           </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
           <b-col cols="4">
             <label>Cancer Hotspots</label>
               <b-form-textarea
                 id="textarea"
                 size="sm"
                 v-model="variants[selectedRowIndex].Cancer_hotspots"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Computational evidence</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
