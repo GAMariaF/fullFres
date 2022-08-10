@@ -117,7 +117,8 @@ export default {
       fields: [
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
-        {key: "CHROM", label: "Chrom", sortable: true},
+        {key: "annotation_variant", label: " Annotation Variant"},
+        {key: "CHROM", sortable: true},        
         {key: "POS", label: "Pos", sortable: true},
         {key: "REF", label: "Ref", sortable: true},
         {key: "ALTEND", label: "Alt / End", sortable: true},

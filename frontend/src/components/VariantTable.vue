@@ -222,11 +222,6 @@ import util_funcs from '../appUtils'
             <h5>Chosen evidence types</h5>
             </div>
             {{this.variants[this.selectedRowIndex].evidence_types}}
-     
-
-
-
-
 
         </b-col>
         </b-row>
@@ -357,9 +352,10 @@ export default {
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
         {key: "exon"},
-        {key: "Locus", sortable: true},
+        {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
+        {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "FILTER", label: "Filter"},
