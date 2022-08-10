@@ -329,6 +329,9 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
 		print(run_id,sample_id,percent_tumor,sample_diseasetype)
 		# Transfer data to database
+		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
+		dfvcf_copy.AF *= 100
+		dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
@@ -336,7 +339,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		try:			
 			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
 		except:
-			print('There is an error trying to add '+run_id+','+sample_id+' to table Samples. Is it already in database?')
+			print('There is an error trying to add '+run_id+','+sample_id+' \
+				to table Samples. Is it already in database?')
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i Variants-tabell 
 #	hvis med 
