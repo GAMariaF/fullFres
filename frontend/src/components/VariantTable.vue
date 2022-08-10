@@ -211,7 +211,9 @@ import util_funcs from '../appUtils'
             <br>
             <br>
             <div>
-            <h5>Oncogenicity: {{ oncoScore }}</h5>
+            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
+            
+            
             </div>
             <h5></h5>
 
@@ -223,6 +225,12 @@ import util_funcs from '../appUtils'
           <!-- content -->
           {{item.tag}} &nbsp;
         </span>
+
+--
+{{ this.variants[this.selectedRowIndex].evidence_types }}
+--
+
+
         </b-col>
         </b-row>
         <hr />     
@@ -401,6 +409,7 @@ export default {
       }
     })
     this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
+    this.variants[this.selectedRowIndex].evidence_types = selectedoncogenicity_list.toString();
     },
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
@@ -413,6 +422,12 @@ export default {
       console.log("--");
       console.log(items);
       console.log("--");
+      // Hvis evidence types fra database:
+      if (this.variants[this.selectedRowIndex].evidence_types.length !== 0) {
+        // Nullstill først
+        this.selectedoncogenicity_list = [];
+      } 
+
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.

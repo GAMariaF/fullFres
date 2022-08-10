@@ -1,7 +1,7 @@
 let config;
 
 config = {
-	$backend_url: 'http://172.16.0.3:5000',
+	$backend_url: 'http://172.16.0.3:5001',
 	$signout_url: function() {
 		return this.$backend_url + '/newlogout';
 	},
