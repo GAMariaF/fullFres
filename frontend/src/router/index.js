@@ -7,6 +7,7 @@ import AllSamples from '../views/AllSamples.vue';
 import Variants from '../views/Variants.vue';
 import AllVariants from '../views/AllVariants.vue';
 import Control from '../views/Control.vue';
+import Statistics from '../views/Statistics.vue';
 
 // temp?
 import login from '../views/LoginWorld.vue';
@@ -39,6 +40,11 @@ const routes = [
 		path: '/control',
 		name: 'Control',
 		component: Control
+	},
+	{
+		path: '/statistics',
+		name: 'Statistics',
+		component: Statistics
 	},
 	{
 		path: '/profile',

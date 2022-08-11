@@ -154,6 +154,10 @@ def api(current_user, query):
             allsamples = list_all_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
+        elif query == "statistics":
+            print("Sending stats")
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="Stats"), 200)
+            return response
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response

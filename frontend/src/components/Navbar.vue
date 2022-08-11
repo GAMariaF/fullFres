@@ -6,7 +6,8 @@
         <b-nav-item to="/samples">Samples</b-nav-item>
         <b-nav-item to="/control">Control</b-nav-item>        
         <b-nav-item to="/allvariants">All Variants</b-nav-item>
-        <b-nav-item to="/allsamples">All Samples</b-nav-item>        
+        <b-nav-item to="/allsamples">All Samples</b-nav-item>  
+        <b-nav-item to="/statistics">Statistics</b-nav-item>
         <b-nav-item to="/login">Login</b-nav-item>
         
           <b-nav-item-dropdown right>
