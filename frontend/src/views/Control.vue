@@ -98,11 +98,16 @@
           </b-table>
                     
           <br><br>
+            
+          <div>
             <b-button v-on:click="approve" class="btn mr-1 btn-info"> Approve </b-button>
+            <p></p>
+            <b-button v-on:click="unApprove" class="btn mr-1 btn-info"> Send Back </b-button>
+          </div>
+          
           <br><br>
         </div>
-        {{ state }}
-        {{ user }}
+   
       </b-col>
     </b-row>
     <b-modal
@@ -538,8 +543,8 @@ export default {
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
     },
-
-      sendVariants() {
+    
+    sendVariants() {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
@@ -570,7 +575,7 @@ export default {
 
     approve() {
       // Sending approval date to database
-            // This if only for signing off the user when interpretation is done. 
+      // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
       // Metode for  sende inn dato, og tolkede varianter til backend.
@@ -597,6 +602,38 @@ export default {
 
 
     },
+
+    unApprove() {
+      // If the sample is not ready and needs to be sent back to the interpretation-list this button is used.
+      // The button does the opposite of the sign-off
+       // This if only for signing off the user when interpretation is done. 
+      console.log("Sign off method");
+      
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/unsignoff";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.selectedSample,
+            variants: this.variants,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+        this.$router.push({
+        name: "Samples"
+        });
+    },
+
   },
   watch: {
     state(newState, oldState) {

@@ -462,14 +462,13 @@ export default {
       this.oncoScore = 0;
       console.log("infomodal lukket");
     },
+
+    
     sendVariants() {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
-      
       if (this.variants.filter(e => e.changed === true).length > 0) {
         console.log("Something has changed - sending updated data to db")
-
-
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
       this.$http
@@ -489,10 +488,11 @@ export default {
         .then((data) => {
           console.log(data);
         });
-
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
     },
+
+
     signOff() {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");

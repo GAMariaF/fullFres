@@ -165,9 +165,6 @@ def api(current_user, query):
             for i in j["variants"]:
                 if i["changed"]==True:
                     # Insert into db:
-                    #_id         =   i["CHROM_POS_ALTEND_DATE"]
-                    #_class      =   i["class"]
-                    #_comment    =   i["Comment"]
                     insert_variants(db_path,i)
                     print("inserted")
 
@@ -178,6 +175,11 @@ def api(current_user, query):
             j = json.loads(json.dumps(request.json))
             insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Signed off sample!'})
+            return response
+        elif query == "unsignoff":
+            j = json.loads(json.dumps(request.json))
+            insert_signoffdate(db_path, "", "", j["sampleid"])
+            response = jsonify({'message': 'Unsigned off sample!'})
             return response
         elif query == "approve":
             print("running approve")
