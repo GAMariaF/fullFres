@@ -38,9 +38,11 @@
             striped
             hover
             outlined
-            :items="filteredClass"
+            :items="variants"
             :fields="variantFields"
             :small="small"
+            :filter="filter1"
+            :filter-included-fields="filterOn"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -70,9 +72,11 @@
             striped
             hover
             outlined
-            :items="filteredNotClass"
+            :items="variants"
             :fields="variantFields"
             :small="small"
+            :filter="filter2"
+            :filter-included-fields="filterOn"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -106,7 +110,7 @@
     :title="infoModal.title"
     ok-only
     size="lg"
-    @hide="resetInfoModal();"
+    @hide="resetInfoModal();sendVariants();"
     >
       <b-container fluid>
         <b-row class="mb-1">
@@ -263,7 +267,7 @@
             <br>
             <br>
             <div>
-            <h5>Oncogenicity: {{ oncoScore }}</h5>
+            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
             </div>
             <h5></h5>
 
@@ -271,10 +275,7 @@
             <div>
             <h5>Chosen evidence types</h5>
             </div>
-        <span v-for="item in selectedoncogenicity_list" v-bind:key="item.id">
-          <!-- content -->
-          {{item.tag}} &nbsp;
-        </span>
+              {{this.variants[this.selectedRowIndex].evidence_types}}
         </b-col>
         </b-row>
         <hr />        
@@ -409,8 +410,9 @@ export default {
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
-      filter: "true",
-      filterOn: ["visibility"],
+      filter1: /^\d/,
+      filter2: /Not Relevant|Technical|^\s*$/i,
+      filterOn: ["class"],
       Technical: ["Technical"],
       NotRelevant: ["Not Relevant"],
     };
@@ -424,7 +426,7 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items[0].Variant;
-        console.log("tester linje 100")
+        
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -438,7 +440,7 @@ export default {
         this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty', "allVariants": false});
         this.variants =  this.$store.getters.variants;
       } else if (items.length === 0) {
-        console.log("linje 175")
+        
         this.selectedSample = "";
       }
     },
@@ -461,6 +463,18 @@ export default {
         break;
       case 'Supporting':
         this.oncoScore += 1
+        break;
+      case 'bVery Strong':
+        this.oncoScore += -8
+        break;
+      case 'bStrong':
+        this.oncoScore += -4
+        break;
+      case 'bModerate':
+        this.oncoScore += -2
+        break;
+      case 'bSupporting':
+        this.oncoScore += -1
         break;
       }
     })
@@ -494,10 +508,17 @@ export default {
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
         this.oncoScoring(this.selectedoncogenicity_list);
+        // Apply evidence to table:
+        var tmplist = []
+        this.selectedoncogenicity_list.forEach(function (arrayItem) {
+          tmplist.push(arrayItem.tag)
+        });
+        this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
+      index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       this.infoModal.title = `Variant: ${index + 1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
@@ -517,6 +538,36 @@ export default {
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
     },
+
+      sendVariants() {
+      // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
+      // If any changed:
+      if (this.variants.filter(e => e.changed === true).length > 0) {
+        console.log("Something has changed - sending updated data to db")
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/updatevariants";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            variants: this.variants,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+      } 
+      console.log("tester om sendvariants blir aktivert when leaving modal")
+    },
+
+
     approve() {
       // Sending approval date to database
             // This if only for signing off the user when interpretation is done. 
@@ -566,20 +617,7 @@ export default {
     user() {
       return this.$store.getters.username;
     },
-    filteredClass() {
-      let classVariants = this.variants
-      classVariants = classVariants.filter((item) => {
-        return (item.class != this.Technical && item.class != this.NotRelevant && !!item.class)
-      })
-      return classVariants;
-    },
-    filteredNotClass() {
-      let notClassVariants = this.variants
-      notClassVariants = notClassVariants.filter((item) => {
-        return (!item.class || item.class == this.Technical || item.class == this.NotRelevant)
-      })
-      return notClassVariants;
-    },
+
 
   },
 };

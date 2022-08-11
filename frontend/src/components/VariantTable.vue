@@ -466,7 +466,6 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       
-      
       if (this.variants.filter(e => e.changed === true).length > 0) {
         console.log("Something has changed - sending updated data to db")
 
