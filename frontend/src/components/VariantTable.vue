@@ -384,7 +384,7 @@ export default {
       case 'Supporting':
         this.oncoScore += 1
         break;
-        case 'bVery Strong':
+      case 'bVery Strong':
         this.oncoScore += -8
         break;
       case 'bStrong':
@@ -463,7 +463,7 @@ export default {
       console.log("infomodal lukket");
     },
 
-    
+
     sendVariants() {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:

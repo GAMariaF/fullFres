@@ -156,6 +156,7 @@ def api(current_user, query):
             return response
         elif query == "statistics":
             print("Sending stats")
+            
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="Stats"), 200)
             return response
         else:
