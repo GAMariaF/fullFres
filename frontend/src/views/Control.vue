@@ -132,87 +132,93 @@
         </b-row>
         <br>
         <b-row class="mb-1">
-          <b-col cols="4">
-            <label>Population Data</label>
+          <b-col cols="6">
+            <label>Population Data<br><i>OP4: 2/152182 (+1)</i></label>
              <b-form-textarea
                 id="textarea"
-                size="sm"
+                size="default"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
           </b-col>
-          <b-col cols="4">
-            <label>Functional Studies</label>
+          <b-col cols="6">
+            <label>Computational evidence<br><i>SBP1: 0,448 Benign (-1)</i></label>
              <b-form-textarea
                 id="textarea"
-                size="sm"
-                v-model="variants[selectedRowIndex].Funksjonsstudier"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Predictive Data</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="variants[selectedRowIndex].Prediktive_data"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>
-
-        <b-row class="mb-1">
-          <b-col cols="4">
-            <label>Cancer Hotspots</label>
-              <b-form-textarea
-                id="textarea"
-                size="sm"
-                v-model="variants[selectedRowIndex].Cancer_hotspots"
-                @change="updateVariants;setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-          <b-col cols="4">
-            <label>Computational evidence</label>
-             <b-form-textarea
-                id="textarea"
-                size="sm"
+                size="default"
                 v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
           </b-col>
-          <b-col cols="4">
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="6">
+            <label>Functional Studies</label>
+            <b-form-select
+              :options="functionalOptions"
+              class="py-sm-0 form-control"
+              v-model="variants[selectedRowIndex].Funksjonsstudier"
+              @change="updateVariants;setChanged()" 
+            >
+            </b-form-select>
+          </b-col>
+          <b-col cols="6">
+            <label>Cancer Hotspots</label>
+            <b-form-select
+              :options="cancerhotspotsOptions"
+              class="py-sm-0 form-control"
+              v-model="variants[selectedRowIndex].Cancer_hotspots"
+              @change="updateVariants;setChanged()" 
+            >
+            </b-form-select>
+          </b-col>            		            
+
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="6">
+            <label>Predictive Data</label>
+            <b-form-select
+              :options="predictiveOptions"
+              multiple :select-size="6"              
+              class="py-sm-0 form-control"
+              v-model="variants[selectedRowIndex].Prediktive_data"
+              @change="updateVariants;setChanged()" 
+            >
+            </b-form-select>
+          </b-col>       
+          <b-col cols="6">
             <label>Conservation</label>
              <b-form-textarea
                 id="textarea"
-                size="sm"
+                size="default"
                 v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
           </b-col>
+
         </b-row>
 
         <b-row class="mb-1">
-          <b-col cols="4">
+          <b-col cols="6">
             <label>ClinVar</label>
              <b-form-textarea
                 id="textarea"
-                size="sm"
+                size="default"
                 v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants;setChanged()"
 
               ></b-form-textarea>
           </b-col>
-          <b-col cols="4">
+          <b-col cols="6">
             <label>Other DB</label>
              <b-form-textarea
                 id="textarea"
-                size="sm"
+                size="default"
                 v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants;setChanged()"
 
@@ -221,7 +227,7 @@
         </b-row>    
 
         <b-row class="mb-1">
-          <b-col cols="4">
+          <b-col cols="6">
               <label>Class</label>
               <b-form-select
                 :options="classOptions"
@@ -231,7 +237,7 @@
               >
               </b-form-select>
           </b-col>
-          <b-col cols="4">
+          <b-col cols="6">
               <label>Tier</label>
               <b-form-select
                 :options="tierOptions"
@@ -386,6 +392,9 @@ export default {
       selectedSample: "",
       selectedRowIndex: 0,
       replyOptions: config.replyOptions,
+      functionalOptions: config.functionalOptions,
+      predictiveOptions: config.predictiveOptions,
+      cancerhotspotsOptions: config.cancerhotspotsOptions,
       classOptions: config.classOptions,
       tierOptions: config.tierOptions,
       infoModal: {
