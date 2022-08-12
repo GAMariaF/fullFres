@@ -11,17 +11,40 @@ config = {
 		{ value: 'Yes', text: 'Yes' },
 		{ value: 'No', text: 'No' }
 	],
+	functionalOptions: [
+		// Obs - dont use 0 (it is reserved)
+		{ value: null, text: '' },
+		{ value: 'OS2: Ja (ref) (+4)', text: 'OS2: Ja (ref) (+4)' },
+		{ value: 'OS2: OncoKB: Likely oncogenic (+4)', text: 'OS2: OncoKB: Likely oncogenic (+4)' },		
+		{ value: 'OS2: OncoKB: Oncogenic (+4)', text: 'OS2: OncoKB: Oncogenic (+4)' }
+	],
+	predictiveOptions: [
+		// Obs - dont use 0 (it is reserved)
+		{ value: null, text: '' },
+		{ value: 'OS1: Same AA prev established (+4)', text: 'OS1: Same AA prev established (+4)' },
+		{ value: 'OM1: Functional domain (+2)', text: 'OM1: Functional domain (+2)' },
+		{ value: 'OM2: Protein length changes (+2)', text: 'OM2: Protein length changes (+2)' },
+		{ value: 'OM3: Different AA in known oncogenic site (+2)', text: 'OM3: Different AA in known oncogenic site (+2)' },
+		{ value: 'OVS1: Nullvariant (+8)', text: 'OVS1: Nullvariant (+8)' }
+	],
+	cancerhotspotsOptions: [
+		// Obs - dont use 0 (it is reserved)
+		{ value: null, text: '' },
+		{ value: 'OS3: Ja (ref) (+4)', text: 'OS3: Ja (ref) (+4)' },
+		{ value: 'OM4: Hotspot medium freq (+2)', text: 'OM4: Hotspot medium freq (+2)' },
+		{ value: 'OP3: Hotspot low freq (+1)', text: 'OP3: Hotspot low freq (+1)' },
+		{ value: 'OS3: Hotspot high freq (+4)', text: 'OS3: Hotspot high freq (+4)' }
+	],
 	classOptions: [
 		// Obs - dont use 0 (it is reserved)
 		{ value: null, text: 'Please select an option' },
 		{ value: 'Not Relevant', text: 'Not Relevant' },
 		{ value: 'Technical', text: 'Technical' },
-		{ value: '1 - Benign', text: '1 - Benign' },
-		{ value: '2 - Likely Benign', text: '2 - Likely Benign' },
-		{ value: '3 - VUS', text: '3 - VUS' },
-		{ value: '4 - Likely Ongogenic', text: '4 - Likely Ongogenic' },
-		{ value: '5 - Oncogenic', text: '5 - Oncogenic' },
-		{ value: '6', text: '6' }
+		{ value: '1 - Benign', text: '1 - Benign ( - -7 )' },
+		{ value: '2 - Likely Benign', text: '2 - Likely Benign ( -6 - -1 )' },
+		{ value: '3 - VUS', text: '3 - VUS ( 0 - 5 )' },
+		{ value: '4 - Likely Ongogenic', text: '4 - Likely Ongogenic (6 - 9 )' },
+		{ value: '5 - Oncogenic', text: '5 - Oncogenic ( 10 - )' }
 	],
 	tierOptions: [
 		// Obs - dont use 0 (it is reserved)
