@@ -1,6 +1,6 @@
 # Added by Oyvind:
 */package-lock.json
-
+frontend/package-lock.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
