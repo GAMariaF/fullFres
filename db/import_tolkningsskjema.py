@@ -9,7 +9,7 @@ config = configparser.ConfigParser()
 config.read('backend/config.ini')
 db = config['Paths']['db_full_path']
 
-excel = '/illumina/analysis/dev/2022/mfahls/fullFres/Tolkningsskjema_NyVersjon_130422_import.xlsx'
+excel = '/illumina/analysis/dev/2022/mfahls/fullFres/Tolkningsskjema_NyVersjon_130422_import2.xlsx'
 
 dfTolkning = pd.read_excel(excel, header = 0)
 
