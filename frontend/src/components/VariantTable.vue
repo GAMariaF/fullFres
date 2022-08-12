@@ -1,6 +1,7 @@
 import util_funcs from '../appUtils'
 <template>
   <div id="app" class="container-fluid" v-if="!loading">
+  
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
     <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
@@ -250,6 +251,11 @@ import util_funcs from '../appUtils'
       <div v-if="locked === false">
       <h5>When interpretation is done, please sign off here</h5>
       <br>
+
+
+
+
+    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have yes or no in the Reply-field!!</b-alert>
       <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button>
       </div>
     <!--  -->
@@ -270,7 +276,7 @@ export default {
   name: "varianttable",
   data() {
     return {
-  
+      showDismissibleAlert: false,
       loading: true,
       sortedIndex: [ 'runid',
                     'sampleid',
@@ -364,6 +370,9 @@ export default {
     };
   },
   methods: {
+    showAlert() {
+        this.dismissCountDown = this.dismissSecs
+      },
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
       console.log("updateVariants");
@@ -497,8 +506,21 @@ export default {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
+
+
+      
+      // Først - sjekk om alle rader har yes/no på reply
+      var all_reply = true
+      this.variants.forEach(item => {
+        console.log(item.Reply)
+        if (item.Reply != "Yes" & item.Reply != "No") {
+          all_reply = false
+        }
+      })
+      
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/signoff";
+      if(all_reply == true) {
       this.$http
         .post(
           baseURI,
@@ -509,7 +531,6 @@ export default {
           },
           {
             withCredentials: true,
-            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
             headers: { "Content-Type": "application/json" },
           }
         )
@@ -520,6 +541,7 @@ export default {
         this.$router.push({
         name: "Samples"
         });
+      } else { this.showDismissibleAlert=true}
     },
     
   },

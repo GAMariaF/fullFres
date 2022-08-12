@@ -680,3 +680,35 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	
 	with open(outvcf, 'w') as f:
 		f.write(vcf_header)
+
+
+
+def statistics(db):
+	'''
+	input: database
+	outputs a json with different statistics from the database
+	
+	
+	'''
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = ""
+	with engine.connect() as conn:
+		# Number of runs
+		n_runs = conn.execute(text("SELECT COUNT(DISTINCT(runid)) FROM Samples")).fetchone()[0]
+		
+		print(n_runs)
+		# Number of samples
+		n_samples = conn.execute(text("SELECT COUNT(DISTINCT(sampleid)) FROM Samples")).fetchone()[0]
+		
+		print(n_samples)
+
+	
+	
+		# Number of variants
+
+
+
+
+	results = {"runs": n_runs, "samples": n_samples}
+	print(results)
+	return results
