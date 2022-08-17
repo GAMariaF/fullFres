@@ -55,5 +55,11 @@ def importVcfXls(folder):
             populate_thermo_variantdb(db, df, dfvariant, \
                 run_id, sample_id, percent_tumor, sample_diseasetype)    
 
+    rm_dir_list = os.listdir(folder)
+    for rm_file in rm_dir_list:
+        os.remove(folder +'/'+ rm_file)
+
+
+
 
 
