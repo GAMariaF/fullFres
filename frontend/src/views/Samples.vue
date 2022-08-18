@@ -115,8 +115,7 @@ export default {
       const baseURI = config.$backend_url + "/api/import";
       axios
         .get(baseURI, { params: [this.importFolder] })
-        .then( this.getsamples());
-     
+        .then(window.location.reload(true) );
     },
   },
   created: function () {
