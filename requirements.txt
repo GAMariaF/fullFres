@@ -14,3 +14,4 @@ Flask-Cors==3.0.10
 Flask-SQLAlchemy==2.5.1
 uuid==1.30
 pyjwt==2.3.0
+flask-jwt-extended==4.4.4

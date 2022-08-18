@@ -16,7 +16,7 @@
             <em>User</em>
           </template>
           <b-dropdown-item to="/profile">Profile</b-dropdown-item>
-          <b-dropdown-item :href="signOut_URL">Sign Out</b-dropdown-item>
+          <b-dropdown-item @click="signout">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
 </b-navbar>
@@ -24,11 +24,22 @@
 
 <script>
 import { config } from '../config.js';
+import util_funcs from "@/appUtils";
 export default {
     name: "navbar",
     data() {
       return {
         signOut_URL: config.$signout_url()
+      }
+    },
+    methods: {
+      signout() {
+        console.log("signout")
+        // Delete cookie (logs you out)
+        util_funcs.delete_cookie('sid')
+        // Reload the page
+        this.$router.push({        name: "login"        });
+
       }
     }
 }

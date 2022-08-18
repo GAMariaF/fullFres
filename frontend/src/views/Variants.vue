@@ -1,8 +1,6 @@
 <template>
   <div>
-  
     <variant-table :locked="locked"/>
-    
   </div>
 </template>
 
@@ -19,7 +17,6 @@ export default {
   data() {
     return {
       sampleid: this.$route.params.id,
-    
     };
   },
   created: function () {

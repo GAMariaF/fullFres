@@ -4,6 +4,11 @@ from signal import valid_signals
 from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
+from flask_jwt_extended import unset_jwt_cookies
+
+
+
 import uuid
 import jwt
 import datetime
@@ -115,6 +120,9 @@ def login_user():
         resp.set_cookie('sid', token, expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
         return resp
     return make_response('could not verify',  401, {'Authentication': '"login required"'})
+
+
+
 
 @app.route('/api/<query>', methods=['GET', 'POST'])
 @token_required
