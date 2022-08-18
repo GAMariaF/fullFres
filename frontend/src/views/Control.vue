@@ -3,6 +3,7 @@
     <b-row>
       <b-col cols="3">
         <br>
+        
         <h2>Signed off samples</h2>
         <br>
         <b-table
@@ -111,6 +112,7 @@
       </b-col>
     </b-row>
     <b-modal
+    v-if="selectedSample !== ''"
     :id="infoModal.id"
     :title="infoModal.title"
     ok-only
@@ -315,7 +317,9 @@
           </b-row>    
       </b-container>
   </b-modal>
+  
   </b-container>
+  
 </template>
 <script>
 // import axios from "axios";

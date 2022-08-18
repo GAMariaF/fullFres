@@ -1,10 +1,12 @@
 import util_funcs from '../appUtils'
 <template>
-  <div id="app" class="container-fluid" v-if="!loading">
+  <b-container id="app" fluid v-if="variants">
+  
+  
   
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
-    <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+    <h5>Gene List: <b >{{ this.variants[0].Genelist }}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
     <br>
     <b-table
       selectable
@@ -20,6 +22,7 @@ import util_funcs from '../appUtils'
       :items="variants"
       :fields="fields"
       :small="small"
+      
     >
      <!-- Adding index column -->
      <template #cell(Nr)="data">
@@ -271,7 +274,7 @@ import util_funcs from '../appUtils'
 
 
 
-  </div>
+  </b-container>
   
 </template>
 <script>
@@ -376,6 +379,7 @@ export default {
         {key: "Reply", label: "Reply (Svares ut)"},
         {key: "Info"}
         ],
+        
     };
   },
   methods: {
@@ -455,7 +459,6 @@ export default {
       }
     },
 
-
     rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
@@ -465,7 +468,6 @@ export default {
         console.log("unselected");
       }
     },
-
 
     openInfoModal(item, index, button) {
       console.log("openInfoModal");
@@ -515,8 +517,6 @@ export default {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
-
-
       
       // Først - sjekk om alle rader har yes/no på reply
       var all_reply = true
@@ -557,7 +557,7 @@ export default {
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
     
-    return this.$store.getters.variants;
+    // return this.$store.getters.variants;
     
   },
   computed: {
@@ -567,12 +567,15 @@ export default {
     variants: {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
+      
     }
   },
   watch: {
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
+      
       this.loading = false;
+      
     },
   },
 };
