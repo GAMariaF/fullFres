@@ -12,7 +12,7 @@ var util_funcs = {
         // Funksjon som sender query til backend
         const baseURI = url + '/api/' + query
         return axios.get(baseURI)
-        .then(function (response) {return response.data});      
+        .then((response) => {return response.data});      
     },
     delete_cookie(name) {
         document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';

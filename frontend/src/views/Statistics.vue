@@ -8,6 +8,7 @@
     </b-jumbotron>
 
     <div class="container" id="login" v-if="items.length === 0">
+    {{stats}}
       <b-row>
         <b-col>
           <b-card

@@ -1,4 +1,3 @@
-import util_funcs from '../appUtils'
 <template>
   <b-container id="app" fluid v-if="variants">
   
@@ -573,7 +572,6 @@ export default {
   watch: {
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
-      
       this.loading = false;
       
     },

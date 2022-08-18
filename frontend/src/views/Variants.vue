@@ -5,7 +5,6 @@
 </template>
 
 
-
 <script>
 import VariantTable from "../components/VariantTable";
 
