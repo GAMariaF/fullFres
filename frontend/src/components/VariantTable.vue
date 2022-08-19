@@ -70,7 +70,7 @@
           <b-col cols="6">
             <label>Date changed</label>
             <td>{{ variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' +
-              variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.20' +
+              variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
               variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)}}</td>
           </b-col>            
         </b-row>
