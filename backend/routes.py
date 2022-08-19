@@ -149,8 +149,9 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
-            print("Sender varianter for sample id: " + query.split("_")[1])
-            variants = list_interpretation(db_path, query.split("_")[1])
+            print(query)
+            print("Sender varianter for sample id: " + query.split("ts_")[1])
+            variants = list_interpretation(db_path, query.split("ts_")[1])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
