@@ -37,7 +37,9 @@ def importVcfXls(folder):
             shutil.rmtree(folder +'/'+ file[:-4] + 'TEMP/')
             fileprefix = re.split("_GX", file)
             vcffile = folder + '/' + file[:-4] + '.vcf'
-            excelfile = folder + '/' + fileprefix[0].lower() + '_variants.xlsx'
+            for fileexcel in dir_list:
+                if fileexcel.startswith(fileprefix[0].lower()):
+                    excelfile = folder + '/' + fileexcel
             # set up path to DB and get run_id, sample_id etc from vcffile
             db = config['Paths']['db_full_path']
             run_id = get_run_id(vcffile)
