@@ -36,6 +36,7 @@ from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
 from dbutils import statistics
+from dbutils import data_report
 
 from importutils import importVcfXls
 
@@ -168,6 +169,14 @@ def api(current_user, query):
             print("Sending stats")
             stats = statistics(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
+            return response
+        elif query == "report":
+            print("report")
+            samples = list_approved_samples(db_path)
+            print("--")
+            print(samples)
+            print("--")
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)

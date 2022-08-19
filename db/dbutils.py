@@ -395,9 +395,10 @@ def list_signoff_samples(db):
 def list_approved_samples(db):
 	#list all approved samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT sampleid, runid \
+	stmt = "SELECT sampleid, runid, Date_Approval \
 				FROM Samples \
-				WHERE Date_Approval IS NOT NULL;"
+				WHERE Samples.Date_Approval IS NOT NULL \
+				AND Samples.Date_Approval != '';"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -712,3 +713,33 @@ def statistics(db):
 	results = {"runs": n_runs, "samples": n_samples}
 	print(results)
 	return results
+
+def data_report(db):
+	#list variant data for report
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "select VariantsPerSample.runid, \
+		VariantsPerSample.sampleid, Samples.Genelist, \
+		Samples.Perc_Tumor, Variants.gene, Variants.exon,\
+		Variants.annotation_variant, \
+		Samples.Date_Approval, \
+		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
+		VariantsPerSample.Copy_Number, VariantsPerSample.AF, \
+		VariantsPerSample.DP, \
+		VariantsPerSample.CNV_Confidence, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.chrom_pos_altend_date, \
+		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER \
+			from VariantsPerSample \
+			left join Variants \
+			on VariantsPerSample.chrom_pos_altend_date = \
+							Variants.chrom_pos_altend_date \
+			LEFT JOIN Samples \
+			on VariantsPerSample.runid = Samples.runid \
+			and VariantsPerSample.sampleid = Samples.sampleid \
+			WHERE Samples.Date_Approval IS NOT NULL \
+			AND Samples.Date_Approval != '' \
+			AND VariantsPerSample.Reply='Yes';"
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json
