@@ -8,7 +8,7 @@ import Variants from '../views/Variants.vue';
 import AllVariants from '../views/AllVariants.vue';
 import Control from '../views/Control.vue';
 import Statistics from '../views/Statistics.vue';
-import Report from '../views/Report.vue';
+//import Report from '../views/Report.vue';
 
 // temp?
 import login from '../views/LoginWorld.vue';
@@ -57,11 +57,11 @@ const routes = [
 		name: 'login',
 		component: login
 	},
-	{
-		path: '/report',
-		name: 'Report',
-		component: Report
-	},
+//	{
+//		path: '/report',
+//		name: 'Report',
+//		component: Report
+//	},
 	
 ];
 const router = new VueRouter({

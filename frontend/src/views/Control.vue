@@ -30,7 +30,7 @@
           <br><br>
           <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
           <br>
-          <h2><p style="text-align:left;">Classified variants</p></h2>
+          <h2><p style="text-align:left;">Reply (Svares ut)</p></h2>
           <br>          
           <b-table
             selectable
@@ -64,7 +64,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not Relevant, Technical or not interpreted variants </p></h2>
+          <h2><p style="text-align:left;">No reply </p></h2>
           <br>          
           <b-table
             selectable
@@ -428,9 +428,9 @@ export default {
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
-      filter1: /^\d/,
-      filter2: /Not Relevant|Technical|^\s*$/i,
-      filterOn: ["class"],
+      filter1: /Yes/,
+      filter2: /No/,
+      filterOn: ["Reply"],
       Technical: ["Technical"],
       NotRelevant: ["Not Relevant"],
     };

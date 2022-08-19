@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-from flask_jwt_extended import unset_jwt_cookies
+#from flask_jwt_extended import unset_jwt_cookies
 
 
 
