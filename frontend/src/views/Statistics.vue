@@ -8,45 +8,30 @@
     </b-jumbotron>
 
     <div class="container" id="login" v-if="items.length === 0">
-    {{stats}}
       <b-row>
+        <!--  -->
         <b-col>
           <b-card
             title="Number of runs"
-            sub-title="Total number of runs in database"
-          >
+            sub-title="Total number of runs in database" >
             <b-card-text>
               <h4>{{stats.runs}}</h4>
             </b-card-text>
           </b-card>
         </b-col>
-        <!--  -->
+      </b-row>
+      <br>
+      <b-row> 
         <b-col>
           <b-card
             title="Number of samples"
             sub-title="Total number of samples in database"
           >
             <b-card-text>
-              <h4>{{stats.samples}}</h4>
+              <h4><br>{{stats.samples}}</h4>
             </b-card-text>
           </b-card>
         </b-col>
-        <!--  -->
-        <b-col>
-          <b-card
-            title="Number of variants"
-            sub-title="Total number of Variants in database"
-          >
-            <b-card-text>
-              <h4>1546</h4>
-            </b-card-text>
-          </b-card>
-        </b-col>
-      </b-row>
-      <!-- Samples in the workflow -->
-      <br>
-      <b-row>
-        
         <!--  -->
         <b-col>
           <b-card
@@ -54,50 +39,109 @@
             sub-title="Total number of samples Waiting for interpretation"
           >
             <b-card-text>
-              <h4>5</h4>
+              <h4>{{stats.samples_waiting}}</h4>
             </b-card-text>
           </b-card>
         </b-col>
         <!--  -->
         <b-col>
           <b-card
-            title="Number of Samples waiting for control"
+            title="Number of samples waiting for control"
             sub-title="Total number of Samples waiting for control"
           >
             <b-card-text>
-              <h4>5</h4>
+              <h4>{{stats.samples_signedoff}}</h4>
             </b-card-text>
           </b-card>
         </b-col>
       </b-row>
-      <!--  -->
-
-      
+      <br>
       <b-row>
+        <!-- Number of variants -->
+        <b-col>
+          <b-card
+            title="Number of variants"
+            sub-title="Total number of Variants in database"
+          >
+            <b-card-text>
+              <h4>{{stats.variants}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+
         <!-- Variants by class -->
-        <b-col>
-
+        <!-- <b-col>
+          <b-card
+            title="Number of variants per genelist"
+            sub-title="Total number of Variants per genelist"
+          >
+            <b-card-text>        
+              <table class="table-hover" style="margin-left:auto;margin-right:auto;">
+                <thead>
+                  <tr>
+                    <th>Genelist</th>
+                    <th>No. of Variants</th>
+                  </tr>
+                </thead>
+                <tbody >
+                  <th>
+                  <tr v-for="(name) in stats.variants_genelist.Genelist" :key="name">
+                    <td>{{ name }}</td>
+                  </tr>
+                  </th>
+                  <th>
+                  <tr v-for="(name) in stats.variants_genelist.Freq" :key="name">
+                    <td>{{ name }}</td>
+                  </tr>
+                  </th>
+                </tbody>
+              </table> 
+            </b-card-text>            
+          </b-card>              
         </b-col>
-        <!-- Variants by cancer types -->
-        <b-col>
-
-        </b-col>
-        <!-- Samples by users -->
+        -->
+      </b-row>
+      <b-row>
+        <!-- Samples by users 
+        
+        
+                      -->
         <b-col>
 
         </b-col>
       </b-row>
-    <!--Plotting  -->
-    <b-row>
-      <b-col>
-        <Plotly v-if="loaded" :data="data" :layout="layout" :display-mode-bar="false" />
-      
-        
-      </b-col>
-    </b-row>
-    {{stats}}
-    {{stats.runs}}
-    <b-button v-on:click="getstats" class="btn mr-1 btn-info"> Approve </b-button>
+      <b-row>
+      <!--Plotting variants per genelist -->    
+        <b-col>
+          <Plotly v-if="loaded" 
+          :data="data"
+          :layout="layout" 
+          :display-mode-bar="false" />
+
+        </b-col>
+      </b-row>
+      <b-row>
+        <!--  -->
+        <b-col>
+          <b-card
+            title="Number of users"
+            sub-title="Total number of users in database" >
+            <b-card-text>
+              <h4>{{stats.users}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+      <b-row>
+      <!--Plotting samples per user -->    
+        <b-col>
+          <Plotly v-if="loaded" 
+          :data="dataUser"
+          :layout="layoutUser" 
+          :display-mode-bar="false" />
+        </b-col>
+      </b-row>
+    <!-- {{this.stats.variants_genelist.Genelist}} -->
   </div>
 
     <!-- Dette er hvis ikke logget inn -->
@@ -111,6 +155,7 @@
   </div>
 </template>
 <script>
+
 import { config } from "../config.js";
 import axios from "axios";
 import { Plotly } from 'vue-plotly'
@@ -126,16 +171,23 @@ export default {
       items: [],
       loaded: true, 
       data:[{
-                x: ["1","2","3","4","5"],
-                y: [10,15,13,17,11],
-                type: "bar"},
-                
+                x: [],
+                y: [],
+                type: "bar"}, 
                 ],
       layout: {
-                title: "Variants by class",
+                title: "Variants by Genelist",
+                autosize: true
+            },
+      dataUser:[{
+                x: [],
+                y: [],
+                type: "bar"}, 
+                ],
+      layoutUser: {
+                title: "Samples per User",
                 autosize: true
             }
-
     };
   },
   methods: {
@@ -147,6 +199,17 @@ export default {
         .then((response) => response.data)
         .then((data) => {
           this.stats = JSON.parse(data.data);
+          this.data = [{
+                x: this.stats.variants_genelist.Genelist,
+                y: this.stats.variants_genelist.Freq,
+                type: "bar"}, 
+                ];
+          this.dataUser = [{
+                x: this.stats.users_samples.User_Signoff,
+                y: this.stats.users_samples.Freq,
+                type: "bar"}, 
+                ];
+
         });
     },
   },

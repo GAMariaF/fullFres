@@ -695,22 +695,72 @@ def statistics(db):
 	stmt = ""
 	with engine.connect() as conn:
 		# Number of runs
-		n_runs = conn.execute(text("SELECT COUNT(DISTINCT(runid)) FROM Samples")).fetchone()[0]
-		
+		n_runs = conn.execute(text("SELECT COUNT(DISTINCT(runid)) \
+			FROM Samples")).fetchone()[0]
 		print(n_runs)
-		# Number of samples
-		n_samples = conn.execute(text("SELECT COUNT(DISTINCT(sampleid)) FROM Samples")).fetchone()[0]
-		
-		print(n_samples)
 
-	
+		# Number of users
+		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
+			FROM Samples")).fetchone()[0]
+		print(n_users)
+
+		# Number of samples
+		n_samples = conn.execute(text("SELECT COUNT(DISTINCT(sampleid)) \
+			FROM Samples")).fetchone()[0]
 	
 		# Number of variants
+		n_variants = conn.execute(text("SELECT COUNT(*) \
+			FROM (SELECT DISTINCT chrom, pos, altend from Variants)")).fetchone()[0]
 
+		# Number of samples waiting for interpretation
+		n_samples_waiting = conn.execute(text("SELECT COUNT(*) FROM(SELECT DISTINCT sampleid, runid \
+												FROM Samples \
+												WHERE (Date_Signoff IS NULL \
+												OR Date_Signoff IS '') \
+												AND (Date_Approval IS Null \
+												OR Date_Approval is ''))")).fetchone()[0]
 
+		# Number of samples waiting for control
+		n_samples_signedoff = conn.execute(text("SELECT COUNT(*) FROM(SELECT DISTINCT \
+													sampleid, runid, Date_Signoff \
+													FROM Samples \
+													WHERE (Date_Signoff IS NOT NULL \
+													AND Date_Signoff IS NOT '') \
+													AND (Date_Approval IS NULL \
+													OR Date_Approval IS ''))")).fetchone()[0]
 
+		# Number of variants per genelist
+		n_variants_genelist = conn.execute(text("SELECT Genelist,COUNT(*) AS Freq FROM ( \
+													SELECT DISTINCT chrom, pos, altend, Genelist FROM Samples s \
+													LEFT JOIN VariantsPerSample vps \
+													ON s.runid = vps.runid \
+													AND s.sampleid = vps.sampleid \
+													LEFT JOIN Variants v \
+													ON vps.CHROM_POS_ALTEND_DATE = \
+														v.CHROM_POS_ALTEND_DATE) \
+													GROUP BY Genelist ")).fetchall()
+		n_variants_genepd = pd.DataFrame(n_variants_genelist)
+		n_variants_genedict = n_variants_genepd.to_dict('list')
+		print(n_variants_genedict)
 
-	results = {"runs": n_runs, "samples": n_samples}
+		# Number of users
+		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
+			FROM Samples")).fetchone()[0]
+		print(n_users)
+
+		n_users_samples = conn.execute(text("SELECT User_Signoff, COUNT(*) AS Freq \
+												FROM Samples \
+												GROUP BY User_Signoff")).fetchall()
+		n_users_samplespd = pd.DataFrame(n_users_samples)
+		n_users_samplesdict = n_users_samplespd.to_dict('list')
+		print(n_users_samplesdict)
+
+	results = {"runs": n_runs, "samples": n_samples, "variants": n_variants, \
+				"samples_waiting": n_samples_waiting, \
+				"samples_signedoff": n_samples_signedoff, \
+				"variants_genelist": n_variants_genedict, \
+				"users": n_users, \
+				"users_samples": n_users_samplesdict }
 	print(results)
 	return results
 

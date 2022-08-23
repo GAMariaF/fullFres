@@ -476,6 +476,7 @@ export default {
 
     openInfoModal(item, index, button) {
       console.log("openInfoModal");
+      index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       this.infoModal.title = `Variant: ${index +1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
