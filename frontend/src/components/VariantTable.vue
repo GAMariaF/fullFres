@@ -77,7 +77,7 @@
         <br>
         <b-row class="mb-1">
           <b-col cols="6">
-            <label>Population Data<br><i>OP4: 2/152182 (+1)</i></label>
+            <label>Population Data (GnomAD)<br><i>OP4: 2/152182 (+1)</i></label>
              <b-form-textarea
                 id="textarea"
                 size="default"
@@ -87,7 +87,7 @@
               ></b-form-textarea>
           </b-col>
           <b-col cols="6">
-            <label>Computational evidence<br><i>SBP1: 0,448 Benign (-1)</i></label>
+            <label>Computational Evidence (Revel)<br><i>SBP1: 0,448 Benign (-1)</i></label>
              <b-form-textarea
                 id="textarea"
                 size="default"
@@ -135,7 +135,7 @@
             </b-form-select>
           </b-col>       
           <b-col cols="6">
-            <label>Conservation</label>
+            <label>Conservation (PhyloP)</label>
              <b-form-textarea
                 id="textarea"
                 size="default"
