@@ -20,7 +20,7 @@ from dbutils import list_all_samples
 from dbutils import list_signoff_samples
 from dbutils import list_approved_samples
 from dbutils import list_all_variants
-from dbutils import list_sample_variants
+#from dbutils import list_sample_variants
 from dbutils import list_interpretation
 
 vcffile     = config['Testfiles']['vcffile']      # './tests/vcfs/22shk04823_Oncomine_Extended_516_filtered.vcf'

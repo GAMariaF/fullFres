@@ -43,7 +43,7 @@ config = {
 		{ value: '1 - Benign', text: '1 - Benign ( - -7 )' },
 		{ value: '2 - Likely Benign', text: '2 - Likely Benign ( -6 - -1 )' },
 		{ value: '3 - VUS', text: '3 - VUS ( 0 - 5 )' },
-		{ value: '4 - Likely Ongogenic', text: '4 - Likely Ongogenic (6 - 9 )' },
+		{ value: '4 - Likely Oncogenic', text: '4 - Likely Oncogenic (6 - 9 )' },
 		{ value: '5 - Oncogenic', text: '5 - Oncogenic ( 10 - )' }
 	],
 	tierOptions: [

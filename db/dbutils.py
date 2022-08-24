@@ -738,10 +738,23 @@ def statistics(db):
 													LEFT JOIN Variants v \
 													ON vps.CHROM_POS_ALTEND_DATE = \
 														v.CHROM_POS_ALTEND_DATE) \
-													GROUP BY Genelist ")).fetchall()
+													GROUP BY Genelist")).fetchall()
 		n_variants_genepd = pd.DataFrame(n_variants_genelist)
 		n_variants_genedict = n_variants_genepd.to_dict('list')
 		print(n_variants_genedict)
+
+#### query to get no of variants grouped by class, Genelist
+# SELECT class, Genelist, COUNT(*) AS Freq FROM ( 
+# 													SELECT DISTINCT chrom, pos, altend, Genelist, class FROM Samples s 
+# 													LEFT JOIN VariantsPerSample vps 
+# 													ON s.runid = vps.runid 
+# 													AND s.sampleid = vps.sampleid 
+# 													LEFT JOIN Variants v 
+# 													ON vps.CHROM_POS_ALTEND_DATE = v.CHROM_POS_ALTEND_DATE 
+# 													LEFT JOIN Classification c
+# 													ON vps.CHROM_POS_ALTEND_DATE = c.CHROM_POS_ALTEND_DATE AND vps.DATE_CHANGED_VARIANT_BROWSER = c.DATE_CHANGED_VARIANT_BROWSER )
+# 													GROUP BY class, Genelist ORDER BY class, Genelist
+
 
 		# Number of users
 		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
