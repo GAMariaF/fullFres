@@ -12,6 +12,7 @@ db = config['Paths']['db_full_path']
 excel = '/illumina/analysis/dev/2022/mfahls/fullFres/Tolkningsskjema_NyVersjon_130422_import3.xlsx'
 
 dfTolkning = pd.read_excel(excel, header = 0)
+dfTolkning.Perc_Tumor *= 100
 
 colSamples              = ["runid", "sampleid", \
                                 "Genelist", "Perc_Tumor", \
