@@ -82,9 +82,10 @@
                 id="textarea"
                 size="default"
                 :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
-                @click="changedatastate"
+                
 
               ></b-form-textarea>
           </b-col>
@@ -93,6 +94,8 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants;setChanged()"
 
