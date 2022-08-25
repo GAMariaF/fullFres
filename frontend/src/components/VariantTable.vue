@@ -81,8 +81,10 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants;setChanged()"
+                @click="changedatastate"
 
               ></b-form-textarea>
           </b-col>
@@ -291,6 +293,7 @@ export default {
   name: "varianttable",
   data() {
     return {
+      datastate: true,
       showDismissibleAlert: false,
       loading: true,
       sortedIndex: [ 'runid',
@@ -389,6 +392,11 @@ export default {
     };
   },
   methods: {
+    changedatastate() {
+      if (this.datastate == true) {
+        this.datastate = false
+      } else (this.datastate = true)
+    },
     fillReply(){
       // Fills No in the reply-col of the variants that are empty
 
