@@ -270,7 +270,8 @@
 
 
     <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have yes or no in the Reply-field!!</b-alert>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button>
+      <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button><p> </p>
+      <b-button v-on:click="fillReply" class="btn mr-1 btn-info"> Fill Reply </b-button>
       </div>
     <!--  -->
     <br>
@@ -388,6 +389,29 @@ export default {
     };
   },
   methods: {
+    fillReply(){
+      // Fills No in the reply-col of the variants that are empty
+
+      this.variants.forEach((item, index) => {
+  
+     
+        
+        
+        if (typeof this.variants[index].Reply === 'object' ) {
+          
+          this.variants[index].Reply = 'No'  
+          
+        } else if (this.variants[index].Reply.length===0 ) {
+          this.variants[index].Reply = 'No'
+        
+        
+        }
+        
+  
+
+      })
+
+    },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
       },
