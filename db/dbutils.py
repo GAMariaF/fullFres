@@ -697,12 +697,10 @@ def statistics(db):
 		# Number of runs
 		n_runs = conn.execute(text("SELECT COUNT(DISTINCT(runid)) \
 			FROM Samples")).fetchone()[0]
-		print(n_runs)
 
 		# Number of users
 		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
 			FROM Samples")).fetchone()[0]
-		print(n_users)
 
 		# Number of samples
 		n_samples = conn.execute(text("SELECT COUNT(DISTINCT(sampleid)) \
@@ -741,20 +739,25 @@ def statistics(db):
 													GROUP BY Genelist")).fetchall()
 		n_variants_genepd = pd.DataFrame(n_variants_genelist)
 		n_variants_genedict = n_variants_genepd.to_dict('list')
-		print(n_variants_genedict)
 
 #### query to get no of variants grouped by class, Genelist
-# SELECT class, Genelist, COUNT(*) AS Freq FROM ( 
-# 													SELECT DISTINCT chrom, pos, altend, Genelist, class FROM Samples s 
-# 													LEFT JOIN VariantsPerSample vps 
-# 													ON s.runid = vps.runid 
-# 													AND s.sampleid = vps.sampleid 
-# 													LEFT JOIN Variants v 
-# 													ON vps.CHROM_POS_ALTEND_DATE = v.CHROM_POS_ALTEND_DATE 
-# 													LEFT JOIN Classification c
-# 													ON vps.CHROM_POS_ALTEND_DATE = c.CHROM_POS_ALTEND_DATE AND vps.DATE_CHANGED_VARIANT_BROWSER = c.DATE_CHANGED_VARIANT_BROWSER )
-# 													GROUP BY class, Genelist ORDER BY class, Genelist
-
+		# n_variants_gene_classlist =  conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		# 											FROM ( \
+		# 											SELECT DISTINCT chrom, pos, altend, Genelist, class FROM Samples s \
+		# 											LEFT JOIN VariantsPerSample vps \
+		# 											ON s.runid = vps.runid \
+		# 											AND s.sampleid = vps.sampleid \
+		# 											LEFT JOIN Variants v \
+		# 											ON vps.CHROM_POS_ALTEND_DATE = \
+		# 												v.CHROM_POS_ALTEND_DATE \
+		# 											LEFT JOIN Classification c \
+		# 											ON vps.CHROM_POS_ALTEND_DATE = \
+		# 												c.CHROM_POS_ALTEND_DATE AND vps.DATE_CHANGED_VARIANT_BROWSER = c.DATE_CHANGED_VARIANT_BROWSER ) \
+		# 											GROUP BY Genelist \
+		# 											WHERE c.class='Benign'")).fetchall()
+		# n_variants_gene_classpd = pd.DataFrame(n_variants_gene_classlist)
+		# n_variants_gene_classdict = n_variants_gene_classpd.to_dict('list')
+		# print(n_variants_gene_classdict["class"])
 
 		# Number of users
 		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
