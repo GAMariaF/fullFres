@@ -463,17 +463,18 @@ def list_interpretation(db,sampleid):
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
 		Samples.Perc_Tumor, Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
-		VariantsPerSample.Copy_Number, VariantsPerSample.AF, Classification.COSMIC, \
+		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
 		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \
-		VariantsPerSample.Variant_Name, VariantsPerSample.Key_Variant, VariantsPerSample.Oncomine_Reporter_Evidence, \
+		VariantsPerSample.Variant_Name, VariantsPerSample.Key_Variant, \
+		VariantsPerSample.Oncomine_Reporter_Evidence, \
 		VariantsPerSample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, \
-		VariantsPerSample.FILTER, Variants.gene, \
+		VariantsPerSample.FILTER, \
 		Variants.chrom || ':' || Variants.pos as Locus, Variants.protein, Variants.ref, \
 		Variants.altend, VariantsPerSample.Call, VariantsPerSample.DP, \
 		VariantsPerSample.FDP, VariantsPerSample.FAO, \
-		Variants.coding, VariantsPerSample.AF, \
+		Variants.coding, \
 		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
-		VariantsPerSample.Oncomine_Driver_Gene, VariantsPerSample.Copy_Number, \
+		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
 		VariantsPerSample.Valid_CNV_Amplicons, Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \

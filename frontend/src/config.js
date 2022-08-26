@@ -9,7 +9,8 @@ config = {
 		// Obs - dont use 0 (it is reserved)
 		{ value: null, text: 'Please select an option' },
 		{ value: 'Yes', text: 'Yes' },
-		{ value: 'No', text: 'No' }
+		{ value: 'No', text: 'No' },
+		{ value: 'NotEvaluated', text: 'NotEvaluated' }		
 	],
 	functionalOptions: [
 		// Obs - dont use 0 (it is reserved)

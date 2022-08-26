@@ -14,7 +14,6 @@
       striped
       hover
       outlined
-      fixed
       label-sort-asc=""
       label-sort-desc=""
       label-sort-clear=""
@@ -106,13 +105,13 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Functional Studies</label>
-            <b-form-select
-              :options="functionalOptions"
-              class="py-sm-0 form-control"
-              v-model="variants[selectedRowIndex].Funksjonsstudier"
-              @change="updateVariants;setChanged()" 
-            >
-            </b-form-select>
+              <b-form-select
+                :options="functionalOptions"
+                class="py-sm-0 form-control"
+                v-model="variants[selectedRowIndex].Funksjonsstudier"
+                @change="updateVariants;setChanged()" 
+              >
+              </b-form-select>
           </b-col>
           <b-col cols="6">
             <label>Cancer Hotspots</label>
@@ -144,6 +143,8 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants;setChanged()"
 
@@ -158,6 +159,8 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants;setChanged()"
 
@@ -168,6 +171,8 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants;setChanged()"
 
@@ -203,6 +208,8 @@
              <b-form-textarea
                 id="textarea"
                 size="default"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
                 placeholder=""
                 rows=4
                 v-model="variants[selectedRowIndex].Comment"
@@ -274,7 +281,7 @@
 
 
 
-    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have yes or no in the Reply-field!!</b-alert>
+    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have Yes, No or Not Evaluated in the Reply-field!!</b-alert>
       <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button><p> </p>
       <b-button v-on:click="fillReply" class="btn mr-1 btn-info"> Fill Reply </b-button>
       </div>
@@ -375,7 +382,6 @@ export default {
       sampleID: this.$route.params.id,
       selectedVariant: "",
       fields: [
-        'Nr',
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
         {key: "exon"},
@@ -385,7 +391,7 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
-        {key: "FILTER", label: "Filter"},
+        {key: "AF", label: "Allele fraction", sortable: true},
         {key: "Oncogenicity"},
         {key: "class"},
         {key: "Reply", label: "Reply (Svares ut)"},
@@ -398,30 +404,27 @@ export default {
     changedatastate() {
       if (this.datastate == true) {
         this.datastate = false
-      } else (this.datastate = true)
+        console.log('false')
+      } else {
+        this.datastate = true
+        }
+     
     },
     fillReply(){
-      // Fills No in the reply-col of the variants that are empty
-
+      // Fills Not evaluated in the reply-col of the variants that are empty
       this.variants.forEach((item, index) => {
-  
-     
-        
-        
         if (typeof this.variants[index].Reply === 'object' ) {
-          
-          this.variants[index].Reply = 'No'  
+          this.variants[index].Reply = 'NotEvaluated'
+          this.updateVariants();
           
         } else if (this.variants[index].Reply.length===0 ) {
-          this.variants[index].Reply = 'No'
-        
-        
+          this.variants[index].Reply = 'NotEvaluated'
+          this.updateVariants();
+                
         }
         
-  
 
       })
-
     },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
@@ -515,6 +518,7 @@ export default {
       this.selectedRowIndex = index;
       this.infoModal.title = `Variant: ${index +1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
+      this.datastate = true;
     },
     resetInfoModal() {
       this.infoModal.title = "";
@@ -563,11 +567,10 @@ export default {
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No") {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "NotEvaluated") {
           all_reply = false
         }
       })
-      
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/signoff";
       if(all_reply == true) {

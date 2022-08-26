@@ -97,6 +97,40 @@
               </b-button>
             </template>
           </b-table>
+          <br>
+          <h2><p style="text-align:left;">Not Evaluated </p></h2>
+          <br>          
+          <b-table
+            selectable
+            select-mode="single"
+            @row-selected="rowSelected"
+            striped
+            hover
+            outlined
+            :items="variants"
+            :fields="variantFields"
+            :small="small"
+
+            :filter-included-fields="filterOn"
+          >
+            <!-- Adding index column -->
+            <template #cell(Nr)="data">
+              {{ data.index + 1 }}
+            </template>
+            <!-- Formatting Type column -->
+            <template #cell(Type)="data">
+              <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <template #cell(Info)="row">
+              <b-button
+                size="sm"
+                @click="openInfoModal(row.item, row.index, $event.target)"
+                class="mr-1"
+              >
+                Info
+              </b-button>
+            </template>
+          </b-table>
                     
           <br><br>
             
@@ -430,9 +464,8 @@ export default {
         ],
       filter1: /Yes/,
       filter2: /No/,
+      filter3: /NotEvaluated/,      
       filterOn: ["Reply"],
-      Technical: ["Technical"],
-      NotRelevant: ["Not Relevant"],
     };
   },
   created: function () {
