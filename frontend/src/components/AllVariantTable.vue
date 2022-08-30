@@ -15,7 +15,6 @@
       striped
       hover
       outlined
-      fixed
       label-sort-asc=""
       label-sort-desc=""
       label-sort-clear=""
