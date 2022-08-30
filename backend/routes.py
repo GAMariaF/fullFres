@@ -183,11 +183,11 @@ def api(current_user, query):
             return response
     elif request.method == 'POST':
         if query == "updatevariants":
-            print("---")          
+            print("--- update variants ---")          
             j = json.loads(json.dumps(request.json))
-            print(j["sampleid"])
             for i in j["variants"]:
                 if i["changed"]==True:
+                    print(i)
                     # Insert into db:
                     insert_variants(db_path,i)
                     print("inserted")
@@ -197,7 +197,7 @@ def api(current_user, query):
             return response
         elif query == "signoff":
             j = json.loads(json.dumps(request.json))
-            print(j)
+            #print(j)
             insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Signed off sample!'})
             return response

@@ -281,7 +281,7 @@
 
 
 
-    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have Yes, No or Not Evaluated in the Reply-field!!</b-alert>
+    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have Yes, No or not evaluated in the Reply-field!!</b-alert>
       <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button><p> </p>
       <b-button v-on:click="fillReply" class="btn mr-1 btn-info"> Fill Reply </b-button>
       </div>
@@ -414,13 +414,17 @@ export default {
       // Fills Not evaluated in the reply-col of the variants that are empty
       this.variants.forEach((item, index) => {
         if (typeof this.variants[index].Reply === 'object' ) {
-          this.variants[index].Reply = 'NotEvaluated'
+          console.log("NotE1")
+          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].changed = true;
           this.updateVariants();
-          
+          this.sendVariants();
         } else if (this.variants[index].Reply.length===0 ) {
-          this.variants[index].Reply = 'NotEvaluated'
+          console.log("NotE2")
+          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].changed = true;
           this.updateVariants();
-                
+          this.sendVariants();              
         }
         
 
@@ -567,7 +571,7 @@ export default {
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "NotEvaluated") {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated") {
           all_reply = false
         }
       })

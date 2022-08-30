@@ -608,6 +608,7 @@ def insert_variants(db, variant_dict):
 	# Update table VariantsPerSample with DATE_CHANGED_VARIANT_BROWSER
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
+		print(dfVarVariantsPerSample['Reply'][0])
 		stmtVPS = "UPDATE VariantsPerSample set \
 					DATE_CHANGED_VARIANT_BROWSER = \
 						'"+dateChangedVariantBrowser+"',\

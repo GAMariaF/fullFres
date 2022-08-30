@@ -98,7 +98,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not Evaluated </p></h2>
+          <h2><p style="text-align:left;">Not evaluated </p></h2>
           <br>          
           <b-table
             selectable
@@ -110,7 +110,7 @@
             :items="variants"
             :fields="variantFields"
             :small="small"
-
+            :filter="filter3"
             :filter-included-fields="filterOn"
           >
             <!-- Adding index column -->
@@ -464,7 +464,7 @@ export default {
         ],
       filter1: /Yes/,
       filter2: /No/,
-      filter3: /NotEvaluated/,      
+      filter3: /not evaluated/,      
       filterOn: ["Reply"],
     };
   },
