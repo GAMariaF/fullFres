@@ -57,6 +57,17 @@
       </b-row>
       <br>
       <b-row>
+      <!--Plotting variants per genelist -->    
+        <b-col>
+          <Plotly v-if="loaded" 
+          :data="dataSamples"
+          :layout="layoutSamples" 
+          :display-mode-bar="false" />
+
+        </b-col>
+      </b-row>
+      <br>
+      <b-row>
         <!-- Number of variants -->
         <b-col>
           <b-card
@@ -68,38 +79,6 @@
             </b-card-text>
           </b-card>
         </b-col>
-
-        <!-- Variants by class -->
-        <!-- <b-col>
-          <b-card
-            title="Number of variants per genelist"
-            sub-title="Total number of Variants per genelist"
-          >
-            <b-card-text>        
-              <table class="table-hover" style="margin-left:auto;margin-right:auto;">
-                <thead>
-                  <tr>
-                    <th>Genelist</th>
-                    <th>No. of Variants</th>
-                  </tr>
-                </thead>
-                <tbody >
-                  <th>
-                  <tr v-for="(name) in stats.variants_genelist.Genelist" :key="name">
-                    <td>{{ name }}</td>
-                  </tr>
-                  </th>
-                  <th>
-                  <tr v-for="(name) in stats.variants_genelist.Freq" :key="name">
-                    <td>{{ name }}</td>
-                  </tr>
-                  </th>
-                </tbody>
-              </table> 
-            </b-card-text>            
-          </b-card>              
-        </b-col>
-        -->
       </b-row>
       <b-row>
         <!-- Samples by users 
@@ -121,6 +100,17 @@
         </b-col>
       </b-row>
       <b-row>
+      <b-row>
+      <!--Plotting variants per genelist and class-->    
+        <b-col>
+          <Plotly v-if="loaded" 
+          :data="dataClass"
+          :layout="layoutClass" 
+          :display-mode-bar="false" />
+
+        </b-col>
+      </b-row>
+
         <!--  -->
         <b-col>
           <b-card
@@ -170,6 +160,15 @@ export default {
       stats: {},
       items: [],
       loaded: true, 
+      dataSamples:[{
+                x: [],
+                y: [],
+                type: "bar"}, 
+                ],
+      layoutSamples: {
+                title: "Samples by Genelist",
+                autosize: true
+            },
       data:[{
                 x: [],
                 y: [],
@@ -177,6 +176,11 @@ export default {
                 ],
       layout: {
                 title: "Variants by Genelist",
+                autosize: true
+            },
+      dataClass: [],
+      layoutClass: {
+                title: "Variants by Genelist and Class",
                 autosize: true
             },
       dataUser:[{
@@ -199,6 +203,11 @@ export default {
         .then((response) => response.data)
         .then((data) => {
           this.stats = JSON.parse(data.data);
+          this.dataSamples = [{
+                x: this.stats.samples_genelist.Genelist,
+                y: this.stats.samples_genelist.Freq,
+                type: "bar"}, 
+                ];
           this.data = [{
                 x: this.stats.variants_genelist.Genelist,
                 y: this.stats.variants_genelist.Freq,
@@ -207,6 +216,32 @@ export default {
           this.dataUser = [{
                 x: this.stats.users_samples.User_Signoff,
                 y: this.stats.users_samples.Freq,
+                type: "bar"}, 
+                ];
+          this.dataClass = [{
+                x: this.stats.variants_class1.Genelist,
+                y: this.stats.variants_class1.Freq,
+                name: 'class1',
+                type: "bar"}, 
+                            {
+                x: this.stats.variants_class2.Genelist,
+                y: this.stats.variants_class2.Freq,
+                name: 'class2',
+                type: "bar"}, 
+                            {
+                x: this.stats.variants_class3.Genelist,
+                y: this.stats.variants_class3.Freq,
+                name: 'class3',
+                type: "bar"}, 
+                            {
+                x: this.stats.variants_class4.Genelist,
+                y: this.stats.variants_class4.Freq,
+                name: 'class4',
+                type: "bar"}, 
+                            {
+                x: this.stats.variants_class5.Genelist,
+                y: this.stats.variants_class5.Freq,
+                name: 'class5',
                 type: "bar"}, 
                 ];
 

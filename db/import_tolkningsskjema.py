@@ -19,7 +19,12 @@ colSamples              = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
 colVariantsPerSample    = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER","Reply"]
+								"DATE_CHANGED_VARIANT_BROWSER","Reply", \
+                                "User_Classification","Variant_ID","Variant_Name", \
+                                "Key_Variant","Oncomine_Reporter_Evidence","Type", \
+                                "Call", "DP", "FDP", "FAO", \
+                                "Copy_Number","AF","Read_Counts_Per_Million"
+                                ]
 colClassification       = ["CHROM_POS_ALTEND_DATE",\
 								"DATE_CHANGED_VARIANT_BROWSER", \
 								"COSMIC", \

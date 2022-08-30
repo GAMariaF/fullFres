@@ -729,6 +729,12 @@ def statistics(db):
 													AND (Date_Approval IS NULL \
 													OR Date_Approval IS ''))")).fetchone()[0]
 
+		# Number of samples per genelist
+		n_samples_genelist = conn.execute(text("SELECT Genelist, COUNT(*) as Freq \
+													FROM Samples GROUP BY Genelist")).fetchall()
+		n_samples_genepd = pd.DataFrame(n_samples_genelist)
+		n_samples_genedict = n_samples_genepd.to_dict('list')
+
 		# Number of variants per genelist
 		n_variants_genelist = conn.execute(text("SELECT Genelist,COUNT(*) AS Freq FROM ( \
 													SELECT DISTINCT chrom, pos, altend, Genelist FROM Samples s \
@@ -743,23 +749,114 @@ def statistics(db):
 		n_variants_genedict = n_variants_genepd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
-		# n_variants_gene_classlist =  conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
-		# 											FROM ( \
-		# 											SELECT DISTINCT chrom, pos, altend, Genelist, class FROM Samples s \
-		# 											LEFT JOIN VariantsPerSample vps \
-		# 											ON s.runid = vps.runid \
-		# 											AND s.sampleid = vps.sampleid \
-		# 											LEFT JOIN Variants v \
-		# 											ON vps.CHROM_POS_ALTEND_DATE = \
-		# 												v.CHROM_POS_ALTEND_DATE \
-		# 											LEFT JOIN Classification c \
-		# 											ON vps.CHROM_POS_ALTEND_DATE = \
-		# 												c.CHROM_POS_ALTEND_DATE AND vps.DATE_CHANGED_VARIANT_BROWSER = c.DATE_CHANGED_VARIANT_BROWSER ) \
-		# 											GROUP BY Genelist \
-		# 											WHERE c.class='Benign'")).fetchall()
-		# n_variants_gene_classpd = pd.DataFrame(n_variants_gene_classlist)
-		# n_variants_gene_classdict = n_variants_gene_classpd.to_dict('list')
-		# print(n_variants_gene_classdict["class"])
+		## class 1
+		n_variants_class1list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+										FROM ( \
+										SELECT DISTINCT chrom, pos, altend, \
+										Genelist, class FROM Samples s \
+										LEFT JOIN VariantsPerSample vps \
+										ON s.runid = vps.runid \
+										AND s.sampleid = vps.sampleid \
+										LEFT JOIN Variants v \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											v.CHROM_POS_ALTEND_DATE \
+										LEFT JOIN Classification c \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											c.CHROM_POS_ALTEND_DATE \
+										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
+											c.DATE_CHANGED_VARIANT_BROWSER \
+										WHERE c.class='1 - Benign') \
+										GROUP BY Genelist")).fetchall()
+		n_variants_class1pd = pd.DataFrame(n_variants_class1list)
+		n_variants_class1 = n_variants_class1pd.to_dict('list')
+
+#### query to get no of variants grouped by class, Genelist
+		## class 2
+		n_variants_class2list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+										FROM ( \
+										SELECT DISTINCT chrom, pos, altend, \
+										Genelist, class FROM Samples s \
+										LEFT JOIN VariantsPerSample vps \
+										ON s.runid = vps.runid \
+										AND s.sampleid = vps.sampleid \
+										LEFT JOIN Variants v \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											v.CHROM_POS_ALTEND_DATE \
+										LEFT JOIN Classification c \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											c.CHROM_POS_ALTEND_DATE \
+										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
+											c.DATE_CHANGED_VARIANT_BROWSER \
+										WHERE c.class='2 - Likely Benign') \
+										GROUP BY Genelist")).fetchall()
+		n_variants_class2pd = pd.DataFrame(n_variants_class2list)
+		n_variants_class2 = n_variants_class2pd.to_dict('list')
+
+#### query to get no of variants grouped by class, Genelist
+		## class 3
+		n_variants_class3list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+										FROM ( \
+										SELECT DISTINCT chrom, pos, altend, \
+										Genelist, class FROM Samples s \
+										LEFT JOIN VariantsPerSample vps \
+										ON s.runid = vps.runid \
+										AND s.sampleid = vps.sampleid \
+										LEFT JOIN Variants v \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											v.CHROM_POS_ALTEND_DATE \
+										LEFT JOIN Classification c \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											c.CHROM_POS_ALTEND_DATE \
+										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
+											c.DATE_CHANGED_VARIANT_BROWSER \
+										WHERE c.class='3 - VUS') \
+										GROUP BY Genelist")).fetchall()
+		n_variants_class3pd = pd.DataFrame(n_variants_class3list)
+		n_variants_class3 = n_variants_class3pd.to_dict('list')
+
+#### query to get no of variants grouped by class, Genelist
+		## class 4
+		n_variants_class4list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+										FROM ( \
+										SELECT DISTINCT chrom, pos, altend, \
+										Genelist, class FROM Samples s \
+										LEFT JOIN VariantsPerSample vps \
+										ON s.runid = vps.runid \
+										AND s.sampleid = vps.sampleid \
+										LEFT JOIN Variants v \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											v.CHROM_POS_ALTEND_DATE \
+										LEFT JOIN Classification c \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											c.CHROM_POS_ALTEND_DATE \
+										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
+											c.DATE_CHANGED_VARIANT_BROWSER \
+										WHERE c.class='4 - Likely Oncogenic') \
+										GROUP BY Genelist")).fetchall()
+		n_variants_class4pd = pd.DataFrame(n_variants_class4list)
+		n_variants_class4 = n_variants_class4pd.to_dict('list')
+
+#### query to get no of variants grouped by class, Genelist
+		## class 5
+		n_variants_class5list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+										FROM ( \
+										SELECT DISTINCT chrom, pos, altend, \
+										Genelist, class FROM Samples s \
+										LEFT JOIN VariantsPerSample vps \
+										ON s.runid = vps.runid \
+										AND s.sampleid = vps.sampleid \
+										LEFT JOIN Variants v \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											v.CHROM_POS_ALTEND_DATE \
+										LEFT JOIN Classification c \
+										ON vps.CHROM_POS_ALTEND_DATE = \
+											c.CHROM_POS_ALTEND_DATE \
+										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
+											c.DATE_CHANGED_VARIANT_BROWSER \
+										WHERE c.class='5 - Oncogenic') \
+										GROUP BY Genelist")).fetchall()
+		n_variants_class5pd = pd.DataFrame(n_variants_class5list)
+		n_variants_class5 = n_variants_class5pd.to_dict('list')
 
 		# Number of users
 		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
@@ -776,9 +873,15 @@ def statistics(db):
 	results = {"runs": n_runs, "samples": n_samples, "variants": n_variants, \
 				"samples_waiting": n_samples_waiting, \
 				"samples_signedoff": n_samples_signedoff, \
+				"samples_genelist": n_samples_genedict, \
 				"variants_genelist": n_variants_genedict, \
 				"users": n_users, \
-				"users_samples": n_users_samplesdict }
+				"users_samples": n_users_samplesdict, \
+				"variants_class1": n_variants_class1,
+				"variants_class2": n_variants_class2,
+				"variants_class3": n_variants_class3,
+				"variants_class4": n_variants_class4,
+				"variants_class5": n_variants_class5 }
 	print(results)
 	return results
 
