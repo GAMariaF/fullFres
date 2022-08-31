@@ -22,8 +22,10 @@ colVariantsPerSample    = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
 								"DATE_CHANGED_VARIANT_BROWSER","Reply", \
                                 "User_Classification","Variant_ID","Variant_Name", \
                                 "Key_Variant","Oncomine_Reporter_Evidence","Type", \
-                                "Call", "DP", "FDP", "FAO", \
-                                "Copy_Number","AF","Read_Counts_Per_Million"
+                                "Call", "P_Value", "DP", "FDP", "FAO", \
+                                "Copy_Number", "CNV_Confidence", \
+                                "Valid_CNV_Amplicons","AF", \
+                                "Read_Counts_Per_Million", "Oncomine_Driver_Gene"
                                 ]
 colClassification       = ["CHROM_POS_ALTEND_DATE",\
 								"DATE_CHANGED_VARIANT_BROWSER", \
