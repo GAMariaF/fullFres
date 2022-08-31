@@ -608,7 +608,6 @@ def insert_variants(db, variant_dict):
 	# Update table VariantsPerSample with DATE_CHANGED_VARIANT_BROWSER
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
-		print(dfVarVariantsPerSample['Reply'][0])
 		stmtVPS = "UPDATE VariantsPerSample set \
 					DATE_CHANGED_VARIANT_BROWSER = \
 						'"+dateChangedVariantBrowser+"',\
@@ -861,14 +860,12 @@ def statistics(db):
 		# Number of users
 		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
 			FROM Samples")).fetchone()[0]
-		print(n_users)
 
 		n_users_samples = conn.execute(text("SELECT User_Signoff, COUNT(*) AS Freq \
 												FROM Samples \
 												GROUP BY User_Signoff")).fetchall()
 		n_users_samplespd = pd.DataFrame(n_users_samples)
 		n_users_samplesdict = n_users_samplespd.to_dict('list')
-		print(n_users_samplesdict)
 
 	results = {"runs": n_runs, "samples": n_samples, "variants": n_variants, \
 				"samples_waiting": n_samples_waiting, \
@@ -882,7 +879,6 @@ def statistics(db):
 				"variants_class3": n_variants_class3,
 				"variants_class4": n_variants_class4,
 				"variants_class5": n_variants_class5 }
-	print(results)
 	return results
 
 def data_report(db):

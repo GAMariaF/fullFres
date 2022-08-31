@@ -187,7 +187,6 @@ def api(current_user, query):
             j = json.loads(json.dumps(request.json))
             for i in j["variants"]:
                 if i["changed"]==True:
-                    print(i)
                     # Insert into db:
                     insert_variants(db_path,i)
                     print("inserted")
