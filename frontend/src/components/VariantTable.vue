@@ -128,12 +128,13 @@
 
         <b-row class="mb-1">
           <b-col cols="6">
-            <label>Predictive Data</label>
+            <label>Predictive Data </label>
             <b-form-select
               :options="predictiveOptions"
               multiple :select-size="6"              
               class="py-sm-0 form-control"
-              v-model="variants[selectedRowIndex].Prediktive_data"
+             
+              v-model="predictive_data"
               @change="updateVariants;setChanged()" 
             >
             </b-form-select>
@@ -303,6 +304,7 @@ export default {
   name: "varianttable",
   data() {
     return {
+      predictive_data: [],
       datastate: true,
       showDismissibleAlert: false,
       loading: true,
@@ -520,6 +522,10 @@ export default {
       console.log("openInfoModal");
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
+      // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
+      if ((typeof(this.variants[this.selectedRowIndex].Prediktive_data) !== 'undefined') && (this.variants[this.selectedRowIndex].Prediktive_data !== null)) {
+        this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
+      }
       this.infoModal.title = `Variant: ${index +1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.datastate = true;
@@ -529,6 +535,9 @@ export default {
       this.infoModal.content = "";
       this.selectedoncogenicity_list = [];
       this.oncoScore = 0;
+      // Get Prediktive_data-field into variants for this specific variant
+      this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
+      this.predictive_data = [];
       console.log("infomodal lukket");
     },
 
@@ -537,6 +546,10 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
+
+
+   
+
         console.log("Something has changed - sending updated data to db")
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/updatevariants";
@@ -605,7 +618,7 @@ export default {
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
     
-    // return this.$store.getters.variants;
+
     
   },
   computed: {
@@ -615,6 +628,7 @@ export default {
     variants: {
       get() {return this.$store.getters.variants;},
       set(value) {this.$store.commit("SET_STORE", value)}
+
       
     }
   },
