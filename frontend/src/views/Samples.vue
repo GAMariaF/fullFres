@@ -87,6 +87,7 @@ export default {
     };
   },
   methods: {
+    
     rowSelected(items) {
       if (items.length === 1) {
         this.selectedSample = items[0].sampleid;

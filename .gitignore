@@ -133,3 +133,5 @@ dmypy.json
 
 # Variant database
 db/*.db
+tests/test_create_user_db.py
+Untitled.ipynb
