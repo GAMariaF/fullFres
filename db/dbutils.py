@@ -43,6 +43,7 @@ from sqlalchemy import update
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import text
+import csv
 
 #sqlite syntax...
 def generate_db(db):
@@ -657,31 +658,22 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	db 		-> the variantDB that is being exported
 	outvcf 	-> name of the output vcf
 	'''
-	vcf_header = '''
-	##fileformat=VCFv4.1
-	##fileDate=20090805
-	##source=myImputationProgramV3.1
-	##reference=file:///seq/references/1000GenomesPilot-NCBI36.fasta
-	##contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
-	##phasing=partial
-	##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples With Data">
-	##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
-	##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
-	##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
-	##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
-	##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
-	##FILTER=<ID=q10,Description="Quality below 10">
-	##FILTER=<ID=s50,Description="Less than 50% of samples have data">
-	##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-	##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
-	##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
-	##FORMAT=<ID=HQ,Number=2,Type=Integer,Description="Haplotype Quality">
-	#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA00001 NA00002 NA00003
-	'''
-	# Write header to file
-	
-	with open(outvcf, 'w') as f:
-		f.write(vcf_header)
+	print("test")
+	writer = csv.writer(open(outvcf,'w'), delimiter="\t", quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
+	vcf_header = ['##fileformat=VCFv4.1',
+		'##fileDate=20170821',
+		'##source=CentoMD',
+		'##reference=GRChr37',
+		'##INFO=<ID=IHSAMPLES,Number=1,Type=String,Description="Sample names from inhouse db that contains this variant and het state in parentheses">',
+		'##INFO=<ID=IHHET,Number=1,Type=String,Description="Number of inhouse hets for this variant">',
+		'##INFO=<ID=IHHOM,Number=1,Type=String,Description="Number of inhouse homozygotes for this variant">'
+		]
+	lasthead = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO']
+		# Write header to file
+	for i in vcf_header:
+		writer.writerow([i])
+	writer.writerow(lasthead)
+
 
 
 
