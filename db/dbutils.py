@@ -674,6 +674,7 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 		writer.writerow([i])
 	writer.writerow(lasthead)
 
+	# Hente data fra DB: (spørring)
 
 
 
