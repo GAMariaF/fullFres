@@ -11,14 +11,13 @@
 
         <div>
     
-
-
           <b-form-select v-model="selected" @change="updateFilter" size="sm" class="mt-3">
             <option v-for="run in runs" v-bind:value="{ id: run.value, text: run.text }" :key="run.value">{{ run.text }}
             </option>
           </b-form-select>
-          <div class="mt-3">Selected: <strong>{{ selected }} -- {{filter}}  </strong></div>
+          
         </div>
+        <br>
         <b-table
           selectable
           select-mode="single"
@@ -43,6 +42,8 @@
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br /><br />
+    
+
           <h5>
             Gene List: <b>{{ this.variants[0].Genelist }}</b> | Tumor %:
             <b>{{ this.variants[0].Perc_Tumor }}</b>
@@ -87,10 +88,25 @@
           
 
           <br /><br />
+
+          <!-- -->
+          <b-form-select v-model="selectedCategory" @change="generateRep" size="sm" class="mt-3">
+            <option v-for="cat in categories" v-bind:value="cat.text" :key="cat.value">{{ cat.value }}
+            </option>
+          </b-form-select>
+          <!-- -->
+          <br>
+          <h5>
+          {{selectedCategory}}
+          </h5>
+          <br>
+          {{selectedVariant}}
         </div>
       </b-col>
     </b-row>
 
+
+<!-- -->
 
 <!-- -->
 <b-modal
@@ -239,9 +255,12 @@ export default {
       filter2: "Ja",
       filterOn2: ["Reply"],
       selected: null,
+      selectedCategory: null,
       runs: [{ value: null, text: 'Please select an option' },],
+      categories: config.reportcodes,
       loggedInStatus: false,
       selectedSample: "",
+      selectedVariant: "",
       small: true,
       items: [],
       fields: [
@@ -265,31 +284,17 @@ export default {
       var result = []
       this.items.forEach((item, index) => {
         if(!runs.includes(item.runid)){
-          
           runs.push(item.runid)
           result.push({value: index, text: item.runid})          
         }
-        
         this.runs = result
       });
-      // var runsset = new Set({ value: null, text: 'Please select an option' })
-      // var check = []
-      
-      // this.items.forEach((item, index) => {
-      //   if(!check.includes(item.runid)){
-      //   runsset.add({ "value": index+1, "text": item.runid })
-        
-      //   check.push(item.runid)
-      //   }  
-
-      // })
-    // this.runs = Array.from(runsset);
-
     },
     rowSelected(items) {
       if (items.length===1) {
-        this.selectedVariant = items[0].Variant;
-        
+        // this.selectedVariant = items[0].Variant;
+        this.selectedVariant = items;
+        console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
@@ -322,6 +327,21 @@ export default {
       this.reportModal.content = "";
       console.log("infomodal lukket")
     },
+    generateRep() {
+      console.log("generateRep")
+      // Send selectedvariant og categori til util_uncs.generate_report
+      // Hvis ikke variant er valgt, gi varsel
+
+      if (this.selectedVariant.length===0) {
+        console.log("No variant selected")
+      } else {
+        var report = util_funcs.generate_report(this.selectedVariant, this.selectedCategory);
+        console.log(report)
+      }
+
+      
+
+    }
   },
   created: function () {
     util_funcs.query_backend(config.$backend_url, "report").then(data => {

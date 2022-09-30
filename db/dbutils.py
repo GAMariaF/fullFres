@@ -44,6 +44,7 @@ import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import text
 import csv
+import os
 
 #sqlite syntax...
 def generate_db(db):
@@ -646,17 +647,7 @@ def insert_variants(db, variant_dict):
 		
 def db_to_vcf(db,outvcf='exported.vcf'):
 	''' 
-	import configparser, sys
-	config = configparser.ConfigParser()
-	config.read('backend/config.ini')
-
-	sys.path.insert(0, config['Paths']['backend_path'])
-	sys.path.insert(0, config['Paths']['db_path'])
-	from dbutils import db_to_vcf
-	db_to_vcf('/illumina/analysis/dev/2022/fullFres/db/variantdb.db')
-
-	db 		-> the variantDB that is being exported
-	outvcf 	-> name of the output vcf
+	
 	'''
 	print("test")
 	writer = csv.writer(open(outvcf,'w'), delimiter="\t", quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
@@ -675,6 +666,40 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	writer.writerow(lasthead)
 
 	# Hente data fra DB: (spørring)
+
+	''' 
+	SELECT CHROM,POS,REF,ALTEND,group_concat(VPS.User_Classification, '|') AS User_Classification, group_concat(VPS.sampleid, '|') AS sampleid FROM Variants AS V
+	LEFT JOIN VariantsPerSample AS VPS ON V.CHROM_POS_ALTEND_DATE = VPS.CHROM_POS_ALTEND_DATE
+	GROUP BY V.CHROM_POS_ALTEND_DATE
+	
+	'''
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	with engine.connect() as conn:
+		vcf_data = conn.execute(text("SELECT CHROM,POS,REF,ALTEND,group_concat(VPS.User_Classification, '|') AS User_Classification, group_concat(VPS.sampleid, '|') AS sampleid, VPS.ID AS ID, VPS.QUAL AS QUAL FROM Variants AS V LEFT JOIN VariantsPerSample AS VPS ON V.CHROM_POS_ALTEND_DATE = VPS.CHROM_POS_ALTEND_DATE GROUP BY V.CHROM_POS_ALTEND_DATE")).fetchall()
+		
+	df_vcf_data = pd.DataFrame(vcf_data)
+	
+	df_vcf_data[['REF', 'ALTEND']] = df_vcf_data[['REF','ALTEND']].fillna(value=".")
+	df_vcf_data[['QUAL']] = df_vcf_data[['QUAL']].fillna(value=".")
+	# Fjerne Chr
+	df_vcf_data.CHROM = df_vcf_data.CHROM.str.replace('chr','')
+	# Slå sammen User_classification og sampleid tin INFO-format
+	df_vcf_data["INFO"] = "SAMPLEID="+df_vcf_data.sampleid
+	# Fjern de som ikke har verdi i CHR
+	df_vcf_data = df_vcf_data[df_vcf_data["CHROM"] != ""]
+	# Legg til classification kun hvis den er tilstede
+	df_vcf_data.loc[~df_vcf_data['User_Classification'].isnull(), 'INFO'] = df_vcf_data.INFO + ";USR_CLASSIFICATION=" + df_vcf_data.User_Classification
+	# ADD filter
+	df_vcf_data[['FILTER']] = "."
+	
+	df_vcf_data[['CHROM','POS','REF','ALTEND','QUAL','FILTER','INFO']].to_csv('exported.vcf', sep="\t", header=False, index=False, mode='a',quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
+
+
+
+
+
+
+
 
 
 

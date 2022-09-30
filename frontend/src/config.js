@@ -1,83 +1,83 @@
 let config;
 
 config = {
-	$backend_url: 'http://172.16.0.3:5000',
-	$signout_url: function() {
-		return this.$backend_url + '/newlogout';
-	},
-	replyOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: 'Please select an option' },
-		{ value: 'Yes', text: 'Yes' },
-		{ value: 'No', text: 'No' },
-		{ value: 'not evaluated', text: 'not evaluated' }		
-	],
-	functionalOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: '' },
-		{ value: 'OS2: Ja (ref) (+4)', text: 'OS2: Ja (ref) (+4)' },
-		{ value: 'OS2: OncoKB: Likely oncogenic (+4)', text: 'OS2: OncoKB: Likely oncogenic (+4)' },		
-		{ value: 'OS2: OncoKB: Oncogenic (+4)', text: 'OS2: OncoKB: Oncogenic (+4)' }
-	],
-	predictiveOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: '' },
-		{ value: 'OS1: Same AA prev established (+4)', text: 'OS1: Same AA prev established (+4)' },
-		{ value: 'OM1: Functional domain (+2)', text: 'OM1: Functional domain (+2)' },
-		{ value: 'OM2: Protein length changes (+2)', text: 'OM2: Protein length changes (+2)' },
-		{ value: 'OM3: Different AA in known oncogenic site (+2)', text: 'OM3: Different AA in known oncogenic site (+2)' },
-		{ value: 'OVS1: Nullvariant (+8)', text: 'OVS1: Nullvariant (+8)' }
-	],
-	cancerhotspotsOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: '' },
-		{ value: 'OS3: Ja (ref) (+4)', text: 'OS3: Ja (ref) (+4)' },
-		{ value: 'OM4: Hotspot medium freq (+2)', text: 'OM4: Hotspot medium freq (+2)' },
-		{ value: 'OP3: Hotspot low freq (+1)', text: 'OP3: Hotspot low freq (+1)' },
-		{ value: 'OS3: Hotspot high freq (+4)', text: 'OS3: Hotspot high freq (+4)' }
-	],
-	classOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: 'Please select an option' },
-		{ value: 'Not Relevant', text: 'Not Relevant' },
-		{ value: 'Technical', text: 'Technical' },
-		{ value: '1 - Benign', text: '1 - Benign ( - -7 )' },
-		{ value: '2 - Likely Benign', text: '2 - Likely Benign ( -6 - -1 )' },
-		{ value: '3 - VUS', text: '3 - VUS ( 0 - 5 )' },
-		{ value: '4 - Likely Oncogenic', text: '4 - Likely Oncogenic (6 - 9 )' },
-		{ value: '5 - Oncogenic', text: '5 - Oncogenic ( 10 - )' }
-	],
-	tierOptions: [
-		// Obs - dont use 0 (it is reserved)
-		{ value: null, text: 'Please select an option' },
-		{ value: 'I A', text: 'I A' },
-		{ value: 'I B', text: 'I B' },		
-		{ value: 'II C', text: 'II C' },
-		{ value: 'II D', text: 'II D' },		
-		{ value: 'III', text: 'III' },
-		{ value: 'VI', text: 'IV' }
-	],
+    $backend_url: 'http://172.16.0.3:5000',
+    $signout_url: function() {
+        return this.$backend_url + '/newlogout';
+    },
+    replyOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: 'Please select an option' },
+        { value: 'Yes', text: 'Yes' },
+        { value: 'No', text: 'No' },
+        { value: 'not evaluated', text: 'not evaluated' }		
+    ],
+    functionalOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: '' },
+        { value: 'OS2: Ja (ref) (+4)', text: 'OS2: Ja (ref) (+4)' },
+        { value: 'OS2: OncoKB: Likely oncogenic (+4)', text: 'OS2: OncoKB: Likely oncogenic (+4)' },		
+        { value: 'OS2: OncoKB: Oncogenic (+4)', text: 'OS2: OncoKB: Oncogenic (+4)' }
+    ],
+    predictiveOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: '' },
+        { value: 'OS1: Same AA prev established (+4)', text: 'OS1: Same AA prev established (+4)' },
+        { value: 'OM1: Functional domain (+2)', text: 'OM1: Functional domain (+2)' },
+        { value: 'OM2: Protein length changes (+2)', text: 'OM2: Protein length changes (+2)' },
+        { value: 'OM3: Different AA in known oncogenic site (+2)', text: 'OM3: Different AA in known oncogenic site (+2)' },
+        { value: 'OVS1: Nullvariant (+8)', text: 'OVS1: Nullvariant (+8)' }
+    ],
+    cancerhotspotsOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: '' },
+        { value: 'OS3: Ja (ref) (+4)', text: 'OS3: Ja (ref) (+4)' },
+        { value: 'OM4: Hotspot medium freq (+2)', text: 'OM4: Hotspot medium freq (+2)' },
+        { value: 'OP3: Hotspot low freq (+1)', text: 'OP3: Hotspot low freq (+1)' },
+        { value: 'OS3: Hotspot high freq (+4)', text: 'OS3: Hotspot high freq (+4)' }
+    ],
+    classOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: 'Please select an option' },
+        { value: 'Not Relevant', text: 'Not Relevant' },
+        { value: 'Technical', text: 'Technical' },
+        { value: '1 - Benign', text: '1 - Benign ( - -7 )' },
+        { value: '2 - Likely Benign', text: '2 - Likely Benign ( -6 - -1 )' },
+        { value: '3 - VUS', text: '3 - VUS ( 0 - 5 )' },
+        { value: '4 - Likely Oncogenic', text: '4 - Likely Oncogenic (6 - 9 )' },
+        { value: '5 - Oncogenic', text: '5 - Oncogenic ( 10 - )' }
+    ],
+    tierOptions: [
+        // Obs - dont use 0 (it is reserved)
+        { value: null, text: 'Please select an option' },
+        { value: 'I A', text: 'I A' },
+        { value: 'I B', text: 'I B' },		
+        { value: 'II C', text: 'II C' },
+        { value: 'II D', text: 'II D' },		
+        { value: 'III', text: 'III' },
+        { value: 'VI', text: 'IV' }
+    ],
 
-	oncogenicitycriteria: [
-		{tag: "OVS1", class: 'btn mr-1 btn-danger btn-sm', 	title: 'Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single-exon or multiexon deletion) in a bona fide tumor suppressor gene.', default: "Very Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OS1",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Same amino acid change as a previously established oncogenic variant (using this standard) regardless of nucleotide change. Example: Val→Leu caused by either G>C or G>T in the same codon.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OS2",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Well-established in vitro or in vivo functional studies, supportive of an oncogenic effect of the variant.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OS3",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Located in one of the hotspots in cancerhotspots. org with at least 50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org in at least 10 samples.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', 	title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OM2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Protein length changes as a result of in-frame deletions/insertions in a known oncogene or tumor suppressor gene or stop-loss variants in a known tumor suppressor gene.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OM3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Missense variant at an amino acid residue where a different missense variant determined to be oncogenic (using this standard) has been documented. Amino acid difference from reference amino acid should be greater or at least approximately the same as for missense change determined to be oncogenic.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OM4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots. org with <50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org is at least 10.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OP1",  class: 'btn mr-1 btn-warning btn-sm',	title: 'All used lines of computational evidence support an oncogenic effect of a variant (conservation/ evolutionary, splicing effect, etc.).', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OP2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Somatic variant in a gene in a malignancy with a single genetic etiology. Example: retinoblastoma is caused by bi-allelic RB1 inactivation.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OP3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots.org and the particular amino acid change count in cancerhotspots.org is below 10.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "OP4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Absent from controls (or at an extremely low frequency) in gnomAD.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-		{tag: "SBVS1",  class: 'btn mr-1 btn-success btn-sm',	title: 'Minor allele frequency is >5% in Genome Aggregation Database (gnomAD) in any of 5 general continental populations: African, East Asian, European (Non-Finnish), Latino, and South Asian. If the somatic variant is in a gene known to cause predisposition to hereditary cancer, ACMG/AMP ClinGen germline expert panel gene specific guidelines (if they exist) must be consulted to establish a cutoff that takes disease prevalence into account.', default: "bVery Strong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
-		{tag: "SBP2",  class: 'btn mr-1 btn-success btn-sm',	title: 'A synonymous (silent) variant for which splicing prediction algorithms predict no impact to the splice consensus sequence nor the creation of a new splice site AND the nucleotide is not highly conserved.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
-		{tag: "SBP1",  class: 'btn mr-1 btn-success btn-sm',	title: 'All utilized lines of computational evidence suggest no impact of a variant (conservation/ evolutionary, splicing impact, etc.). Caveat: Because many in silico algorithms use the same or very similar input for their predictions, each algorithm cannot be counted as an independent criterion. Can be used only once in any evaluation of a variant.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
-		{tag: "SBS1",  class: 'btn mr-1 btn-success btn-sm',	title: 'Minor allele frequency is >1% in Genome Aggregation Database (gnomAD) in any of 5 general continental populations: African, East Asian, European (Non-Finnish), Latino, and South Asian. If the somatic variant is in a gene known to cause predisposition to hereditary cancer, ACMG/AMP ClinGen germline expert panel gene specific guidelines (if they exist) must be consulted to establish a cutoff that takes disease prevalence into account.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
-		{tag: "SBS2",  class: 'btn mr-1 btn-success btn-sm',	title: 'Well-established in vitro or in vivo functional studies show no oncogenic effects.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] }
-	],
-	sortedIndex: [ 'runid',
+    oncogenicitycriteria: [
+        {tag: "OVS1", class: 'btn mr-1 btn-danger btn-sm', 	title: 'Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single-exon or multiexon deletion) in a bona fide tumor suppressor gene.', default: "Very Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OS1",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Same amino acid change as a previously established oncogenic variant (using this standard) regardless of nucleotide change. Example: Val→Leu caused by either G>C or G>T in the same codon.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OS2",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Well-established in vitro or in vivo functional studies, supportive of an oncogenic effect of the variant.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OS3",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Located in one of the hotspots in cancerhotspots. org with at least 50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org in at least 10 samples.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', 	title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Protein length changes as a result of in-frame deletions/insertions in a known oncogene or tumor suppressor gene or stop-loss variants in a known tumor suppressor gene.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Missense variant at an amino acid residue where a different missense variant determined to be oncogenic (using this standard) has been documented. Amino acid difference from reference amino acid should be greater or at least approximately the same as for missense change determined to be oncogenic.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots. org with <50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org is at least 10.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OP1",  class: 'btn mr-1 btn-warning btn-sm',	title: 'All used lines of computational evidence support an oncogenic effect of a variant (conservation/ evolutionary, splicing effect, etc.).', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OP2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Somatic variant in a gene in a malignancy with a single genetic etiology. Example: retinoblastoma is caused by bi-allelic RB1 inactivation.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OP3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots.org and the particular amino acid change count in cancerhotspots.org is below 10.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OP4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Absent from controls (or at an extremely low frequency) in gnomAD.', default: "Supporting", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "SBVS1",  class: 'btn mr-1 btn-success btn-sm',	title: 'Minor allele frequency is >5% in Genome Aggregation Database (gnomAD) in any of 5 general continental populations: African, East Asian, European (Non-Finnish), Latino, and South Asian. If the somatic variant is in a gene known to cause predisposition to hereditary cancer, ACMG/AMP ClinGen germline expert panel gene specific guidelines (if they exist) must be consulted to establish a cutoff that takes disease prevalence into account.', default: "bVery Strong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
+        {tag: "SBP2",  class: 'btn mr-1 btn-success btn-sm',	title: 'A synonymous (silent) variant for which splicing prediction algorithms predict no impact to the splice consensus sequence nor the creation of a new splice site AND the nucleotide is not highly conserved.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
+        {tag: "SBP1",  class: 'btn mr-1 btn-success btn-sm',	title: 'All utilized lines of computational evidence suggest no impact of a variant (conservation/ evolutionary, splicing impact, etc.). Caveat: Because many in silico algorithms use the same or very similar input for their predictions, each algorithm cannot be counted as an independent criterion. Can be used only once in any evaluation of a variant.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
+        {tag: "SBS1",  class: 'btn mr-1 btn-success btn-sm',	title: 'Minor allele frequency is >1% in Genome Aggregation Database (gnomAD) in any of 5 general continental populations: African, East Asian, European (Non-Finnish), Latino, and South Asian. If the somatic variant is in a gene known to cause predisposition to hereditary cancer, ACMG/AMP ClinGen germline expert panel gene specific guidelines (if they exist) must be consulted to establish a cutoff that takes disease prevalence into account.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
+        {tag: "SBS2",  class: 'btn mr-1 btn-success btn-sm',	title: 'Well-established in vitro or in vivo functional studies show no oncogenic effects.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] }
+    ],
+    sortedIndex: [ 'runid',
                     'sampleid',
                     'Genelist',
                     'Perc_Tumor',
@@ -126,8 +126,17 @@ config = {
                     'evidence_types',
                     'Oncogenicity',
                     'Tier'
+                  ],
+                  reportcodes: [
+                    {value:  "Please select an option" , text: null},
+                    {value: "NGS8", text: "Den påviste sekvensvarianten/fusjonen/kopitallsvarianten (…) i XXXX-genet (xxbiopsi med xx % tumor) er av usikker klinisk betydning."},
+                    {value: "NGS2", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX % (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS3", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse)."},
+                    {value: "NGS4", text: "Den påviste sekvensvarianten (NM_XXXXc---p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
+                    {value: "NGS5", text: "Den påviste fusjonen xxxx/yyyy med xxxx reads/million (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS6", text: "Den påviste kopitallsvarianten i XXXX-genet (+X kopier) (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS7", text: "Den påviste delesjonen av ekson X i XXXX-genet (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
                   ]
-
 };
 
 export { config };
