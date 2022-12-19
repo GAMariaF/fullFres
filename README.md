@@ -54,11 +54,12 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 source ~/.bash_profile
 nvm install v16.14.2
 
-# Pakker som er installert etterpå:
-npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
 
 # Create Vue App:
-vue create frontend # preset = vue2
+# vue create frontend # preset = vue2
+
+# Pakker som er installert etterpå:
+npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
 
 # Starts the development server.
 npm run serve
