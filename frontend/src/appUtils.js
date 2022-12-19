@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { config } from '../config.js'
+import { config } from './config.js'
 var util_funcs = {
     sort_table(objects) {
         const order = [ "chr1", "chr2", "chr4","chr10" ];       
@@ -18,7 +18,7 @@ var util_funcs = {
     delete_cookie(name) {
         document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     },
-    generate_report(variant, cat) {
+    generate_report() {
         // Hent en categori fra cat
         config.reportcodes
         return ("generate_report")
