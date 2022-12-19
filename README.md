@@ -58,7 +58,7 @@ nvm install v16.14.2
 # Create Vue App:
 # vue create frontend # preset = vue2
 
-# Pakker som er installert etterpå:
+# Pakker som er installert etterpå (i frontend-folder):
 npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
 
 # Starts the development server.
