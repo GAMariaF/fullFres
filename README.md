@@ -15,7 +15,6 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 > virtualenv is used to manage Python packages for different projects. Using virtualenv allows you to avoid installing Python packages globally which could break system tools or other projects. You can install virtualenv using pip.
 
 ```python
-virtualenv env # creating env. just once
 # Installert med: python3.9 -m venv env
 # Aktiver
 source env/bin/activate
