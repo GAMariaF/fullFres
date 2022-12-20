@@ -20,7 +20,7 @@ const actions = {
 				if (variants){
 					commit('SET_STORE', Object.values(variants));
 				} else {
-
+					commit('SET_STORE', Object.values({0: 0}))
 				}
 			})
 		} else {
@@ -30,7 +30,7 @@ const actions = {
 				if (variants){
 					commit('SET_STORE', Object.values(variants));
 				} else {
-					
+					commit('SET_STORE', Object.values({0: 0}));
 				}
 			})
 		}
