@@ -10,8 +10,8 @@
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
                   <h4 class="mt-2">
-                    <div>Welcome,</div>
-                    <span>Please sign in to your account below.</span>
+                    <div>Welcome to fullFres</div>
+                    <span></span>
                   </h4>
                 </div>
                 

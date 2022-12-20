@@ -1,7 +1,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
+# Import ikkje brukt?
 
-from backend import db
+from backend import db_user as db
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)

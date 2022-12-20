@@ -12,12 +12,12 @@ app = Flask(__name__)
 CORS(app, resources={ r'/*': {'origins': "*"}}, supports_credentials=True)
 
 app.config['SECRET_KEY']='004f2af45d3a4e161a7dd2d17fdae47f'
-#app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////illumina/analysis/dev/2022/fullFres//backend/user_db/users.db'
+#app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////illumina/analysis/dev/2022/sigvla/fullFres_dev/fullFres/backend/user_db/users.db'
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:'+config['Paths']['db_users']
 #app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////fullFres//backend/user_db/users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-db = SQLAlchemy(app)
+db_user = SQLAlchemy(app)
 
 #app.config['CORS_HEADERS'] = 'Content-Type'
 app.config.from_object(__name__)
