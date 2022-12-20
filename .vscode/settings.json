@@ -3,5 +3,5 @@
         "./backend",
         "./db"
     ],
-    "python.defaultInterpreterPath": "Z:/analysis/dev/2022/sigvla/fullFres_dev/env/bin/python"
+
 }
