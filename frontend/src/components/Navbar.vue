@@ -15,7 +15,8 @@
           <b-nav-item-dropdown right v-show="state">
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em>User</em>
+            <em v-show="state">{{username}}</em>
+            <em v-show="!state">User</em>
           </template>
           <b-dropdown-item to="/profile">Profile</b-dropdown-item>
           <b-dropdown-item to="/" @click="signout">Sign Out</b-dropdown-item>
@@ -31,7 +32,8 @@ export default {
     name: "navbar",
     data() {
       return {
-        signOut_URL: config.$signout_url()
+        signOut_URL: config.$signout_url(),
+        //username: this.$store.getters.username
       }
     },
     methods: {
@@ -46,13 +48,17 @@ export default {
     },
     computed: {
     state() {
-      return  this.$store.getters.loggedInStatus
-      }
+      return this.$store.getters.loggedInStatus
+      },
+    username() {
+      return this.$store.getters.username
+    }
     },
     watch: {
     state (newState, oldState) {
       console.log(`State changed from ${oldState} to ${newState}`)
-    }
+      this.$forceUpdate();
+    },
   },
 }
 </script>

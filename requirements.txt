@@ -16,3 +16,4 @@ uuid==1.30
 pyjwt==2.3.0
 flask-jwt-extended==4.4.4
 openpyxl
+maskpass==0.3.7
