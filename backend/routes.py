@@ -179,7 +179,7 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
-            response = make_response(jsonify(isError=False, message="None", statusCode=201, data=None), 201)
+            response = make_response(jsonify(isError=False, message="None", statusCode=201, data={0: 0}), 201)
             return response
     elif request.method == 'POST':
         if query == "updatevariants":

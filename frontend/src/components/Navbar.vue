@@ -1,27 +1,28 @@
 <template>
+
 <b-navbar toggleable="lg" type="dark" variant="info">
     <b-navbar-brand to="/">Variant browser</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
      <b-navbar-nav>
-        <b-nav-item to="/samples">Samples</b-nav-item>
-        <b-nav-item to="/control">Control</b-nav-item>        
-        <b-nav-item to="/allvariants">All Variants</b-nav-item>
-        <b-nav-item to="/allsamples">All Samples</b-nav-item>  
-        <b-nav-item to="/statistics">Statistics</b-nav-item>
-        <b-nav-item to="/report">Report</b-nav-item>
-        <b-nav-item to="/login">Login</b-nav-item>
+        <b-nav-item to="/samples" v-show="state">Samples</b-nav-item>
+        <b-nav-item to="/control" v-show="state">Control</b-nav-item>        
+        <b-nav-item to="/allvariants" v-show="state">All Variants</b-nav-item>
+        <b-nav-item to="/allsamples" v-show="state">All Samples</b-nav-item>  
+        <b-nav-item to="/statistics" v-show="state">Statistics</b-nav-item>
+        <b-nav-item to="/report" v-show="state">Report</b-nav-item>
+        <b-nav-item to="/login" v-show="!state">Login</b-nav-item>
         
-          <b-nav-item-dropdown right>
+          <b-nav-item-dropdown right v-show="state">
           <!-- Using 'button-content' slot -->
           <template #button-content>
             <em>User</em>
           </template>
           <b-dropdown-item to="/profile">Profile</b-dropdown-item>
-          <b-dropdown-item @click="signout">Sign Out</b-dropdown-item>
+          <b-dropdown-item to="/" @click="signout">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
 </b-navbar>
-</template>
+</template> 
 
 <script>
 import { config } from '../config.js';
@@ -42,6 +43,16 @@ export default {
         this.$router.push({        name: "login"        });
 
       }
+    },
+    computed: {
+    state() {
+      return  this.$store.getters.loggedInStatus
+      }
+    },
+    watch: {
+    state (newState, oldState) {
+      console.log(`State changed from ${oldState} to ${newState}`)
     }
+  },
 }
 </script>
