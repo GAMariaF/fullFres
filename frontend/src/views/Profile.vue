@@ -1,7 +1,6 @@
 <template>
     <div>
-      <br />
-     <b> Logged in as: {{ username }} </b>
+     <b> Logged in as: {{username}} </b>
     </div>  
 </template>
 
