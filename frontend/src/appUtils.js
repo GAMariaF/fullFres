@@ -18,12 +18,12 @@ var util_funcs = {
     delete_cookie(name) {
         document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     },
-    generate_report(variant, cat) {
+/*     generate_report(variant, cat) {
         // Hent en categori fra cat
         config.reportcodes
         return ("generate_report")
         
-    }
+    } */
 };
 
 export default util_funcs;
