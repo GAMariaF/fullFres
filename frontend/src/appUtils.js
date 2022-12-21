@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { config } from '../config.js'
+//import { config } from '../config.js'
 var util_funcs = {
     sort_table(objects) {
         const order = [ "chr1", "chr2", "chr4","chr10" ];       
