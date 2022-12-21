@@ -116,11 +116,11 @@ export default {
         const headers = { 
             //"Authorization": "Bearer my-token",
         };
-        axios.post(baseURI, article, {headers}                )
+        axios.post(baseURI, article, {headers})
           .then((response) => response.data)
           .catch((error) => {
             console.log(error.response.data.message);
-            alert("Wrong Credentials.")
+            alert("Wrong Credentials.");
           })
           .then((data) => {
             console.log(data);
@@ -131,7 +131,8 @@ export default {
             // Send status to store
             this.$store.commit('SET_STORE_STATUS', true);
             this.loggedInStatus = this.$store.getters.loggedInStatus;
-            
+            // Send username to store
+            this.$store.commit('SET_STORE_USERNAME', this.username);
           });
       } else {
         alert("Please fill both fields!");
@@ -150,6 +151,9 @@ export default {
   watch: {
     state (newState, oldState) {
       console.log(`State changed from ${oldState} to ${newState}`)
+      if(newState) {
+        this.$router.push({        name: "Profile"        });
+      }
     }
   },
 };

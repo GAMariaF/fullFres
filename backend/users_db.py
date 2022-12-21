@@ -13,5 +13,8 @@ class Users(db.Model):
 
     def __repr__(self):
         return "User({}, {})".format(self.name, self.password)
+    
+    def set_pwd(self, new_password):
+        self.password = new_password
 
 
