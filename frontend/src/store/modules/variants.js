@@ -26,8 +26,6 @@ const actions = {
 				commit('SET_STORE', Object.values(variants));	
 			})
 		}
-        
-
 
 	},
 	sendToBackend: ({ commit }, payload) => {
@@ -38,10 +36,12 @@ const actions = {
 
 const mutations = {
 	SET_STORE(state, variants) {
-		console.log("updated variants")
+		console.log("updated variants")		
 		state.variants = variants;
+		console.log(state.variants)
 	}
 };
+
 
 export default {
 	name: 'variants',
