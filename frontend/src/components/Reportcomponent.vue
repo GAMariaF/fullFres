@@ -28,8 +28,8 @@
           :items="items"
           :fields="fields"
           :small="small"
-          :filter="filter"
-          :filter-included-fields="filterOn"
+          :filter="filterRun"
+          :filter-included-fields="filterRunOn"
         >
           <template #cell(runid)="data">
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
@@ -42,14 +42,12 @@
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br /><br />
-    
-
           <h5>
             Gene List: <b>{{ this.variants[0].Genelist }}</b> | Tumor %:
             <b>{{ this.variants[0].Perc_Tumor }}</b>
           </h5>
           <br />
-          <h2><p style="text-align: left">Classified variants</p></h2>
+          <h2><p style="text-align: left">Classified variants:</p></h2>
           <br />
           <b-table
             selectable
@@ -61,8 +59,8 @@
             :items="variants"
             :fields="variantFields"
             :small="small"
-            :filter="filter2"
-            :filter-included-fields="filterOn2"
+            :filter="filterVar"
+            :filter-included-fields="filterVarOn"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -250,10 +248,10 @@ export default {
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
-      filter: "",
-      filterOn: ["runid"],
-      filter2: "Ja",
-      filterOn2: ["Reply"],
+      filterRun: "",
+      filterRunOn: ["runid"],
+      filterVar: "Yes",
+      filterVarOn: ["Reply"],
       selected: null,
       selectedCategory: null,
       runs: [{ value: null, text: 'Please select an option' },],
@@ -263,6 +261,8 @@ export default {
       selectedVariant: "",
       small: true,
       items: [],
+      // 'Variants' is a placeholder to prevent errors, until the data is fetched from backend.
+      variants: ["Genelist"],
       fields: [
         { key: "runid", label: "Run id" },
         { key: "sampleid", label: "Sample id" },
@@ -272,7 +272,7 @@ export default {
   },
   methods: {
     updateFilter() {      
-      this.filter = this.selected.text
+      this.filterRun = this.selected.text
     },
     getRuns() {
       console.log("getRuns!!! Running!! ")
@@ -291,6 +291,8 @@ export default {
       });
     },
     rowSelected(items) {
+      console.log("rowSelect items: ")
+      console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
@@ -300,17 +302,27 @@ export default {
         console.log("unselected")
       }
     },
+
     sampleRowSelected(items) {
       if (items.length === 1) {
+
         this.selectedSample = items[0].sampleid;
         console.log(this.selectedSample);
-        // Get variants for that sample:
-        this.$store.dispatch("initVariantStore", {
-          sample_id: this.selectedSample,
-          selected: "empty",
-          allVariants: false,
-        });
-        this.variants = this.$store.getters.variants;
+         //Get variants for that sample:
+
+        //this.$store.dispatch("initVariantStore", {
+        //  sample_id: this.selectedSample,
+        //  selected: "empty",
+        //  allVariants: false,
+        //});
+        
+
+        util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
+          var variants = Object.values(result['data']);
+          this.variants = variants})
+        
+        this.$store.commit('SET_STORE', this.variants);
+
       } else if (items.length === 0) {
         this.selectedSample = "";
       }
@@ -339,14 +351,16 @@ export default {
         console.log(report)
       }
 
-      
+    },
 
-    }
   },
   created: function () {
     util_funcs.query_backend(config.$backend_url, "report").then(data => {
       this.items = data.data
       this.getRuns()});
+
+
+    
     
   },
   computed: {
