@@ -71,8 +71,8 @@
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
             <!-- Get specific values for specific variant types -->
-            <template #cell(Special)="data">
-              <b class="text-info">{{ typeSpecialValue(data) }}</b>
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
             </template>
             <template #cell(Info)="row">
               <b-button
@@ -116,8 +116,6 @@
         </div>
       </b-col>
     </b-row>
-
-
 <!-- -->
 
 <!-- -->
@@ -198,8 +196,6 @@
 
         <hr />        
 
-
-
           <b-row>
             <b-col>
                 <div class="table-responsive">
@@ -224,8 +220,6 @@
   </b-modal>
 
 <!-- -->
-
-
 
   </b-container>
 </template>
@@ -256,7 +250,7 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
-        {key: "Special", label: "Type Specific"},
+        {key: "Specific", label: "Type Specific"},
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
@@ -311,21 +305,19 @@ export default {
     },
 
     rowSelected(items) {
-      // Litt kode repitisjon for å resette categori raport når ny varaint velges.
       console.log("rowSelect items: ")
       console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
-        this.report = "";
-        this.selectedCategory = null;
         console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
-        this.report = "";
-        this.selectedCategory = null;
         console.log("unselected")
       }
+      // Resette categori/report når ny varaint velges, eller ved deselect.
+      this.report = "";
+      this.selectedCategory = null;
     },
 
     sampleRowSelected(items) {
@@ -370,7 +362,7 @@ export default {
       console.log("infomodal lukket")
     },
 
-    typeSpecialValue(data) {
+    typeSpecificValue(data) {
       switch(data.item['Type']) {
         case 'snp':
             return("AF: "+data.item['AF']);
@@ -412,17 +404,17 @@ export default {
         var variant = this.selectedVariant[0]
 
         var type = 'varianten'
-        switch (variant['Type']) {
-          case 'snp':
+        switch (variant['Type'].toUpperCase()) {
+          case 'SNP':
             type = 'sekvensvarianten';
             break;
-          case 'del':
+          case 'DEL':
             type = 'delesjonen';
             break;
-          case 'mnp':
-            type = 'multinukelotidsekvensvarianten';
+          case 'MNP':
+            type = 'multinukelotidvarianten';
             break;
-          case 'Fusion':
+          case 'FUSION':
             type = 'fusjonen';
             break;
           case 'CNV':
@@ -435,7 +427,7 @@ export default {
           annoVar = variant['annotation_variant'];
         }
 
-        // Trengs for å "lese variabelene, kan nok gjøres på ein anna måte"
+        // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
         console.log(annoVar)
