@@ -70,6 +70,10 @@
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Special)="data">
+              <b class="text-info">{{ typeSpecialValue(data) }}</b>
+            </template>
             <template #cell(Info)="row">
               <b-button
                 size="sm"
@@ -81,11 +85,7 @@
             </template>
           </b-table>
           <br />
-     
           <br />
-          
-
-          <br /><br />
 
           <!-- -->
           <b-form-select v-model="selectedCategory" @change="generateRep" size="sm" class="mt-3">
@@ -93,12 +93,26 @@
             </option>
           </b-form-select>
           <!-- -->
-          <br>
-          <h5>
-          {{selectedCategory}}
+          <br />
+          <br />
+
+          <h5 id="reportarea">
+            {{ report }}
+          </h5>
+          <br />
+          <body>
+            <b-button size="sm" @click="copyToClipboard(this.report)" class="mr-1">Copy (does not work)</b-button>
+          </body>
+          <br />
+          <br />
+          <body v-if='this.generalReport===""'>
+            <b-button size="sm" @click="generateGenRep()" class="mr-1">Generate General Report</b-button>
+          </body>
+          <h5 id="generalreportarea">
+            {{ generalReport }}
           </h5>
           <br>
-          {{selectedVariant}}
+          {{selectedVariant}} 
         </div>
       </b-col>
     </b-row>
@@ -216,9 +230,9 @@
   </b-container>
 </template>
 <script>
+
 import { config } from '../config.js'
 import util_funcs from "@/appUtils";
-
 
 export default {
   props: ["locked"],
@@ -242,6 +256,7 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
+        {key: "Special", label: "Type Specific"},
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
@@ -250,7 +265,8 @@ export default {
         ],
       filterRun: "",
       filterRunOn: ["runid"],
-      filterVar: "Yes",
+      // OBS: "Yes" på nyere data. 
+      filterVar: "Ja",
       filterVarOn: ["Reply"],
       selected: null,
       selectedCategory: null,
@@ -262,7 +278,10 @@ export default {
       small: true,
       items: [],
       // 'Variants' is a placeholder to prevent errors, until the data is fetched from backend.
+      // Somehow it also ensures the component is rerendered when the data arrives. 
       variants: ["Genelist"],
+      generalReport: "",
+      report: "",
       fields: [
         { key: "runid", label: "Run id" },
         { key: "sampleid", label: "Sample id" },
@@ -270,6 +289,7 @@ export default {
       ],
     };
   },
+
   methods: {
     updateFilter() {      
       this.filterRun = this.selected.text
@@ -279,7 +299,6 @@ export default {
       console.log("---")
       console.log(this.items)
       console.log("---")
-      // console.log(this.items)
       var runs = []
       var result = []
       this.items.forEach((item, index) => {
@@ -290,15 +309,21 @@ export default {
         this.runs = result
       });
     },
+
     rowSelected(items) {
+      // Litt kode repitisjon for å resette categori raport når ny varaint velges.
       console.log("rowSelect items: ")
       console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
+        this.report = "";
+        this.selectedCategory = null;
         console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
+        this.report = "";
+        this.selectedCategory = null;
         console.log("unselected")
       }
     },
@@ -316,17 +341,21 @@ export default {
         //  allVariants: false,
         //});
         
-
+        // Query and commit to store here isntead of having the store do it.
         util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
+          console.log(typeof result);
           var variants = Object.values(result['data']);
-          this.variants = variants})
+          this.variants = variants}) 
         
         this.$store.commit('SET_STORE', this.variants);
+        this.generalReport = "";
 
       } else if (items.length === 0) {
         this.selectedSample = "";
+        this.generalReport = "";
       }
     },
+
     openReportModal(item, index, button) {
       console.log("openReportModal")
       index = this.variants.indexOf(item);
@@ -334,35 +363,106 @@ export default {
       this.reportModal.title = `Variant: ${index + 1}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
+
     resetReportModal() {
       this.reportModal.title = "";
       this.reportModal.content = "";
       console.log("infomodal lukket")
     },
+
+    typeSpecialValue(data) {
+      switch(data.item['Type']) {
+        case 'snp':
+            return("AF: "+data.item['AF']);
+          case 'del':
+          return("");
+          case 'mnp':
+            return("");
+          case 'Fusion':
+          return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'CNV':
+          return("CN: "+data.item['Copy_Number']);
+          default:
+            return("")
+      }
+    },
+
+    generateGenRep() {
+      if (this.selectedSample === "") {
+        console.log("No row selected")
+        this.generalReport = "No row selected"
+
+      } else {
+
+        this.generalReport = `${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}`
+        //legg til kopi på knapp når fungerer
+        //this.copyToClipboard(this.generalReport)
+      }
+    },
+
     generateRep() {
       console.log("generateRep")
       // Send selectedvariant og categori til util_uncs.generate_report
       // Hvis ikke variant er valgt, gi varsel
 
-      if (this.selectedVariant.length===0) {
+      if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
+        this.report = "No variant selected"
       } else {
-        var report = util_funcs.generate_report(this.selectedVariant, this.selectedCategory);
-        console.log(report)
+        var variant = this.selectedVariant[0]
+
+        var type = 'varianten'
+        switch (variant['Type']) {
+          case 'snp':
+            type = 'sekvensvarianten';
+            break;
+          case 'del':
+            type = 'delesjonen';
+            break;
+          case 'mnp':
+            type = 'multinukelotidsekvensvarianten';
+            break;
+          case 'Fusion':
+            type = 'fusjonen';
+            break;
+          case 'CNV':
+            type = 'kopitallsvarianten';
+            break;
+        }
+
+        var annoVar = "";
+        if (variant['annotation_variant'] !== ": ()"){
+          annoVar = variant['annotation_variant'];
+        }
+
+        // Trengs for å "lese variabelene, kan nok gjøres på ein anna måte"
+        console.log(variant)
+        console.log(type)
+        console.log(annoVar)
+
+        this.report = eval('`'+this.selectedCategory+'`');
       }
 
     },
 
+    async copyToClipboard(text) { 
+      // Needs https to work
+      try {
+        await navigator.clipboard.writeText(text);
+        console.log('Text copied to clipboard');
+    } catch (err) {
+        console.error('Error in copying text: ', err);
+    }
+    },
+
   },
+
   created: function () {
     util_funcs.query_backend(config.$backend_url, "report").then(data => {
       this.items = data.data
       this.getRuns()});
-
-
-    
-    
   },
+
   computed: {
     state() {
       return this.$store.getters.loggedInStatus;

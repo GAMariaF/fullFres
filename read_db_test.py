@@ -66,7 +66,12 @@ def list_approved_samples(db, sampleid):
     with engine.connect() as conn:
         interpretationlist = pd.read_sql_query(text(stmt), con = conn)
     list_json = interpretationlist.to_dict('records')
-    print(list_json)
+    for item in list_json:
+        #print(item)
+        print("----------------NEW VAR-----------------------")
+        for k, v in item.items():
+            print(str(k)+": "+str(v))
+            
 
 if __name__ == '__main__':
-    list_approved_samples(db_path, '22SKH16134')
+    list_approved_samples(db_path, '22SKH04506')

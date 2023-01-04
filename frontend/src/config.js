@@ -129,6 +129,7 @@ config = {
                   ],
                   reportcodes: [
                     {value:  "Please select an option" , text: null},
+                    {value: "Test", text: "Den påviste ${type} ${annoVar} i ${variant['gene']}-genet er av usikker klinisk betydning."},
                     {value: "NGS8", text: "Den påviste sekvensvarianten/fusjonen/kopitallsvarianten (…) i XXXX-genet (xxbiopsi med xx % tumor) er av usikker klinisk betydning."},
                     {value: "NGS2", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX % (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
                     {value: "NGS3", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse)."},
