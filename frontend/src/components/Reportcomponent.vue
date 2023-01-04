@@ -271,8 +271,8 @@ export default {
       selectedVariant: "",
       small: true,
       items: [],
-      // 'Variants' is a placeholder to prevent errors, until the data is fetched from backend.
-      // Somehow it also ensures the component is rerendered when the data arrives. 
+      // 'Variants' is a placeholder to prevent errors until the data is fetched from backend.
+      // Also ensures the component is rerendered when the data arrives. 
       variants: ["Genelist"],
       generalReport: "",
       report: "",
@@ -290,9 +290,8 @@ export default {
     },
     getRuns() {
       console.log("getRuns!!! Running!! ")
-      console.log("---")
       console.log(this.items)
-      console.log("---")
+
       var runs = []
       var result = []
       this.items.forEach((item, index) => {
@@ -363,17 +362,17 @@ export default {
     },
 
     typeSpecificValue(data) {
-      switch(data.item['Type']) {
-        case 'snp':
+      switch(data.item['Type'].toUpperCase()) {
+        case 'SNP':
             return("AF: "+data.item['AF']);
-          case 'del':
-          return("");
-          case 'mnp':
+          case 'DEL':
             return("");
-          case 'Fusion':
-          return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'MNP':
+            return("");
+          case 'FUSION':
+            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
-          return("CN: "+data.item['Copy_Number']);
+            return("CN: "+data.item['Copy_Number']);
           default:
             return("")
       }
@@ -393,9 +392,6 @@ export default {
     },
 
     generateRep() {
-      console.log("generateRep")
-      // Send selectedvariant og categori til util_uncs.generate_report
-      // Hvis ikke variant er valgt, gi varsel
 
       if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
