@@ -1,7 +1,6 @@
+
 <template>
   <b-container id="app" fluid v-show="state">
-    
-    
     <b-row>
       <b-col cols="3">
         <br />
@@ -10,31 +9,33 @@
         <br />
 
         <div>
-    
           <b-form-select v-model="selected" @change="updateFilter" size="sm" class="mt-3">
             <option v-for="run in runs" v-bind:value="{ id: run.value, text: run.text }" :key="run.value">{{ run.text }}
             </option>
           </b-form-select>
-          
         </div>
         <br>
-        <b-table
-          selectable
-          select-mode="single"
-          @row-selected="sampleRowSelected"
-          striped
-          hover
-          outlined
-          :items="items"
-          :fields="fields"
-          :small="small"
-          :filter="filterRun"
-          :filter-included-fields="filterRunOn"
-        >
-          <template #cell(runid)="data">
-            <b class="text-info">{{ data.value.toUpperCase() }}</b>
-          </template>
-        </b-table>
+        
+        <!-- Scrollbar for the run and samples table -->
+        <VuePerfectScrollbar class="scroll-area" :settings="settings">
+          <b-table
+            selectable
+            select-mode="single"
+            @row-selected="sampleRowSelected"
+            striped
+            hover
+            outlined
+            :items="items"
+            :fields="fields"
+            :small="small"
+            :filter="filterRun"
+            :filter-included-fields="filterRunOn">
+
+            <template #cell(runid)="data">
+              <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+          </b-table>
+        </VuePerfectScrollbar>
       </b-col>
       <b-col>
         <br />
@@ -227,10 +228,14 @@
 
 import { config } from '../config.js'
 import util_funcs from "@/appUtils";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
   props: ["locked"],
   name: "reportcomponent",
+  components: {
+        VuePerfectScrollbar
+      },
   data() {
     return {
       selectedRowIndex: 0,
@@ -281,6 +286,9 @@ export default {
         { key: "sampleid", label: "Sample id" },
         { key: "Date_Approval", label: "Date Approval" },
       ],
+      // Settings for Vue perfect scrollbar.
+      settings: {
+        maxScrollbarLength: 60},
     };
   },
 
@@ -373,8 +381,12 @@ export default {
             return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
+          case 'INS':
+            return("");
+          case 'RNAEXONVARIANT':
+            return("");
           default:
-            return("")
+            return("");
       }
     },
 
@@ -416,6 +428,12 @@ export default {
           case 'CNV':
             type = 'kopitallsvarianten';
             break;
+          case 'INS':
+            type = 'insettingsvarianten';
+            break;
+          case 'RNAEXONVARIANT':
+            type = "exonvarianten";
+            break;
         }
 
         var annoVar = "";
@@ -442,7 +460,6 @@ export default {
         console.error('Error in copying text: ', err);
     }
     },
-
   },
 
   created: function () {
@@ -459,3 +476,13 @@ export default {
   watch: {},
 };
 </script>
+
+
+<style>
+.scroll-area {
+  position: relative;
+  margin: auto;
+  width: 410px;
+  height: 400px;
+}
+</style> 
