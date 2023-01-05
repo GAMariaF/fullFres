@@ -390,6 +390,8 @@ export default {
             return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
             return("AF: "+data.item['AF']);
+          case 'COMPLEX':
+            return("AF: "+data.item['AF'])
           default:
             return("");
       }
@@ -434,6 +436,9 @@ export default {
             break;
           case 'RNAEXONVARIANT':
             type = "exonvarianten";
+            break;
+          case 'COMPLEX':
+            type = "kompleksvarianten"
             break;
         }
 
