@@ -17,6 +17,7 @@
         <br>
         
         <!-- Scrollbar for the run and samples table -->
+        <!-- :filter-included-fields="filterRunOn" -->
         <VuePerfectScrollbar class="scroll-area" :settings="settings">
           <b-table
             selectable
@@ -29,8 +30,8 @@
             :fields="fields"
             :small="small"
             :filter="filterRun"
-            :filter-included-fields="filterRunOn">
-
+            :filter-function="filterTable">
+            
             <template #cell(runid)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
@@ -86,32 +87,27 @@
             </template>
           </b-table>
           <br />
+            <h2 v-if="this.warning !== ''">No variant selected!</h2>
           <br />
-
-          <!-- -->
+          <!-- 
           <b-form-select v-model="selectedCategory" @change="generateRep" size="sm" class="mt-3">
             <option v-for="cat in categories" v-bind:value="cat.text" :key="cat.value">{{ cat.value }}
             </option>
           </b-form-select>
-          <!-- -->
+          -->
+          <!-- Use buttons instead of dropdown menu -->
+          <span v-for="cat in categories" :key="cat.value">
+            <b-button v-on:click="generateRep(cat.text)" type="button" :class="cat.class">{{cat.value}}</b-button><span>&nbsp;</span>
+          </span>
           <br />
           <br />
-
           <h5 id="reportarea">
             {{ report }}
           </h5>
-          <br />
           <body>
-            <b-button size="sm" @click="copyToClipboard(this.report)" class="mr-1">Copy (does not work)</b-button>
+            <b-button size="sm" @click="generateGenRep" class="mr-1">Reset Report</b-button>
           </body>
           <br />
-          <br />
-          <body v-if='this.generalReport===""'>
-            <b-button size="sm" @click="generateGenRep()" class="mr-1">Generate General Report</b-button>
-          </body>
-          <h5 id="generalreportarea">
-            {{ generalReport }}
-          </h5>
           <br>
           {{selectedVariant}} 
         </div>
@@ -264,11 +260,11 @@ export default {
         ],
       filterRun: "",
       filterRunOn: ["runid"],
-      // OBS: "Yes" på nyere data. 
-      filterVar: "Ja",
+      // OBS: "Yes" på nyere data, "Ja" på eldre. 
+      filterVar: "Yes",
       filterVarOn: ["Reply"],
       selected: null,
-      selectedCategory: null,
+      //selectedCategory: null,
       runs: [{ value: null, text: 'Please select an option' },],
       categories: config.reportcodes,
       loggedInStatus: false,
@@ -281,6 +277,7 @@ export default {
       variants: ["Genelist"],
       generalReport: "",
       report: "",
+      warning: "",
       fields: [
         { key: "runid", label: "Run id" },
         { key: "sampleid", label: "Sample id" },
@@ -293,8 +290,11 @@ export default {
   },
 
   methods: {
-    updateFilter() {      
+    updateFilter() { 
       this.filterRun = this.selected.text
+    },
+    filterTable(row, filter) {
+      return(row['runid']===filter);
     },
     getRuns() {
       console.log("getRuns!!! Running!! ")
@@ -302,13 +302,17 @@ export default {
 
       var runs = []
       var result = []
+
       this.items.forEach((item, index) => {
         if(!runs.includes(item.runid)){
-          runs.push(item.runid)
+          runs.push(item.runid) 
           result.push({value: index, text: item.runid})          
-        }
-        this.runs = result
-      });
+        }});
+
+      this.runs = result
+      // Used to only show last run on render.
+      this.filterRun = runs[runs.length-1];
+
     },
 
     rowSelected(items) {
@@ -317,17 +321,18 @@ export default {
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
+        this.warning = "";
         console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
       }
       // Resette categori/report når ny varaint velges, eller ved deselect.
-      this.report = "";
-      this.selectedCategory = null;
+      //this.report = "";
+      //this.selectedCategory = null;
     },
 
-    sampleRowSelected(items) {
+    async sampleRowSelected(items) {
       if (items.length === 1) {
 
         this.selectedSample = items[0].sampleid;
@@ -340,14 +345,14 @@ export default {
         //  allVariants: false,
         //});
         
-        // Query and commit to store here isntead of having the store do it.
-        util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
+        // Query and commit to store here instead of having the store do it.
+        await util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
           console.log(typeof result);
           var variants = Object.values(result['data']);
           this.variants = variants}) 
         
         this.$store.commit('SET_STORE', this.variants);
-        this.generalReport = "";
+        this.generateGenRep();
 
       } else if (items.length === 0) {
         this.selectedSample = "";
@@ -374,17 +379,17 @@ export default {
         case 'SNP':
             return("AF: "+data.item['AF']);
           case 'DEL':
-            return("");
+            return("AF: "+data.item['AF']);
           case 'MNP':
-            return("");
+            return("AF: "+data.item['AF']);
           case 'FUSION':
             return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
-            return("");
+            return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
-            return("");
+            return("AF: "+data.item['AF']);
           default:
             return("");
       }
@@ -393,21 +398,17 @@ export default {
     generateGenRep() {
       if (this.selectedSample === "") {
         console.log("No row selected")
-        this.generalReport = "No row selected"
-
+        this.report = "No row selected";
       } else {
-
-        this.generalReport = `${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}`
-        //legg til kopi på knapp når fungerer
-        //this.copyToClipboard(this.generalReport)
+        this.report = `${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`;
       }
     },
 
-    generateRep() {
+    generateRep(category) {
 
       if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
-        this.report = "No variant selected"
+        this.warning = "No variant selected"
       } else {
         var variant = this.selectedVariant[0]
 
@@ -440,15 +441,13 @@ export default {
         if (variant['annotation_variant'] !== ": ()"){
           annoVar = variant['annotation_variant'];
         }
-
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
         console.log(annoVar)
 
-        this.report = eval('`'+this.selectedCategory+'`');
+        this.report = this.report.concat(eval('`'+category+'`'));
       }
-
     },
 
     async copyToClipboard(text) { 
@@ -456,16 +455,18 @@ export default {
       try {
         await navigator.clipboard.writeText(text);
         console.log('Text copied to clipboard');
-    } catch (err) {
+      } catch (err) {
         console.error('Error in copying text: ', err);
-    }
+      }
     },
   },
 
   created: function () {
     util_funcs.query_backend(config.$backend_url, "report").then(data => {
       this.items = data.data
-      this.getRuns()});
+      this.getRuns()
+    });
+
   },
 
   computed: {

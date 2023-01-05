@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ loggedInStatus }}
     <h1>All samples</h1>
     <br>
     <div class="container" id="login">
@@ -39,6 +38,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { config } from "../config.js";
 import axios from "axios";
@@ -55,8 +55,10 @@ export default {
       items: [],
       fields: [{key: "runid", label: "Run id", sortable: true}, 
               {key: "sampleid", label: "Sample id", sortable: true},
+              {key: "User_Signoff", label: "User Sign off", sortable: false},
               {key: "Date_Signoff", label: "Date Sign off", sortable: true},
-              {key: "Date_Approval", label: "Date Approval", sortable: true}],
+              {key: "User_Approval", label: "User Approval", sortable: false},
+              {key: "Date_Approval", label: "Date Approval", sortable: true},],
       filter: '',
     };
   },
