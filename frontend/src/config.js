@@ -128,15 +128,14 @@ config = {
                     'Tier'
                   ],
                   reportcodes: [
-                    {value:  "Please select an option" , text: null},
-                    {value: "Test", text: "Den påviste ${type} ${annoVar} i ${variant['gene']}-genet er av usikker klinisk betydning."},
-                    {value: "NGS8", text: "Den påviste sekvensvarianten/fusjonen/kopitallsvarianten (…) i XXXX-genet (xxbiopsi med xx % tumor) er av usikker klinisk betydning."},
-                    {value: "NGS2", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX % (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS3", text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse)."},
-                    {value: "NGS4", text: "Den påviste sekvensvarianten (NM_XXXXc---p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-                    {value: "NGS5", text: "Den påviste fusjonen xxxx/yyyy med xxxx reads/million (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS6", text: "Den påviste kopitallsvarianten i XXXX-genet (+X kopier) (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS7", text: "Den påviste delesjonen av ekson X i XXXX-genet (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
+                    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type} ${annoVar} i ${variant['gene']}-genet er av usikker klinisk betydning. "},
+                    {value: "NGS8", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten/fusjonen/kopitallsvarianten (…) i XXXX-genet (xxbiopsi med xx % tumor) er av usikker klinisk betydning. "},
+                    {value: "NGS2", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX % (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse). "},
+                    {value: "NGS3", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse). "},
+                    {value: "NGS4", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten (NM_XXXXc---p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse). "},
+                    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste fusjonen xxxx/yyyy med xxxx reads/million (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse). "},
+                    {value: "NGS6", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste kopitallsvarianten i XXXX-genet (+X kopier) (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse). "},
+                    {value: "NGS7", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste delesjonen av ekson X i XXXX-genet (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse). "}
                   ]
 };
 
