@@ -101,8 +101,8 @@
           </span>
           <br />
           <br />
-          <h5 id="reportarea">
-            {{ report }}
+          <h5 class="report">
+            {{ report }} 
           </h5>
           <body>
             <b-button size="sm" @click="generateGenRep" class="mr-1">Reset Report</b-button>
@@ -444,14 +444,14 @@ export default {
 
         var annoVar = "";
         if (variant['annotation_variant'] !== ": ()"){
-          annoVar = variant['annotation_variant'];
+          annoVar = " " + variant['annotation_variant'];
         }
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
         console.log(annoVar)
 
-        this.report = this.report.concat(eval('`'+category+'`'));
+        this.report = this.report.concat(eval('`'+category+' \n\n`'));
       }
     },
 
@@ -490,5 +490,10 @@ export default {
   margin: auto;
   width: 410px;
   height: 400px;
+}
+h5.report {
+  white-space: pre-wrap;
+  color: blue;
+  text-align: left;
 }
 </style> 
