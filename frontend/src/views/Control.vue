@@ -27,6 +27,7 @@
         <h2 v-if="selectedSample === ''">Please select a sample</h2>
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
+          <h5>Signed off by {{ this.sampleUserSignoff }}</h5>
           <br><br>
           <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
           <br>
@@ -135,6 +136,7 @@
           <br><br>
             
           <div>
+            <h3 v-if="warning !== ''">{{ this.warning }}</h3>
             <b-button v-on:click="approve" class="btn mr-1 btn-info"> Approve </b-button>
             <p></p>
             <b-button v-on:click="unApprove" class="btn mr-1 btn-info"> Send Back </b-button>
@@ -425,10 +427,12 @@ export default {
             sortable: true
       }],
       loggedInStatus: false,
+      warning: "",
       small: true,
       sampleID: "",
       selectedSample: "",
       selectedRowIndex: 0,
+      sampleUserSignoff: "",
       replyOptions: config.replyOptions,
       functionalOptions: config.functionalOptions,
       predictiveOptions: config.predictiveOptions,
@@ -490,6 +494,7 @@ export default {
         // Get variants for that sample:
         this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty', "allVariants": false});
         this.variants =  this.$store.getters.variants;
+        this.sampleUserSignoff = items[0].User_Signoff
       } else if (items.length === 0) {
         
         this.selectedSample = "";
@@ -625,26 +630,34 @@ export default {
       console.log("Sign off method");
       
       // Metode for  sende inn dato, og tolkede varianter til backend.
-      const baseURI = config.$backend_url + "/api/approve";
-      this.$http
-        .post(
-          baseURI,
+
+      console.log(this.sampleUserSignoff)
+      console.log(this.$store.getters.username)
+
+      if(this.sampleUserSignoff === this.$store.getters.username) {
+        this.warning = "You are not allowed to both sign off on and approve a sample."
+      } else {
+
+        const baseURI = config.$backend_url + "/api/approve";
+        this.$http
+          .post(
+            baseURI,
+            {
+              sampleid: this.selectedSample,
+              user: this.$store.getters.username,
+            },
           {
-            sampleid: this.selectedSample,
-            user: this.$store.getters.username,
-          },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
-        this.$router.push({
-        name: "Samples"
-        });
+              withCredentials: true,
+              headers: { "Content-Type": "application/json" },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => {
+            console.log(data);
+          });
+          this.$router.push({
+          name: "Samples"
+        });}
 
 
     },

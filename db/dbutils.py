@@ -371,9 +371,11 @@ def list_samples(db):
 def list_all_samples(db):
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT s.runid, s.sampleid, \
+	stmt = "SELECT s.runid, s.sampleid,\
 			s.Date_Signoff, \
-			s.Date_Approval \
+			s.Date_Approval, \
+			s.User_Signoff, \
+			s.User_Approval \
 			FROM Samples s;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
@@ -383,7 +385,7 @@ def list_all_samples(db):
 def list_signoff_samples(db):
 	#list all signed off samples ready for approval
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT DISTINCT sampleid, runid, Date_Signoff \
+	stmt = "SELECT DISTINCT sampleid, runid, Date_Signoff, User_Signoff \
 				FROM Samples \
 				WHERE (Date_Signoff IS NOT NULL \
 				AND Date_Signoff IS NOT '') \

@@ -1,7 +1,6 @@
+
 <template>
   <b-container id="app" fluid v-show="state">
-    
-    
     <b-row>
       <b-col cols="3">
         <br />
@@ -10,31 +9,34 @@
         <br />
 
         <div>
-    
           <b-form-select v-model="selected" @change="updateFilter" size="sm" class="mt-3">
             <option v-for="run in runs" v-bind:value="{ id: run.value, text: run.text }" :key="run.value">{{ run.text }}
             </option>
           </b-form-select>
-          
         </div>
         <br>
-        <b-table
-          selectable
-          select-mode="single"
-          @row-selected="sampleRowSelected"
-          striped
-          hover
-          outlined
-          :items="items"
-          :fields="fields"
-          :small="small"
-          :filter="filter"
-          :filter-included-fields="filterOn"
-        >
-          <template #cell(runid)="data">
-            <b class="text-info">{{ data.value.toUpperCase() }}</b>
-          </template>
-        </b-table>
+        
+        <!-- Scrollbar for the run and samples table -->
+        <!-- :filter-included-fields="filterRunOn" -->
+        <VuePerfectScrollbar class="scroll-area" :settings="settings">
+          <b-table
+            selectable
+            select-mode="single"
+            @row-selected="sampleRowSelected"
+            striped
+            hover
+            outlined
+            :items="items"
+            :fields="fields"
+            :small="small"
+            :filter="filterRun"
+            :filter-function="filterTable">
+            
+            <template #cell(runid)="data">
+              <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+          </b-table>
+        </VuePerfectScrollbar>
       </b-col>
       <b-col>
         <br />
@@ -42,14 +44,12 @@
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <br /><br />
-    
-
           <h5>
             Gene List: <b>{{ this.variants[0].Genelist }}</b> | Tumor %:
             <b>{{ this.variants[0].Perc_Tumor }}</b>
           </h5>
           <br />
-          <h2><p style="text-align: left">Classified variants</p></h2>
+          <h2><p style="text-align: left">Classified variants:</p></h2>
           <br />
           <b-table
             selectable
@@ -61,8 +61,8 @@
             :items="variants"
             :fields="variantFields"
             :small="small"
-            :filter="filter2"
-            :filter-included-fields="filterOn2"
+            :filter="filterVar"
+            :filter-included-fields="filterVarOn"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -71,6 +71,10 @@
             <!-- Formatting Type column -->
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
             </template>
             <template #cell(Info)="row">
               <b-button
@@ -83,29 +87,32 @@
             </template>
           </b-table>
           <br />
-     
+            <h2 v-if="this.warning !== ''">No variant selected!</h2>
           <br />
-          
-
-          <br /><br />
-
-          <!-- -->
+          <!-- 
           <b-form-select v-model="selectedCategory" @change="generateRep" size="sm" class="mt-3">
             <option v-for="cat in categories" v-bind:value="cat.text" :key="cat.value">{{ cat.value }}
             </option>
           </b-form-select>
-          <!-- -->
-          <br>
-          <h5>
-          {{selectedCategory}}
+          -->
+          <!-- Use buttons instead of dropdown menu -->
+          <span v-for="cat in categories" :key="cat.value">
+            <b-button v-on:click="generateRep(cat.text)" type="button" :class="cat.class">{{cat.value}}</b-button><span>&nbsp;</span>
+          </span>
+          <br />
+          <br />
+          <h5 class="report">
+            {{ report }} 
           </h5>
+          <body>
+            <b-button size="sm" @click="generateGenRep" class="mr-1">Reset Report</b-button>
+          </body>
+          <br />
           <br>
-          {{selectedVariant}}
+          {{selectedVariant}} 
         </div>
       </b-col>
     </b-row>
-
-
 <!-- -->
 
 <!-- -->
@@ -186,8 +193,6 @@
 
         <hr />        
 
-
-
           <b-row>
             <b-col>
                 <div class="table-responsive">
@@ -213,18 +218,20 @@
 
 <!-- -->
 
-
-
   </b-container>
 </template>
 <script>
+
 import { config } from '../config.js'
 import util_funcs from "@/appUtils";
-
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
   props: ["locked"],
   name: "reportcomponent",
+  components: {
+        VuePerfectScrollbar
+      },
   data() {
     return {
       selectedRowIndex: 0,
@@ -244,18 +251,20 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
+        {key: "Specific", label: "Type Specific"},
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
-      filter: "",
-      filterOn: ["runid"],
-      filter2: "Ja",
-      filterOn2: ["Reply"],
+      filterRun: "",
+      filterRunOn: ["runid"],
+      // OBS: "Yes" på nyere data, "Ja" på eldre. 
+      filterVar: "Yes",
+      filterVarOn: ["Reply"],
       selected: null,
-      selectedCategory: null,
+      //selectedCategory: null,
       runs: [{ value: null, text: 'Please select an option' },],
       categories: config.reportcodes,
       loggedInStatus: false,
@@ -263,58 +272,94 @@ export default {
       selectedVariant: "",
       small: true,
       items: [],
+      // 'Variants' is a placeholder to prevent errors until the data is fetched from backend.
+      // Also ensures the component is rerendered when the data arrives. 
+      variants: ["Genelist"],
+      generalReport: "",
+      report: "",
+      warning: "",
       fields: [
         { key: "runid", label: "Run id" },
         { key: "sampleid", label: "Sample id" },
         { key: "Date_Approval", label: "Date Approval" },
       ],
+      // Settings for Vue perfect scrollbar.
+      settings: {
+        maxScrollbarLength: 60},
     };
   },
+
   methods: {
-    updateFilter() {      
-      this.filter = this.selected.text
+    updateFilter() { 
+      this.filterRun = this.selected.text
+    },
+    filterTable(row, filter) {
+      return(row['runid']===filter);
     },
     getRuns() {
       console.log("getRuns!!! Running!! ")
-      console.log("---")
       console.log(this.items)
-      console.log("---")
-      // console.log(this.items)
+
       var runs = []
       var result = []
+
       this.items.forEach((item, index) => {
         if(!runs.includes(item.runid)){
-          runs.push(item.runid)
+          runs.push(item.runid) 
           result.push({value: index, text: item.runid})          
-        }
-        this.runs = result
-      });
+        }});
+
+      this.runs = result
+      // Used to only show last run on render.
+      this.filterRun = runs[runs.length-1];
+
     },
+
     rowSelected(items) {
+      console.log("rowSelect items: ")
+      console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
+        this.warning = "";
         console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
         console.log("unselected")
       }
+      // Resette categori/report når ny varaint velges, eller ved deselect.
+      //this.report = "";
+      //this.selectedCategory = null;
     },
-    sampleRowSelected(items) {
+
+    async sampleRowSelected(items) {
       if (items.length === 1) {
+
         this.selectedSample = items[0].sampleid;
         console.log(this.selectedSample);
-        // Get variants for that sample:
-        this.$store.dispatch("initVariantStore", {
-          sample_id: this.selectedSample,
-          selected: "empty",
-          allVariants: false,
-        });
-        this.variants = this.$store.getters.variants;
+         //Get variants for that sample:
+
+        //this.$store.dispatch("initVariantStore", {
+        //  sample_id: this.selectedSample,
+        //  selected: "empty",
+        //  allVariants: false,
+        //});
+        
+        // Query and commit to store here instead of having the store do it.
+        await util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
+          console.log(typeof result);
+          var variants = Object.values(result['data']);
+          this.variants = variants}) 
+        
+        this.$store.commit('SET_STORE', this.variants);
+        this.generateGenRep();
+
       } else if (items.length === 0) {
         this.selectedSample = "";
+        this.generalReport = "";
       }
     },
+
     openReportModal(item, index, button) {
       console.log("openReportModal")
       index = this.variants.indexOf(item);
@@ -322,33 +367,113 @@ export default {
       this.reportModal.title = `Variant: ${index + 1}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
+
     resetReportModal() {
       this.reportModal.title = "";
       this.reportModal.content = "";
       console.log("infomodal lukket")
     },
-    generateRep() {
-      console.log("generateRep")
-      // Send selectedvariant og categori til util_uncs.generate_report
-      // Hvis ikke variant er valgt, gi varsel
 
-      if (this.selectedVariant.length===0) {
-        console.log("No variant selected")
-      } else {
-        var report = util_funcs.generate_report(this.selectedVariant, this.selectedCategory);
-        console.log(report)
+    typeSpecificValue(data) {
+      switch(data.item['Type'].toUpperCase()) {
+        case 'SNP':
+            return("AF: "+data.item['AF']);
+          case 'DEL':
+            return("AF: "+data.item['AF']);
+          case 'MNP':
+            return("AF: "+data.item['AF']);
+          case 'FUSION':
+            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'CNV':
+            return("CN: "+data.item['Copy_Number']);
+          case 'INS':
+            return("AF: "+data.item['AF']);
+          case 'RNAEXONVARIANT':
+            return("AF: "+data.item['AF']);
+          case 'COMPLEX':
+            return("AF: "+data.item['AF'])
+          default:
+            return("");
       }
+    },
 
-      
+    generateGenRep() {
+      if (this.selectedSample === "") {
+        console.log("No row selected")
+        this.report = "No row selected";
+      } else {
+        this.report = `${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`;
+      }
+    },
 
-    }
+    generateRep(category) {
+
+      if (this.selectedVariant.length === 0) {
+        console.log("No variant selected")
+        this.warning = "No variant selected"
+      } else {
+        var variant = this.selectedVariant[0]
+
+        var type = 'varianten'
+        switch (variant['Type'].toUpperCase()) {
+          case 'SNP':
+            type = 'sekvensvarianten';
+            break;
+          case 'DEL':
+            type = 'delesjonen';
+            break;
+          case 'MNP':
+            type = 'multinukelotidvarianten';
+            break;
+          case 'FUSION':
+            type = 'fusjonen';
+            break;
+          case 'CNV':
+            type = 'kopitallsvarianten';
+            break;
+          case 'INS':
+            type = 'insettingsvarianten';
+            break;
+          case 'RNAEXONVARIANT':
+            type = "exonvarianten";
+            break;
+          case 'COMPLEX':
+            type = "kompleksvarianten"
+            break;
+        }
+
+        var annoVar = "";
+        if (variant['annotation_variant'] !== ": ()"){
+          annoVar = " " + variant['annotation_variant'];
+        }
+        // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
+        console.log(variant)
+        console.log(type)
+        console.log(annoVar)
+
+        this.report = this.report.concat(eval('`'+category+' \n\n`'));
+      }
+    },
+
+    async copyToClipboard(text) { 
+      // Needs https to work
+      try {
+        await navigator.clipboard.writeText(text);
+        console.log('Text copied to clipboard');
+      } catch (err) {
+        console.error('Error in copying text: ', err);
+      }
+    },
   },
+
   created: function () {
     util_funcs.query_backend(config.$backend_url, "report").then(data => {
       this.items = data.data
-      this.getRuns()});
-    
+      this.getRuns()
+    });
+
   },
+
   computed: {
     state() {
       return this.$store.getters.loggedInStatus;
@@ -357,3 +482,18 @@ export default {
   watch: {},
 };
 </script>
+
+
+<style>
+.scroll-area {
+  position: relative;
+  margin: auto;
+  width: 410px;
+  height: 400px;
+}
+h5.report {
+  white-space: pre-wrap;
+  color: blue;
+  text-align: left;
+}
+</style> 

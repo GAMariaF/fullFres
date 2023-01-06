@@ -10,8 +10,8 @@
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
                   <h4 class="mt-2">
-                    <div>Welcome,</div>
-                    <span>Please sign in to your account below.</span>
+                    <div>Welcome to fullFres!</div>
+                    <span></span>
                   </h4>
                 </div>
                 
@@ -24,9 +24,9 @@
                       method="POST"
                       class="box"
                     >
-                      <h1 class="h3">Please sign in</h1>
+                      <h1 class="h3">Please sign in:</h1>
                       <label for="defaultFormLoginEmailEx" class="grey-text"
-                        >Your email</label
+                        >Your username</label
                       >
                       <input
                         name="username"
@@ -107,7 +107,7 @@ export default {
   methods: {
     doLogin: function () {
       // Sjekker brukernavn og passord mot database og sender tilbake en JWT
-      if (this.username != "" && this.password != "") {
+      if (this.username != "" && this.password != "") { 
         const baseURI = config.$backend_url + "/login";
         const article = {
             username: this.username,
@@ -116,8 +116,12 @@ export default {
         const headers = { 
             //"Authorization": "Bearer my-token",
         };
-        axios.post(baseURI, article, {headers}                )
+        axios.post(baseURI, article, {headers})
           .then((response) => response.data)
+          .catch((error) => {
+            console.log(error.response.data.message);
+            alert("Wrong Credentials.");
+          })
           .then((data) => {
             console.log(data);
             console.log(data['token']);
@@ -127,9 +131,11 @@ export default {
             // Send status to store
             this.$store.commit('SET_STORE_STATUS', true);
             this.loggedInStatus = this.$store.getters.loggedInStatus;
+            // Send username to store
+            this.$store.commit('SET_STORE_USERNAME', this.username);
           });
       } else {
-        alert("Please fill the text!");
+        alert("Please fill both fields!");
       }
     },
    
@@ -145,6 +151,9 @@ export default {
   watch: {
     state (newState, oldState) {
       console.log(`State changed from ${oldState} to ${newState}`)
+      if(newState) {
+        this.$router.push({        name: "Profile"        });
+      }
     }
   },
 };

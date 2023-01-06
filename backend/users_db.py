@@ -1,7 +1,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
+# Import ikkje brukt?
 
-from backend import db
+from backend import db_user as db
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,5 +13,8 @@ class Users(db.Model):
 
     def __repr__(self):
         return "User({}, {})".format(self.name, self.password)
+    
+    def set_pwd(self, new_password):
+        self.password = new_password
 
 
