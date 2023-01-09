@@ -1,8 +1,10 @@
 <template>
     <div>
-     <b> Logged in as: {{username}} </b>
+      <br />
+      <b> Logged in as: {{username}} </b>
     </div>  
 </template>
+
 
 <script>
 
@@ -39,7 +41,5 @@ export default {
   },
 
 }
-
-
 
 </script>

@@ -74,4 +74,4 @@ def list_approved_samples(db, sampleid):
             
 
 if __name__ == '__main__':
-    list_approved_samples(db_path, '22SKH04506')
+    list_approved_samples(db_path, '22SHK10172')

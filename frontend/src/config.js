@@ -1,7 +1,7 @@
 let config;
 
 config = {
-    $backend_url: 'http://172.16.0.3:5001',
+    $backend_url: 'http://172.16.0.3:5000',
     $signout_url: function() {
         return this.$backend_url + '/newlogout';
     },
@@ -63,7 +63,7 @@ config = {
         {tag: "OS1",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Same amino acid change as a previously established oncogenic variant (using this standard) regardless of nucleotide change. Example: Val→Leu caused by either G>C or G>T in the same codon.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OS2",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Well-established in vitro or in vivo functional studies, supportive of an oncogenic effect of the variant.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OS3",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Located in one of the hotspots in cancerhotspots. org with at least 50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org in at least 10 samples.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-        {tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', 	title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Protein length changes as a result of in-frame deletions/insertions in a known oncogene or tumor suppressor gene or stop-loss variants in a known tumor suppressor gene.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Missense variant at an amino acid residue where a different missense variant determined to be oncogenic (using this standard) has been documented. Amino acid difference from reference amino acid should be greater or at least approximately the same as for missense change determined to be oncogenic.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots. org with <50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org is at least 10.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
