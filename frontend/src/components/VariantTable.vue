@@ -634,7 +634,15 @@ export default {
         });
       } else { this.showDismissibleAlert=true }
     },
+<<<<<<< HEAD
 
+=======
+    
+  },
+  created: function() {
+    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
+    
+>>>>>>> 17a1f06 (Some report changes + minor fixes)
   },
 
   created: function() {
@@ -652,6 +660,7 @@ export default {
     }
   },
   watch: {
+<<<<<<< HEAD
       // Use of loading?
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
@@ -667,6 +676,12 @@ export default {
       })
       this.$store.commit('SET_STORE', this.variants);
       this.sendVariants();
+=======
+    // Useless?
+      variants(newVars, oldVars) {
+      console.log(`Changed from ${oldVars} to ${newVars}`);
+      this.loading = false;
+>>>>>>> 17a1f06 (Some report changes + minor fixes)
     },
   },
 };
