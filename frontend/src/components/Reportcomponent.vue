@@ -412,7 +412,9 @@ export default {
         console.log("No variant selected")
         this.warning = "No variant selected"
       } else {
+
         var variant = this.selectedVariant[0]
+        var name = variant['Variant_Name']
 
         var type = 'varianten'
         switch (variant['Type'].toUpperCase()) {
@@ -427,6 +429,7 @@ export default {
             break;
           case 'FUSION':
             type = 'fusjonen';
+            name = variant['Variant_Name'].split(' ')[0];
             break;
           case 'CNV':
             type = 'kopitallsvarianten';
@@ -441,15 +444,19 @@ export default {
             type = "kompleksvarianten"
             break;
         }
+        type = type + " ";
 
         var annoVar = "";
         if (variant['annotation_variant'] !== ": ()"){
-          annoVar = " " + variant['annotation_variant'];
+          annoVar = variant['annotation_variant'] + " ";
         }
+        
+
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
         console.log(annoVar)
+        console.log(name)
 
         this.report = this.report.concat(eval('`'+category+' \n\n`'));
       }

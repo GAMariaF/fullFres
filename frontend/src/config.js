@@ -133,7 +133,7 @@ config = {
                     {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar} i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
                     {value: "NGS3", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse)."},
                     {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_XXXXc---p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-                    {value: "NGS5", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste fusjonen xxxx/yyyy med xxxx reads/million (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
                     {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
                     {value: "NGS7", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste delesjonen av ekson X i XXXX-genet (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
                   ]

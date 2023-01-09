@@ -705,8 +705,8 @@ export default {
         name: "Samples"
         });
     },
-
   },
+
   watch: {
     state(newState, oldState) {
       console.log(`State changed from ${oldState} to ${newState}`);
@@ -715,6 +715,7 @@ export default {
       console.log(`State changed from ${oldUser} to ${newUser}`);
     },
   },
+  
   computed: {
     variants: {
      get() {return this.$store.getters.variants;},
@@ -726,8 +727,6 @@ export default {
     user() {
       return this.$store.getters.username;
     },
-
-
   },
 };
 </script>
