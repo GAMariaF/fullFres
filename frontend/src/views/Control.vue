@@ -163,7 +163,7 @@
               :options="replyOptions"
               class="py-sm-0 form-control"
               v-model="variants[selectedRowIndex].Reply"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>            
@@ -176,7 +176,7 @@
                 id="textarea"
                 size="default"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -186,7 +186,7 @@
                 id="textarea"
                 size="default"
                 v-model="variants[selectedRowIndex].Computational_evidens"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -199,7 +199,7 @@
               :options="functionalOptions"
               class="py-sm-0 form-control"
               v-model="variants[selectedRowIndex].Funksjonsstudier"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>
@@ -209,7 +209,7 @@
               :options="cancerhotspotsOptions"
               class="py-sm-0 form-control"
               v-model="variants[selectedRowIndex].Cancer_hotspots"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>            		            
@@ -223,8 +223,8 @@
               :options="predictiveOptions"
               multiple :select-size="6"              
               class="py-sm-0 form-control"
-              v-model="variants[selectedRowIndex].Prediktive_data"
-              @change="updateVariants;setChanged()" 
+              v-model="predictive_data"
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>       
@@ -234,7 +234,7 @@
                 id="textarea"
                 size="default"
                 v-model="variants[selectedRowIndex].Konservering"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -248,7 +248,7 @@
                 id="textarea"
                 size="default"
                 v-model="variants[selectedRowIndex].ClinVar"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -258,7 +258,7 @@
                 id="textarea"
                 size="default"
                 v-model="variants[selectedRowIndex].Andre_DB"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -271,7 +271,7 @@
                 :options="classOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants();setChanged()" 
               >
               </b-form-select>
           </b-col>
@@ -281,7 +281,7 @@
                 :options="tierOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].Tier"              
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
         </b-row>
@@ -295,7 +295,7 @@
                 placeholder=""
                 rows=4
                 v-model="variants[selectedRowIndex].Comment"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -417,6 +417,7 @@ export default {
                     'Oncogenicity',
                     'Tier'
                   ],
+      predictive_data: [],
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -427,9 +428,9 @@ export default {
             sortable: true
       }],
       loggedInStatus: false,
+      somethingChanged: false,
       warning: "",
       small: true,
-      sampleID: "",
       selectedSample: "",
       selectedRowIndex: 0,
       sampleUserSignoff: "",
@@ -448,7 +449,8 @@ export default {
       fields: [
         {key: "runid", label: "Run id"}, 
         {key: "sampleid", label: "Sample id"},
-        {key: "Date_Signoff", label: "Date Sign off"}        
+        {key: "Date_Signoff", label: "Date Sign off"},
+        {key: "User_Signoff", label: "User"}    
         ],
       variantFields: [
         {key: "Nr"},        
@@ -576,6 +578,11 @@ export default {
       console.log("openInfoModal")
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
+      // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
+      if ((typeof(this.variants[this.selectedRowIndex].Prediktive_data) !== 'undefined') && (this.variants[this.selectedRowIndex].Prediktive_data !== null)) {
+        this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
+        console.log(this.predictive_data)
+      }
       this.infoModal.title = `Variant: ${index + 1}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
     },
@@ -583,6 +590,9 @@ export default {
       this.infoModal.title = "";
       this.infoModal.content = "";
       console.log("infomodal lukket")
+      this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
+      this.predictive_data = [];
+      console.log("infomodal lukket");
     },
     getsamples() {
       // Funksjon for å få samples fra backenc
@@ -599,28 +609,32 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
+        // Viss noko har blitt endra, er det ikkje lenger mulig å godkjenne.
+        this.somethingChanged = true
         console.log("Something has changed - sending updated data to db")
       // Metode for  sende inn dato, og tolkede varianter til backend.
-      const baseURI = config.$backend_url + "/api/updatevariants";
-      this.$http
-        .post(
-          baseURI,
-          {
-            sampleid: this.$route.params.id,
-            variants: this.variants,
-            user: this.$store.getters.username,
-          },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+      // OBS: fjerner også signoff, altså prøven blir sendt tilbake til samples.
+        const baseURI = config.$backend_url + "/api/updatevariants";
+        this.$http
+          .post(
+            baseURI,
+            {
+              sampleid: this.$route.params.id,
+              variants: this.variants,
+              user: this.$store.getters.username,
+            },
+            {
+              withCredentials: true,
+              headers: { "Content-Type": "application/json" },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => {
+            console.log(data);
+          });
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
+      console.log(this.variants)
     },
 
 
@@ -630,11 +644,12 @@ export default {
       console.log("Sign off method");
       
       // Metode for  sende inn dato, og tolkede varianter til backend.
-
-      console.log(this.sampleUserSignoff)
-      console.log(this.$store.getters.username)
-
-      if(this.sampleUserSignoff === this.$store.getters.username) {
+      
+      // Må sjekke om noko har blitt endra.
+      console.log(this.somethingChanged)
+      if(this.somethingChanged) {
+        this.warning = "You are not allowed to approve after making changes."
+      } else if(this.sampleUserSignoff === this.$store.getters.username) {
         this.warning = "You are not allowed to both sign off on and approve a sample."
       } else {
 
@@ -658,14 +673,12 @@ export default {
           this.$router.push({
           name: "Samples"
         });}
-
-
     },
 
     unApprove() {
       // If the sample is not ready and needs to be sent back to the interpretation-list this button is used.
       // The button does the opposite of the sign-off
-       // This if only for signing off the user when interpretation is done. 
+      // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
       // Metode for  sende inn dato, og tolkede varianter til backend.
@@ -692,8 +705,8 @@ export default {
         name: "Samples"
         });
     },
-
   },
+
   watch: {
     state(newState, oldState) {
       console.log(`State changed from ${oldState} to ${newState}`);
@@ -702,6 +715,7 @@ export default {
       console.log(`State changed from ${oldUser} to ${newUser}`);
     },
   },
+  
   computed: {
     variants: {
      get() {return this.$store.getters.variants;},
@@ -713,8 +727,6 @@ export default {
     user() {
       return this.$store.getters.username;
     },
-
-
   },
 };
 </script>

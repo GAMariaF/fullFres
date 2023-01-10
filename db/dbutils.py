@@ -586,7 +586,7 @@ def insert_variants(db, variant_dict):
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
 				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
-				AND evidence_types='"+					dfVarClassification['evidence_types'][0]						+"' \
+				AND evidence_types='"+				dfVarClassification['evidence_types'][0]				+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
@@ -595,7 +595,7 @@ def insert_variants(db, variant_dict):
 		# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date
 		print('new classifiction')
 		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-		dfVarClassification['DATE_CHANGED_VARIANT_BROWSER'][0] = \
+		dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 		dateChangedVariantBrowser
 		# Since Classification not in table it has to be added
 		engine = create_engine("sqlite:///"+db, echo=False, future=True)
@@ -605,7 +605,7 @@ def insert_variants(db, variant_dict):
 			conn.commit()
 	else:
 		print('not new in classification')
-		# If already in DB chose most recent entry DATE_CHANGED_VARIANT_BROWSER
+		# If already in DB choose most recent entry DATE_CHANGED_VARIANT_BROWSER
 		dateChangedVariantBrowser = \
 			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
 	print(dateChangedVariantBrowser)

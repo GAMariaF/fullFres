@@ -1,7 +1,7 @@
 let config;
 
 config = {
-    $backend_url: 'http://172.16.0.3:5001',
+    $backend_url: 'http://172.16.0.3:5000',
     $signout_url: function() {
         return this.$backend_url + '/newlogout';
     },
@@ -63,7 +63,7 @@ config = {
         {tag: "OS1",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Same amino acid change as a previously established oncogenic variant (using this standard) regardless of nucleotide change. Example: Val→Leu caused by either G>C or G>T in the same codon.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OS2",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Well-established in vitro or in vivo functional studies, supportive of an oncogenic effect of the variant.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OS3",  class: 'btn mr-1 btn-danger btn-sm', 	title: 'Located in one of the hotspots in cancerhotspots. org with at least 50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org in at least 10 samples.', default: "Strong", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
-        {tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', 	title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
+        {tag: "OM1",  class: 'btn mr-1 btn-warning btn-sm', title: 'Located in a critical and well-established part of a functional domain (eg, active site of an enzyme).', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM2",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Protein length changes as a result of in-frame deletions/insertions in a known oncogene or tumor suppressor gene or stop-loss variants in a known tumor suppressor gene.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM3",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Missense variant at an amino acid residue where a different missense variant determined to be oncogenic (using this standard) has been documented. Amino acid difference from reference amino acid should be greater or at least approximately the same as for missense change determined to be oncogenic.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
         {tag: "OM4",  class: 'btn mr-1 btn-warning btn-sm',	title: 'Located in one of the hotspots in cancerhotspots. org with <50 samples with a somatic variant at the same amino acid position, and the same amino acid change count in cancerhotspots.org is at least 10.', default: "Moderate", categories: ["Very Strong", "Strong", "Moderate", "Supporting"] },
@@ -129,13 +129,13 @@ config = {
                   ],
                   reportcodes: [
                     {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
-                    {value: "NGS8", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten/fusjonen/kopitallsvarianten (…) i XXXX-genet (xxbiopsi med xx % tumor) er av usikker klinisk betydning."},
-                    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar} i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS3", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_xxxxx c…… p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for behandling av annen krefttype (referanse)."},
-                    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten (NM_XXXXc---p.(….)) i XXXX-genet med allelfraksjon XX %  (xxbiopsi med xx % tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-                    {value: "NGS5", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste fusjonen xxxx/yyyy med xxxx reads/million (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
+                    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
+                    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
+                    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
+                    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
                     {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS7", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste delesjonen av ekson X i XXXX-genet (xxbiopsi med xx % tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
+                    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
                   ]
 };
 

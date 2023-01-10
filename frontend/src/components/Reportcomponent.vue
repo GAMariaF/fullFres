@@ -87,17 +87,17 @@
             </template>
           </b-table>
           <br />
-            <h2 v-if="this.warning !== ''">No variant selected!</h2>
+            <h3 v-if="this.warning !== ''">No variant selected!</h3>
           <br />
           <!-- 
-          <b-form-select v-model="selectedCategory" @change="generateRep" size="sm" class="mt-3">
+          <b-form-select v-model="selectedCategory" @change="generateVarRep" size="sm" class="mt-3">
             <option v-for="cat in categories" v-bind:value="cat.text" :key="cat.value">{{ cat.value }}
             </option>
           </b-form-select>
           -->
           <!-- Use buttons instead of dropdown menu -->
           <span v-for="cat in categories" :key="cat.value">
-            <b-button v-on:click="generateRep(cat.text)" type="button" :class="cat.class">{{cat.value}}</b-button><span>&nbsp;</span>
+            <b-button v-on:click="generateVarRep(cat.text)" type="button" :class="cat.class">{{cat.value}}</b-button><span>&nbsp;</span>
           </span>
           <br />
           <br />
@@ -105,7 +105,10 @@
             {{ report }} 
           </h5>
           <body>
-            <b-button size="sm" @click="generateGenRep" class="mr-1">Reset Report</b-button>
+            <span>
+            <b-button size="sm" @click="revertLast()" class="mr-1" type="button">Revert</b-button>&nbsp;
+            <b-button size="sm" @click="generateGenRep()" class="mr-1" type="button">Reset Report</b-button>&nbsp;
+          </span>
           </body>
           <br />
           <br>
@@ -276,6 +279,7 @@ export default {
       // Also ensures the component is rerendered when the data arrives. 
       variants: ["Genelist"],
       generalReport: "",
+      reportArray: [],
       report: "",
       warning: "",
       fields: [
@@ -402,17 +406,20 @@ export default {
         console.log("No row selected")
         this.report = "No row selected";
       } else {
-        this.report = `${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`;
+        this.reportArray = [`${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`];
+        this.generateReport();
       }
     },
 
-    generateRep(category) {
+    generateVarRep(category) {
 
       if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
         this.warning = "No variant selected"
       } else {
+
         var variant = this.selectedVariant[0]
+        var name = variant['Variant_Name']
 
         var type = 'varianten'
         switch (variant['Type'].toUpperCase()) {
@@ -427,6 +434,7 @@ export default {
             break;
           case 'FUSION':
             type = 'fusjonen';
+            name = variant['Variant_Name'].split(' ')[0];
             break;
           case 'CNV':
             type = 'kopitallsvarianten';
@@ -441,18 +449,33 @@ export default {
             type = "kompleksvarianten"
             break;
         }
+        type = type + " ";
 
         var annoVar = "";
         if (variant['annotation_variant'] !== ": ()"){
-          annoVar = " " + variant['annotation_variant'];
+          annoVar = variant['annotation_variant'] + " ";
         }
+        
+
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
         console.log(annoVar)
+        console.log(name)
 
-        this.report = this.report.concat(eval('`'+category+' \n\n`'));
+        this.reportArray.push(eval('`'+category+' \n\n`'));
+        //this.report = this.report.concat(eval('`'+category+' \n\n`'));
+        this.generateReport();
       }
+    },
+
+    revertLast() {
+      this.reportArray.splice(-1, 1);
+      this.generateReport();
+    },
+
+    generateReport() {
+      this.report = this.reportArray.join('')
     },
 
     async copyToClipboard(text) { 
@@ -471,7 +494,6 @@ export default {
       this.items = data.data
       this.getRuns()
     });
-
   },
 
   computed: {

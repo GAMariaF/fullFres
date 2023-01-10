@@ -62,7 +62,7 @@
               :options="replyOptions"
               class="py-sm-0 form-control"
               v-model="variants[selectedRowIndex].Reply"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>            
@@ -83,7 +83,7 @@
                 :plaintext="datastate ? true : null"
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
                 
 
               ></b-form-textarea>
@@ -96,7 +96,7 @@
                 :plaintext="datastate ? true : null"
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].Computational_evidens"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -109,7 +109,7 @@
                 :options="functionalOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].Funksjonsstudier"
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants();setChanged()" 
               >
               </b-form-select>
           </b-col>
@@ -119,7 +119,7 @@
               :options="cancerhotspotsOptions"
               class="py-sm-0 form-control"
               v-model="variants[selectedRowIndex].Cancer_hotspots"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>            		            
@@ -135,7 +135,7 @@
               class="py-sm-0 form-control"
              
               v-model="predictive_data"
-              @change="updateVariants;setChanged()" 
+              @change="updateVariants();setChanged()" 
             >
             </b-form-select>
           </b-col>       
@@ -147,7 +147,7 @@
                 :plaintext="datastate ? true : null"
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].Konservering"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -163,7 +163,7 @@
                 :plaintext="datastate ? true : null"
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].ClinVar"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -175,7 +175,7 @@
                 :plaintext="datastate ? true : null"
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].Andre_DB"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -188,7 +188,7 @@
                 :options="classOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].class"
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants();setChanged()" 
               >
               </b-form-select>
           </b-col>
@@ -198,7 +198,7 @@
                 :options="tierOptions"
                 class="py-sm-0 form-control"
                 v-model="variants[selectedRowIndex].Tier"              
-                @change="updateVariants;setChanged()" 
+                @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
         </b-row>
@@ -214,7 +214,7 @@
                 placeholder=""
                 rows=4
                 v-model="variants[selectedRowIndex].Comment"
-                @change="updateVariants;setChanged()"
+                @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
@@ -230,7 +230,7 @@
           <b-col cols="12">
           <h5>Available evidence types </h5>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item);updateVariants;setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+            <b-button v-on:click="oncogenicitySelected(item);updateVariants();setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
           </span>
             <br>
             <br>
@@ -288,13 +288,7 @@
       </div>
     <!--  -->
     <br>
-    <br>
-    Class: {{variants[0].class}}
-
-
-
   </b-container>
-  
 </template>
 <script>
 
@@ -618,8 +612,6 @@ export default {
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
     
-
-    
   },
   computed: {
     currentRouteName() {
@@ -627,16 +619,14 @@ export default {
     },
     variants: {
       get() {return this.$store.getters.variants;},
-      set(value) {this.$store.commit("SET_STORE", value)}
-
-      
+      set(value) {this.$store.commit("SET_STORE", value)} 
     }
   },
   watch: {
+    // Useless?
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
       this.loading = false;
-      
     },
   },
 };
