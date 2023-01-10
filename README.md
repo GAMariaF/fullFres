@@ -60,6 +60,7 @@ nvm install v16.14.2
 
 # Pakker som er installert etterpå (i frontend-folder):
 npm install bootstrap bootstrap-vue vue-router@3.4.9 axios vue-axios --save
+npm install --save vue-perfect-scrollbar
 
 # Starts the development server.
 npm run serve
