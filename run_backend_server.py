@@ -1,7 +1,4 @@
 import sys, os
-import configparser
-config = configparser.ConfigParser()
-config.read('/db/config_ip.ini')
 
 SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
 
@@ -27,6 +24,6 @@ from backend import app
 
 if __name__ == '__main__':
     print( "in_virtualenv()")
-    app.run(config['IP']['ip'], port=5000, threaded=True, debug=True)
+    app.run('0.0.0.0', port=5000, threaded=True, debug=True)
     
    
