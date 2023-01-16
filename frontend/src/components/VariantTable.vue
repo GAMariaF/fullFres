@@ -549,7 +549,8 @@ export default {
       if ((typeof(this.variants[this.selectedRowIndex].Prediktive_data) !== 'undefined') && (this.variants[this.selectedRowIndex].Prediktive_data !== null)) {
         this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
       }
-      this.infoModal.title = `Variant: ${index +1}`;
+      //this.infoModal.title = `Variant: ${index +1}`;
+      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.datastate = true;
     },

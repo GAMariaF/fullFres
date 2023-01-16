@@ -368,7 +368,8 @@ export default {
       console.log("openReportModal")
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
-      this.reportModal.title = `Variant: ${index + 1}`;
+      //this.reportModal.title = `Variant: ${index + 1}`;
+      this.reportModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
 
