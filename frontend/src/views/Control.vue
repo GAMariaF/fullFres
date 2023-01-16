@@ -54,6 +54,10 @@
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
+            </template>
             <template #cell(Info)="row">
               <b-button
                 size="sm"
@@ -88,6 +92,10 @@
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
+            </template>
             <template #cell(Info)="row">
               <b-button
                 size="sm"
@@ -121,6 +129,9 @@
             <!-- Formatting Type column -->
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
             </template>
             <template #cell(Info)="row">
               <b-button
@@ -462,6 +473,7 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
+        {key: "Specific", label: "Type Specific"},
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
@@ -574,6 +586,30 @@ export default {
         this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
+
+    typeSpecificValue(data) {
+      switch(data.item['Type'].toUpperCase()) {
+        case 'SNP':
+            return("AF: "+data.item['AF']);
+          case 'DEL':
+            return("AF: "+data.item['AF']);
+          case 'MNP':
+            return("AF: "+data.item['AF']);
+          case 'FUSION':
+            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'CNV':
+            return("CN: "+data.item['Copy_Number']);
+          case 'INS':
+            return("AF: "+data.item['AF']);
+          case 'RNAEXONVARIANT':
+            return("AF: "+data.item['AF']);
+          case 'COMPLEX':
+            return("AF: "+data.item['AF'])
+          default:
+            return("");
+      }
+    },
+
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       index = this.variants.indexOf(item);
