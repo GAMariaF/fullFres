@@ -2,7 +2,7 @@
     <div>
       <br />
       <b> Logged in as: {{username}} </b>
-    </div>  
+    </div>   
 </template>
 
 
@@ -10,7 +10,6 @@
 
 //import axios from 'axios';
 import { config } from '../config.js'
-
 
 export default {
   name: "profile",
