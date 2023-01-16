@@ -297,6 +297,7 @@
 <script>
 
 import { config } from '../config.js'
+//import util_funcs from "@/appUtils";
 export default {
   props: ['locked'],
   name: "varianttable",
@@ -568,39 +569,33 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
-
-
-   
-
         console.log("Something has changed - sending updated data to db")
-      // Metode for  sende inn dato, og tolkede varianter til backend.
-      const baseURI = config.$backend_url + "/api/updatevariants";
-      this.$http
-        .post(
-          baseURI,
-          {
-            sampleid: this.$route.params.id,
-            variants: this.variants,
-            user: this.$store.getters.username,
-          },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        // Metode for  sende inn dato, og tolkede varianter til backend.
+        const baseURI = config.$backend_url + "/api/updatevariants";
+        this.$http
+          .post(
+            baseURI,
+            {
+              sampleid: this.$route.params.id,
+              variants: this.variants,
+              user: this.$store.getters.username,
+            },
+            {
+              withCredentials: true,
+              headers: { "Content-Type": "application/json" },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => {
+            console.log(data);
+          });
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
     },
 
-
     signOff() {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
-      
       
       // Først - sjekk om alle rader har yes/no på reply
       var all_reply = true
@@ -612,7 +607,7 @@ export default {
       })
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/signoff";
-      if(all_reply == true) {
+      if(all_reply) {
       this.$http
         .post(
           baseURI,
@@ -633,14 +628,16 @@ export default {
         this.$router.push({
         name: "Samples"
         });
-      } else { this.showDismissibleAlert=true}
+      } else { this.showDismissibleAlert=true }
     },
-    
+
   },
+
   created: function() {
+
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    
   },
+
   computed: {
     currentRouteName() {
         return this.$route.name;
@@ -651,10 +648,21 @@ export default {
     }
   },
   watch: {
-    // Useless?
+      // Use of loading?
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
       this.loading = false;
+      // When a new set of variants are selected they are checked for whether they are benigne or technical,
+      // then automatically assiged 'No' as reply.
+      this.variants.forEach(item => {
+            if ((item.class === "Technical" || item.class === "1 - Benign") && item.Reply === "") {
+                item.Reply = "No";
+                item.visibility = true;
+                item.changed = true;
+            }
+      })
+      this.$store.commit('SET_STORE', this.variants);
+      this.sendVariants();
     },
   },
 };
