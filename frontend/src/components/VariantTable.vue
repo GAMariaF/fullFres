@@ -660,7 +660,6 @@ export default {
     }
   },
   watch: {
-<<<<<<< HEAD
       // Use of loading?
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
@@ -676,12 +675,6 @@ export default {
       })
       this.$store.commit('SET_STORE', this.variants);
       this.sendVariants();
-=======
-    // Useless?
-      variants(newVars, oldVars) {
-      console.log(`Changed from ${oldVars} to ${newVars}`);
-      this.loading = false;
->>>>>>> 17a1f06 (Some report changes + minor fixes)
     },
   },
 };
