@@ -284,7 +284,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					dfdbClassification = \
 						pd.read_sql_query(text(stmtClassification), con = conn)
 					if not dfdbClassification.empty:
-						dfvcf_copy.DATE_CHANGED_VARIANT_BROWSER.loc[row] = \
+						dfvcf_copy.loc[row, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 							dfdbClassification.DATE_CHANGED_VARIANT_BROWSER.max()	
 					# if sample, run and variant already in VariantsPerSample database don't add
 					stmtvcf = "select * from VariantsPerSample \
