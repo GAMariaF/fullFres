@@ -23,13 +23,14 @@ folder = config['Paths']['db_test_path']
 
 def importVcfXls(folder):
     dir_list = os.listdir(folder)
-    if len(dir_list) != 2:
+    if len(dir_list)%2 != 0:
         raise FileNotFoundError
+    num_zip = 0
     for file in dir_list:
         if file.endswith('.zip'):
-
+            num_zip += 1
             #excelfile = folder + '/' + re.split("_GX", file)[0].lower()+'_variants.xlsx'
-            # Get excel file immediately to uncover error
+            # Get excel file immediately to uncover potential error
             for fileexcel in dir_list:
                 if fileexcel.startswith(re.split("_GX", file)[0].lower()):
                     excelfile = folder + '/' + fileexcel   
@@ -64,9 +65,13 @@ def importVcfXls(folder):
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
             populate_thermo_variantdb(db, df, dfvariant, \
                 run_id, sample_id, percent_tumor, sample_diseasetype) 
-            break
-    else:
-        raise ValueError 
+
+        elif not file.endswith('.xlsx'):
+            # Should only be zip and excel files in the folder.
+            raise ValueError
+            
+    if num_zip == 0:
+        raise ValueError
 
     rm_dir_list = os.listdir(folder)
     for rm_file in rm_dir_list:

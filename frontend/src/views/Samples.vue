@@ -111,8 +111,7 @@ export default {
         .then((data) => {
           (this.items = data.data)
           this.importFolder = data.message.replace("Success fetching samples. Import folder is: ", "");
-          });
-        
+          });   
     },
     loadData() {
       // This is to import new data downloaded from Genexus GUI. 
@@ -127,12 +126,12 @@ export default {
         } else if (response.status === 204) {
             this.showDismissibleAlert = true;
             this.alertMessage = "Missing or too many file(s).";
-        }  else if (response.status === 205) {
+        } else if (response.status === 205) {
             this.showDismissibleAlert = true;
             this.alertMessage = "File(s) of wrong type.";
         } else if (response.status === 500) {
             this.showDismissibleAlert = true;
-            this.alertMessage = "Someting went wrong, check that the files are correct. If the error presists, contact support.";
+            this.alertMessage = "Someting went wrong, check that the files are correct. If the error persists, contact support.";
         } 
       })
     },
