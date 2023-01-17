@@ -480,7 +480,7 @@ export default {
     },
 
     async copyToClipboard(text) { 
-      // Needs https to work
+      // Needs https to work, not currently active.
       try {
         await navigator.clipboard.writeText(text);
         console.log('Text copied to clipboard');

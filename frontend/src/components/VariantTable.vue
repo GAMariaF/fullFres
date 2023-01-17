@@ -602,7 +602,7 @@ export default {
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated") {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
       })
