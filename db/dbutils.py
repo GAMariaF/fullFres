@@ -284,7 +284,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					dfdbClassification = \
 						pd.read_sql_query(text(stmtClassification), con = conn)
 					if not dfdbClassification.empty:
-						dfvcf_copy.DATE_CHANGED_VARIANT_BROWSER.loc[row] = \
+						dfvcf_copy.loc[row, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 							dfdbClassification.DATE_CHANGED_VARIANT_BROWSER.max()	
 					# if sample, run and variant already in VariantsPerSample database don't add
 					stmtvcf = "select * from VariantsPerSample \
@@ -427,6 +427,17 @@ def list_all_variants(db):
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
+	"""
+	To print (some) duplicates to check the data.
+	temp = samplelist[['CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER)', 'DATE_CHANGED_VARIANT_BROWSER', 'ID', 'Type', ]].reset_index()
+	for i in range(temp.shape[0]-100, temp.shape[0]):
+		print(i)
+		temp2 = temp.loc[i, :]
+		temp2.sort_index(inplace=True)
+		for c in temp2.items():
+			print(c)
+		print("----------new var-------------")
+		"""
 	return samplelist_json
 
 '''

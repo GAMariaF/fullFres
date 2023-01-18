@@ -58,6 +58,8 @@
               </div>
           </template>
           <br>
+          <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false;alertMessage=''" variant="danger">{{ alertMessage }}</b-alert>
+          <br>
           <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
           
         </b-col>
@@ -77,6 +79,8 @@ export default {
   data() {
     return {
       importFolder: 'test',
+      showDismissibleAlert: false,
+      alertMessage: "",
       loggedInStatus: false,
       small: true,
       sampleID: "",
@@ -107,8 +111,7 @@ export default {
         .then((data) => {
           (this.items = data.data)
           this.importFolder = data.message.replace("Success fetching samples. Import folder is: ", "");
-          });
-        
+          });   
     },
     loadData() {
       // This is to import new data downloaded from Genexus GUI. 
@@ -116,7 +119,21 @@ export default {
       const baseURI = config.$backend_url + "/api/import";
       axios
         .get(baseURI, { params: [this.importFolder] })
-        .then(window.location.reload(true) );
+        .then((response) => {
+
+          if (response.status === 200){
+            window.location.reload(true);
+        } else if (response.status === 204) {
+            this.showDismissibleAlert = true;
+            this.alertMessage = "Missing or too many file(s).";
+        } else if (response.status === 205) {
+            this.showDismissibleAlert = true;
+            this.alertMessage = "File(s) of wrong type.";
+        } else if (response.status === 500) {
+            this.showDismissibleAlert = true;
+            this.alertMessage = "Someting went wrong, check that the files are correct. If the error persists, contact support.";
+        } 
+      })
     },
   },
   created: function () {

@@ -23,8 +23,21 @@ folder = config['Paths']['db_test_path']
 
 def importVcfXls(folder):
     dir_list = os.listdir(folder)
+    if len(dir_list)%2 != 0:
+        raise FileNotFoundError
+    num_zip = 0
     for file in dir_list:
         if file.endswith('.zip'):
+            num_zip += 1
+            #excelfile = folder + '/' + re.split("_GX", file)[0].lower()+'_variants.xlsx'
+            # Get excel file immediately to uncover potential error
+            for fileexcel in dir_list:
+                if fileexcel.startswith(re.split("_GX", file)[0].lower()):
+                    excelfile = folder + '/' + fileexcel   
+                    break
+            else:
+                raise ValueError 
+
             # unzip vcf-file
             with zipfile.ZipFile(folder +'/'+ file, 'r') as zip_ref:
                 zip_ref.extractall(folder +'/'+ file[:-4] + 'TEMP')
@@ -36,10 +49,6 @@ def importVcfXls(folder):
             os.remove(folder +'/'+ file)
             shutil.rmtree(folder +'/'+ file[:-4] + 'TEMP/')
             vcffile = folder + '/' + file[:-4] + '.vcf'
-            #excelfile = folder + '/' + re.split("_GX", file)[0].lower()+'_variants.xlsx'
-            for fileexcel in dir_list:
-                if fileexcel.startswith(re.split("_GX", file)[0].lower()):
-                    excelfile = folder + '/' + fileexcel            
             # set up path to DB and get run_id, sample_id etc from vcffile
             db = config['Paths']['db_full_path']
             run_id = get_run_id(vcffile)
@@ -55,7 +64,14 @@ def importVcfXls(folder):
             dfvariant = explode_func(dfvariant)
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
             populate_thermo_variantdb(db, df, dfvariant, \
-                run_id, sample_id, percent_tumor, sample_diseasetype)    
+                run_id, sample_id, percent_tumor, sample_diseasetype) 
+
+        elif not file.endswith('.xlsx'):
+            # Should only be zip and excel files in the folder.
+            raise ValueError
+            
+    if num_zip == 0:
+        raise ValueError
 
     rm_dir_list = os.listdir(folder)
     for rm_file in rm_dir_list:

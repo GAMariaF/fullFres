@@ -223,7 +223,8 @@ export default {
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
-      this.infoModal.title = `Variant: ${item.transcript}`;
+      //this.infoModal.title = `Variant: ${item.transcript}`;
+      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       //this.variants = util_funcs.sort_table(this.variants);
       //this.$store.commit("SET_STORE",this.variants)

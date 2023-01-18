@@ -134,8 +134,13 @@ def api(current_user, query):
             print("Running sample import function")
             args = request.args
             importfolder = args["0"]
-            importVcfXls(importfolder)
-            response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)
+            try:
+                importVcfXls(importfolder)
+                response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)            
+            except FileNotFoundError:
+                response = make_response(jsonify(isError=False, message="Missing file(s).", statusCode=204), 204)
+            except ValueError:
+                response = make_response(jsonify(isError=False, message="Wrong Type.", statusCode=205), 205)
             return response
         if query == "samples":
             samples = list_samples(db_path)
@@ -178,7 +183,7 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
-            response = make_response(jsonify(isError=False, message="None", statusCode=201, data={0: 0}), 201)
+            response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)
             return response
     elif request.method == 'POST':
         if query == "updatevariants":
