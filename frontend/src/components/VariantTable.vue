@@ -332,7 +332,7 @@ export default {
                     'Locus',
                     'protein',
                     'REF',
-                    'ALTEND',
+                    //'ALTEND',
                     'Call',
                     'DP',
                     'FDP',
@@ -388,7 +388,7 @@ export default {
         {key: "exon"},
         {key: "Locus"},
         {key: "REF", label: "Ref"},
-        {key: "ALTEND", label: "Alt / End"},
+        //{key: "ALTEND", label: "Alt / End"},
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
@@ -520,7 +520,7 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return(data.item['Variant_ID'][0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
@@ -595,6 +595,7 @@ export default {
           });
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
+      console.log(this.variants[0])
     },
 
     signOff() {
@@ -656,7 +657,8 @@ export default {
     },
     variants: {
       get() {return this.$store.getters.variants;},
-      set(value) {this.$store.commit("SET_STORE", value)} 
+      set(value) {this.$store.commit("SET_STORE", value)},
+      
     }
   },
   watch: {
