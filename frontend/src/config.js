@@ -127,17 +127,31 @@ config = {
                     'evidence_types',
                     'Oncogenicity',
                     'Tier'
-                  ],
-                  reportcodes: [
-                    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
-                    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
-                    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
-                    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-                    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
-                  ]
+    ],
+
+    reportcodes: [
+    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
+    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
+    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
+    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
+    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
+    ],
+
+    geneListOptions: [
+    {value: "Non-Small Cell Lung Cancer", text: "Non-Small Cell Lung Cancer"},
+    {value: "Colorectal Cancer", text: "Colorectal Cancer"},
+    {value: "Melanoma", text: "Melanoma"},
+    {value: "Prostate Cancer", text: "Prostate Cancer"},
+    {value: "Breast Cancer", text: "Breast Cancer"},
+    {value: "Cholangiocarcinoma", text: "Cholanigiocarcinoma"},
+    {value: "Kidney Cancer", text: "Kidney Cancer"},
+    {value: "Bladder Utothelial Carcinoma", text: "Bladder Utothelial Carcinoma"},
+    {value: "Pancreatic Cancer", text: "Pancreatic Cancer"},
+    {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"}
+    ]               
 };
 
 export { config };

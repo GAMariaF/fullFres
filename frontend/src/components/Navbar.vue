@@ -7,6 +7,7 @@
         <b-nav-item to="/samples" v-show="state">Samples</b-nav-item>
         <b-nav-item to="/control" v-show="state">Control</b-nav-item>        
         <b-nav-item to="/allvariants" v-show="state">All Variants</b-nav-item>
+        <b-nav-item to="/allstats" v-show="state">All Stats</b-nav-item>
         <b-nav-item to="/allsamples" v-show="state">All Samples</b-nav-item>  
         <b-nav-item to="/statistics" v-show="state">Statistics</b-nav-item>
         <b-nav-item to="/report" v-show="state">Report</b-nav-item>

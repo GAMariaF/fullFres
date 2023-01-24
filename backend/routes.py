@@ -37,6 +37,7 @@ from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
 from dbutils import statistics
 from dbutils import data_report
+from dbutils import list_search
 
 from importutils import importVcfXls
 
@@ -182,6 +183,17 @@ def api(current_user, query):
             print(samples)
             print("--")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
+            return response
+        elif query[:11] == 'stat_search':
+            import ast
+            q = ast.literal_eval(query[11:])
+            for i in range(len(q)):
+                if len(q[i]) == 1 and q[i][0] == "":
+                    q[i] = []
+           
+            #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
+            res = list_search(db_path, q[0], q[1], q[2], q[3])
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
         else:
             response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)

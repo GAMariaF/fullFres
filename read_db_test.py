@@ -19,9 +19,9 @@ sys.path.insert(0, config['Paths']['db_path'])
 
 db_path = config['Paths']['db_full_path']
 
-def list_approved_samples(db, sampleid):
+def list_approved_samples(db, runid: list, sampleid: list, diag: list, variants: list):
 
-    
+
 	#list "tolkningsskjema"
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
     stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
@@ -74,4 +74,4 @@ def list_approved_samples(db, sampleid):
             
 
 if __name__ == '__main__':
-    list_approved_samples(db_path, '22SHK10172')
+	list_approved_samples(db_path, runid=[], sampleid=[], diag=['Colorectal Cancer', 'Prostate Cancer'], variants=[])
