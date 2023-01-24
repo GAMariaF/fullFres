@@ -16,6 +16,7 @@ dfTolkning.Perc_Tumor *= 100
 
 colSamples              = ["runid", "sampleid", \
                                 "Genelist", "Perc_Tumor", \
+                                "Seq_Date", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
 colVariantsPerSample    = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\

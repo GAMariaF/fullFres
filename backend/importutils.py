@@ -16,6 +16,7 @@ from vcfutils import get_sample_id
 from vcfutils import get_run_id
 from vcfutils import get_percent_tumor
 from vcfutils import get_sample_diseasetype
+from vcfutils import get_sequencing_date
 from dbutils import populate_thermo_variantdb
 
 # list files and directories in import directory
@@ -56,15 +57,18 @@ def importVcfXls(folder):
             print(sample_id)
             percent_tumor = get_percent_tumor(vcffile)
             sample_diseasetype = get_sample_diseasetype(vcffile)
+            sequencing_date = get_sequencing_date(vcffile)
             # TRANSFER VCF TO DATAFRAME
             df = parse_thermo_vcf(vcffile,excelfile)
             df = explode_format_gt(df)
             df = explode_info(df)
             dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
             dfvariant = explode_func(dfvariant)
+            # Adding column for assigning possible correction of annotation
+            dfvariant['annotation_variant2']=dfvariant['annotation_variant']
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
             populate_thermo_variantdb(db, df, dfvariant, \
-                run_id, sample_id, percent_tumor, sample_diseasetype) 
+                run_id, sample_id, percent_tumor, sample_diseasetype, sequencing_date)
 
         elif not file.endswith('.xlsx'):
             # Should only be zip and excel files in the folder.

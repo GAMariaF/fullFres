@@ -548,6 +548,9 @@ export default {
         break;
       }
     })
+    if (this.oncoScore == 0){
+      this.oncoScore = "";
+    }
     this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
     },
     setChanged() {

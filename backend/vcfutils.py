@@ -10,15 +10,23 @@ def parse_thermo_vcf(vcf,excel):
     df_excel = pd.read_excel(excel)
     df1 = pd.DataFrame()
     df2 = pd.DataFrame()
-    # With fusion
+    df3 = pd.DataFrame()
+    # With fusion 
     df_excel_w = df_excel.loc[df_excel['Type'] == 'Fusion']
     if not df_excel_w.empty:
         #df_excel_w.loc[:,'ID'] = df_excel_w.loc[:,'Variant ID'] + "_1"
         df_excel_w = df_excel_w.assign(ID = df_excel_w.loc[:,'Variant ID'] + "_1")
         df1 = pd.merge(df_excel_w,df_vcf,on='ID',how='left')
         df1.loc[:,'ID']=df1.loc[:,'Variant ID']
-    # Without fusion 
+    # With RNAExonVariant
+    df_excel_wRNA = df_excel.loc[df_excel['Type'] == 'RNAExonVariant']
+    if not df_excel_wRNA.empty:
+        df_excel_wRNA = df_excel_wRNA.assign(ID = df_excel_wRNA.loc[:,'Variant ID'])
+        df3 = pd.merge(df_excel_wRNA,df_vcf,on='ID',how='left')
+        df3.loc[:,'ID']=df3.loc[:,'Variant ID']
+    # Without fusion and without RNAExonVariant
     df_excel_wo = df_excel.loc[df_excel['Type'] != 'Fusion']
+    df_excel_wo = df_excel_wo.loc[df_excel_wo['Type'] != 'RNAExonVariant']
     if not df_excel_wo.empty:
         df_excel_wo = df_excel_wo.reset_index(drop='True')
         df_vcf["Locus_vcf"] = df_vcf.CHROM.astype(str)+":" \
@@ -26,9 +34,9 @@ def parse_thermo_vcf(vcf,excel):
         #df_vcf.Locus = df_vcf.Locus.astype(str)
         #df_excel_wo.Locus.astype(str)
         df2 = pd.merge(df_excel_wo,df_vcf,\
-                    left_on=['Locus'],right_on=['Locus_vcf'],how='left')
+                    left_on=['Locus','Variant ID'],right_on=['Locus_vcf','ID'],how='left')
         df2 = df2.drop(columns=['Locus_vcf'])
-    df = pd.concat([df1,df2])
+    df = pd.concat([df1,df2,df3])
     df = df.reset_index(drop='True')
     df = df.rename(columns={'ALT':'ALTEND'})
     # Removing columns TYPE and SVTYPE (already specifiec in column Type)
@@ -37,7 +45,7 @@ def parse_thermo_vcf(vcf,excel):
                         'Effective Read Depth', 'Alt Allele Read Counts',\
                         'Allele Ratio', 'Nuc Change', 'Allele Frequency', \
                         'Allele Frequency (%)', 'Filtered Read Coverage', \
-                        'Allele read Count'], errors='ignore')
+                        'Allele read Count', 'NOCALL_REASON'], errors='ignore')
     return df
    
 def filter_nocalls(df):
@@ -54,6 +62,7 @@ def explode_format_gt(df):
     '''
     df.reset_index(inplace=True,drop=True)
     df.rename(columns = {'GT':'GTFORMAT'}, inplace = True)
+    df.to_csv('test.csv')
     ny = pd.DataFrame(list(dict(zip(a,b)) for a,b in zip(df['FORMAT'].str.split(":"), df['GTFORMAT'].str.split(":"))))
     for i in ["AF","AO","DP","FAO","FDP","FRO","FSAF","FSAR","FSRF","FSRR","RO","SAF","SAR","SRF","SRR"]: #1
         try:
@@ -86,6 +95,7 @@ def explode_info(df):
             temp1 = dfOut.ALTEND
             temp2 = dfOut.END
             dfOut.ALTEND = temp1.combine_first(temp2)
+    dfOut = dfOut.drop(columns=['NOCALL_REASON'], errors='ignore')
     return dfOut
 
 def explode_func(df):
@@ -167,6 +177,14 @@ def get_sample_diseasetype(vcf):
             for line in open(vcf)]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string[20:]
+    return sample_string
+# ##sampleDiseaseType=Prostate Cancer
+
+def get_sequencing_date(vcf):
+    sample_list=[re.findall(r'##fileDate=.*',line) 
+            for line in open(vcf)]
+    sample_string=[string for string in sample_list if len(string) > 0][0][0]
+    sample_string=sample_string[11:]
     return sample_string
 # ##sampleDiseaseType=Prostate Cancer
 

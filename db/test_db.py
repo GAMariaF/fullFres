@@ -13,6 +13,7 @@ from vcfutils import get_sample_id
 from vcfutils import get_run_id
 from vcfutils import get_percent_tumor
 from vcfutils import get_sample_diseasetype
+from vcfutils import get_sequencing_date
 from dbutils import generate_db
 from dbutils import populate_thermo_variantdb
 from dbutils import list_samples
@@ -30,6 +31,7 @@ run_id = get_run_id(vcffile)
 sample_id = get_sample_id(vcffile)
 percent_tumor = get_percent_tumor(vcffile)
 sample_diseasetype = get_sample_diseasetype(vcffile)
+sequencing_date = get_sequencing_date(vcffile)
 
 # GENERATE DATABASE
 generate_db(db)
