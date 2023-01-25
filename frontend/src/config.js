@@ -11,7 +11,8 @@ config = {
         { value: 'Yes', text: 'Yes' },
         { value: 'Yes, VN', text: 'Yes, vertification needed' },
         { value: 'No', text: 'No' },
-        { value: 'not evaluated', text: 'not evaluated' }		
+        { value: 'Not evaluated', text: 'Not evaluated' }
+        //{ value: 'Failed sample', text: 'Failed sample' }	
     ],
     functionalOptions: [
         // Obs - dont use 0 (it is reserved)

@@ -482,7 +482,7 @@ export default {
         ],
       filter1: /Yes/,
       filter2: /No/,
-      filter3: /not evaluated/,      
+      filter3: /[Nn]ot evaluated/,     
       filterOn: ["Reply"],
     };
   },

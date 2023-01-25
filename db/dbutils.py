@@ -530,15 +530,23 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list):
 		if v:
 			conds += k + " IN (" + str(v)[1:-1] +") AND " 
 
+	add_cond = ""
 	if cond_dict["Samples.Genelist"]:
-		add_cond = ("").join([f" AND GenelistsPerVariant LIKE '%{gl}%'" for gl in cond_dict["Samples.Genelist"]])
-	else:
-		add_cond = ""
+		add_cond += ("").join([f" AND GenelistsPerVariant LIKE '%{gl}%'" for gl in cond_dict["Samples.Genelist"]])
+	
+	elif cond_dict["VariantsPerSample.sampleid"]:
+		add_cond += ("").join([f" AND SamplesPerVariant LIKE '%{s}%'" for s in cond_dict["VariantsPerSample.sampleid"]])
+
+	elif cond_dict["VariantsPerSample.runid"]:
+		add_cond += ("").join([f" AND RunsPerVariant LIKE '%{r}%'" for r in cond_dict["VariantsPerSample.runid"]])
+
+
 	stmt = f"""
 	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
 
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
+	group_concat(s.runid, ', ') RunsPerVariant,
 
 	COUNT(DISTINCT s.Genelist) as FreqGenLis, 
 	COUNT(s.sampleid) as FreqSamples,
