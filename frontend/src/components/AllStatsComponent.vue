@@ -2,28 +2,32 @@
   <div  id="app" class="container-fluid">
     <h1>Welcome to the most amazing statistics tab!</h1>
     <h3>We promise to fulfill all your statistics wishes</h3>
-    <h6>(Accurate results not guaranteed)</h6>
+    <h6 style="color: lightgray">(Accurate results not guaranteed)</h6>
     <br>
 
-       
         <b-col  class="my-1">
            <b-input-group size="sm">
               <b-input v-model="run_input" placeholder="Enter Run(s)"></b-input> 
               <b-input v-model="sample_input" placeholder="Enter Sample(s)"></b-input> 
 
-              <b-form-select
-              :options="geneListOptions"
-              class="py-sm-0 form-control"
-              v-model="selectedGeneList"
-              @change="addGeneList" 
-              > </b-form-select>
+                <b-form-select
+                :options="geneListOptions"
+                class="py-sm-0 form-control"
+                v-model="selectedGeneList"
+                @change="addGeneList" 
+                >
+                <template #first>
+                  <b-form-select-option :value="null" disabled>Gene Lists</b-form-select-option>
+                </template> 
+              </b-form-select>
 
               <b-input v-model="var_input" placeholder="Enter Variant(s)"></b-input>
+              <b-input v-model="gene_input" placeholder="Enter Gene (One only)"></b-input>
            </b-input-group>
         </b-col>
-        <div class="mt-3"><strong>Current genelist search: {{ this.geneListSearch }}</strong></div>
+        <div class="mt-3"><strong>Current gene lists search: {{ this.geneListSearch }}</strong></div>
         <br>
-        <b-button v-on:click="query(run_input, sample_input, var_input)" type="button">Search</b-button><span>&nbsp;</span>
+        <b-button v-on:click="query(run_input, sample_input, var_input, gene_input)" type="button">Search</b-button><span>&nbsp;</span>
         <b-button v-on:click="resetSearch()" type="button">Reset</b-button><span>&nbsp;</span>
         <br>
         <br>
@@ -49,14 +53,14 @@
 
     <template #cell(Stats)="row">
         <b-button size="sm" @click="row.toggleDetails" class="mr-2">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+           Details
         </b-button>
         <div v-if="row.detailsShowing">{{ plotPie(row.item) }}</div>
 
       <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @change -->
-      <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails">
+      <!-- <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails">
         Details via check
-      </b-form-checkbox> 
+      </b-form-checkbox> -->
     </template>
 
 
@@ -70,7 +74,8 @@
                 :display-mode-bar="false" />
             </b-col>
 
-            <b-col>
+            <b-col> 
+              <br>
               <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
                 <div class="sampleList">{{  makeSampleList(row.item) }} </div>
               </VuePerfectScrollbar> 
@@ -134,7 +139,7 @@
     </b-modal>
 
     <!--  test -->
-<b-button v-on:click="sortTable(variants)" type="button">Testklikk sorter</b-button><span>&nbsp;</span>
+<!-- <b-button v-on:click="sortTable(variants)" type="button">Testklikk sorter</b-button><span>&nbsp;</span> -->
     <!--  -->
 
 
@@ -159,10 +164,8 @@ export default {
       run_input: "",
       sample_input: "",
       var_input: "",
-      run_input_array: [],
-      sample_input_array: [],
-      diag_input_array: [],
-      var_input_array: [],
+      gene_input: "",
+
 
       variantSampleList: "",
       variants: ['SamplesPerVariant'],
@@ -177,9 +180,9 @@ export default {
       }],
       options: config.classOptions,
       geneListOptions: config.geneListOptions,
+      selectedGeneList: null,
       small: true,
       selectedRowIndex: 0,
-      selectedGeneList: "",
       infoModal: {
         id: "info-modal",
         title: "",
@@ -237,22 +240,31 @@ export default {
     };
   },
   methods: {
-    query(run_input, sample_input, var_input) {
+    query(run_input, sample_input, var_input, gene_input) {
 
         const run_input_array = run_input.split(' AND ')
         const sample_input_array = sample_input.split(' AND ')
         const diag_input_array = this.geneListSearch.split(' AND ')
         const var_input_array = var_input.split(' AND ')
+        const gene_input_array = [gene_input]
+        console.log(gene_input)
         console.log(this.run_input_array)
 
 
-        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array]);
+        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array]);
         console.log(array_1)
-        if (array_1 === '[[""],[""],[""],[""]]'){
+        if (array_1 === '[[""],[""],[""],[""],[""]]'){
           console.log('Empty Search')
+          this.displayWarning("No search parameters provided!")
         } else {
           util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
-            this.variants = Object.values(result['data']);
+            var variants = Object.values(result['data']);
+            if (variants.length) {
+              this.variants = variants;
+            } else {
+              this.variants = ['SamplesPerVariant'];
+            }
+            
             console.log(this.variants);
           })
         }
@@ -266,6 +278,8 @@ export default {
       this.run_input =  "";
       this.sample_input = "";
       this.var_input = "";
+      this.gene_input = "";
+      this.selectedGeneList = null;
     },
 
     addGeneList(item){
@@ -336,7 +350,7 @@ export default {
 
         }
       this.pieLayout = {
-        height: 400,
+        height: 460,
         width: 800
       };
       this.pieData = [{
@@ -387,6 +401,7 @@ export default {
         console.log("unselected")
       }
     },
+
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
@@ -396,6 +411,7 @@ export default {
       //this.variants = util_funcs.sort_table(this.variants);
       //this.$store.commit("SET_STORE",this.variants)
     },
+
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
@@ -404,18 +420,20 @@ export default {
 
     sortTable() {
       this.variants = util_funcs.sort_table(this.variants);
-      
+    },
 
+    displayWarning(message) {
+      alert(message);
+      
     }
   },
   created: function() {
-    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""]]);
+    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""]]);
     util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
-      this.variants = Object.values(result['data']);
-          
-          }) 
-    
+      this.variants = Object.values(result['data']);     
+    }) 
   },
+
   computed: {
 
   }
@@ -434,5 +452,9 @@ div.sampleList {
   margin: auto;
   width: 410px;
   height: 360px;
+  text-align: center;
+}
+.center {
+  text-align: center;
 }
 </style> 

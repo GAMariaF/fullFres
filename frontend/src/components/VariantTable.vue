@@ -635,15 +635,6 @@ export default {
         });
       } else { this.showDismissibleAlert=true }
     },
-<<<<<<< HEAD
-
-=======
-    
-  },
-  created: function() {
-    this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    
->>>>>>> 17a1f06 (Some report changes + minor fixes)
   },
 
   created: function() {

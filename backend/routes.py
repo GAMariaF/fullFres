@@ -192,7 +192,7 @@ def api(current_user, query):
                     q[i] = []
            
             #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
-            res = list_search(db_path, q[0], q[1], q[2], q[3])
+            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
         else:

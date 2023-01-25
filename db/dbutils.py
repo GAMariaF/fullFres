@@ -179,7 +179,7 @@ def generate_db(db):
 		coding TEXT, \
 		transcript TEXT, \
 		annotation_variant TEXT, \
-		annotation_variant2 TEXT, \
+		 \
 		function TEXT, \
 		protein TEXT, \
 		location TEXT, \
@@ -331,8 +331,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				})
 		# Data to table Samples
 		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],\
-					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype],\
-					'Seq_Date': [sequencing_date]})
+					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
 		print(run_id,sample_id,percent_tumor,sample_diseasetype,sequencing_date)
 		# Transfer data to database
 		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
@@ -519,11 +518,11 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def list_search(db, runid: list, sampleid: list, diag: list, variants: list):
+def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list):
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 
-	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Samples.Genelist": diag, "Variants.annotation_variant": variants}
+	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Samples.Genelist": diag, "Variants.annotation_variant": variants, "v.gene": gene}
 	conds = ""
 	
 	for k, v in cond_dict.items():
@@ -534,12 +533,14 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list):
 	if cond_dict["Samples.Genelist"]:
 		add_cond += ("").join([f" AND GenelistsPerVariant LIKE '%{gl}%'" for gl in cond_dict["Samples.Genelist"]])
 	
-	elif cond_dict["VariantsPerSample.sampleid"]:
+	if cond_dict["VariantsPerSample.sampleid"]:
 		add_cond += ("").join([f" AND SamplesPerVariant LIKE '%{s}%'" for s in cond_dict["VariantsPerSample.sampleid"]])
 
-	elif cond_dict["VariantsPerSample.runid"]:
+	if cond_dict["VariantsPerSample.runid"]:
 		add_cond += ("").join([f" AND RunsPerVariant LIKE '%{r}%'" for r in cond_dict["VariantsPerSample.runid"]])
 
+	if cond_dict["v.gene"]:
+		add_cond += f" AND v.gene LIKE '{gene[0]}'"
 
 	stmt = f"""
 	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
@@ -636,7 +637,7 @@ def insert_variants(db, variant_dict):
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
-	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ALTEND", "DATE", "annotation_variant2"]
+	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ALTEND", "DATE"]
 	# Dataframe to table Classification
 	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
 	dfVarClassification = dfVarClassification.fillna('')
@@ -725,22 +726,7 @@ def insert_variants(db, variant_dict):
 		result = conn.execute(text(stmtS))
 		conn.commit()
 	# Update table Variants with annotation_variant2
-	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	with engine.connect() as conn:
-		stmtV = "UPDATE Variants set \
-					annotation_variant2 = \
-						'"+dfVariants.annotation_variant2[0]+"'\
-				WHERE \
-					CHROM = \
-						'"+dfVariants.CHROM[0]+"'\
-					POS = \
-						'"+dfVariants.POS[0]+"'\
-					ALTEND = \
-						'"+dfVariants.ALTEND[0]+"'\
-					DATE = \
-						'"+dfVariants.DATE[0]+"';"
-		result = conn.execute(text(stmtS))
-		conn.commit()
+
 
 def db_to_vcf(db,outvcf='exported.vcf'):
 	''' 
@@ -790,13 +776,6 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	df_vcf_data[['FILTER']] = "."
 	
 	df_vcf_data[['CHROM','POS','REF','ALTEND','QUAL','FILTER','INFO']].to_csv('exported.vcf', sep="\t", header=False, index=False, mode='a',quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
-
-
-
-
-
-
-
 
 
 
