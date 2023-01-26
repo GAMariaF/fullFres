@@ -10,8 +10,7 @@ config = {
         { value: null, text: 'Please select an option' },
         { value: 'Yes', text: 'Yes' },
         { value: 'Yes, VN', text: 'Yes, vertification needed' },
-        { value: 'No', text: 'No' },
-        { value: 'Not evaluated', text: 'Not evaluated' }
+        { value: 'No', text: 'No' }
         //{ value: 'Failed sample', text: 'Failed sample' }	
     ],
     functionalOptions: [
@@ -41,6 +40,7 @@ config = {
     classOptions: [
         // Obs - dont use 0 (it is reserved)
         { value: null, text: 'Please select an option' },
+        { value: 'Not evaluated', text: 'Not Evaluated' },
         { value: 'Not Relevant', text: 'Not Relevant' },
         { value: 'Technical', text: 'Technical' },
         { value: '1 - Benign', text: '1 - Benign ( - -7 )' },
@@ -149,7 +149,7 @@ config = {
     {value: "Breast Cancer", text: "Breast Cancer"},
     {value: "Cholangiocarcinoma", text: "Cholanigiocarcinoma"},
     {value: "Kidney Cancer", text: "Kidney Cancer"},
-    {value: "Bladder Utothelial Carcinoma", text: "Bladder Utothelial Carcinoma"},
+    {value: "Bladder Urothelial Carcinoma", text: "Bladder Urothelial Carcinoma"},
     {value: "Pancreatic Cancer", text: "Pancreatic Cancer"},
     {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"}
     ]               

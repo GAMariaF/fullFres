@@ -417,20 +417,19 @@ export default {
       this.variants.forEach((item, index) => {
         if (typeof this.variants[index].Reply === 'object' ) {
           console.log("NotE1")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();
+          this.variants[index].class = "Not evaluated";
+
         } else if (this.variants[index].Reply.length===0 ) {
           console.log("NotE2")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();              
+          this.variants[index].class = "Not evaluated";
         }
-        
-
       })
+      this.updateVariants();
+      this.sendVariants();
     },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
@@ -606,7 +605,7 @@ export default {
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated" & item.Reply != 'Yes, VN') {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
       })
@@ -638,7 +637,6 @@ export default {
   },
 
   created: function() {
-
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
   },
 

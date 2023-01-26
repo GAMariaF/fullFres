@@ -576,7 +576,9 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 
 	GROUP BY v.CHROM, v.POS, v.annotation_variant 
 	HAVING FreqGenLis >= {len(diag)}{add_cond}
-	ORDER BY FreqGenLis DESC;"""
+	ORDER BY FreqGenLis DESC;
+	"""
+
 	print(stmt)
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
