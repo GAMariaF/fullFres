@@ -151,7 +151,10 @@ config = {
     {value: "Kidney Cancer", text: "Kidney Cancer"},
     {value: "Bladder Urothelial Carcinoma", text: "Bladder Urothelial Carcinoma"},
     {value: "Pancreatic Cancer", text: "Pancreatic Cancer"},
-    {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"}
+    {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"},
+    {value: "Controll -BRCA SLP", text: "Controll -BRCA SLP"},
+    {value: "Conrtoll - MMR Ex SLP", text: "Conrtoll - MMR Ex SLP"},
+    {value: "Melanoma+ERBB4", text: "Melanoma+ERBB4"},
     ]               
 };
 
