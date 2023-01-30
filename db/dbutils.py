@@ -179,7 +179,7 @@ def generate_db(db):
 		coding TEXT, \
 		transcript TEXT, \
 		annotation_variant TEXT, \
-		 \
+		annotation_variant2 TEXT, \
 		function TEXT, \
 		protein TEXT, \
 		location TEXT, \
@@ -331,7 +331,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				})
 		# Data to table Samples
 		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],\
-					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype]})
+					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype],\
+					'Seq_Date': [sequencing_date]})
 		print(run_id,sample_id,percent_tumor,sample_diseasetype,sequencing_date)
 		# Transfer data to database
 		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
@@ -639,7 +640,7 @@ def insert_variants(db, variant_dict):
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
-	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ALTEND", "DATE"]
+	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ALTEND", "DATE", "annotation_variant2"]
 	# Dataframe to table Classification
 	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
 	dfVarClassification = dfVarClassification.fillna('')
@@ -728,6 +729,22 @@ def insert_variants(db, variant_dict):
 		result = conn.execute(text(stmtS))
 		conn.commit()
 	# Update table Variants with annotation_variant2
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	with engine.connect() as conn:
+		stmtV = "UPDATE Variants set \
+					annotation_variant2 = \
+						'"+dfVariants.annotation_variant2[0]+"'\
+				WHERE \
+					CHROM = \
+						'"+dfVariants.CHROM[0]+"'\
+					POS = \
+						'"+dfVariants.POS[0]+"'\
+					ALTEND = \
+						'"+dfVariants.ALTEND[0]+"'\
+					DATE = \
+						'"+dfVariants.DATE[0]+"';"
+		result = conn.execute(text(stmtS))
+		conn.commit()
 
 
 def db_to_vcf(db,outvcf='exported.vcf'):
