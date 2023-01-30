@@ -82,7 +82,7 @@
             :fields="variantFields"
             :small="small"
             :filter="filter2"
-            :filter-included-fields="filterOn"
+            :filter-function="filterTable"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -107,7 +107,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not evaluated </p></h2>
+          <h2><p style="text-align:left;">Not evaluated and Technical </p></h2>
           <br>          
           <b-table
             selectable
@@ -120,7 +120,7 @@
             :fields="variantFields"
             :small="small"
             :filter="filter3"
-            :filter-included-fields="filterOn"
+            :filter-function="filterTable"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -480,10 +480,12 @@ export default {
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
+
       filter1: /Yes/,
-      filter2: /No/,
-      filter3: /not evaluated/,      
       filterOn: ["Reply"],
+
+      filter2: "row['Reply'] === 'No' && !['Not evaluated', 'Technical'].includes(row['class'])",
+      filter3: "row['Reply'] === 'No' && ['Not evaluated', 'Technical'].includes(row['class'])", 
     };
   },
   created: function () {
@@ -518,6 +520,7 @@ export default {
       this.$store.commit("SET_STORE", this.variants);
       console.log("updateVariants");
     },
+
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
     selectedoncogenicity_list.forEach(item => {
@@ -589,6 +592,12 @@ export default {
         this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
+
+    filterTable(row, filter) {
+      //console.log(row)
+      return(eval(filter));
+    },
+
 
     typeSpecificValue(data) {
       switch(data.item['Type'].toUpperCase()) {

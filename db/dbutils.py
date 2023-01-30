@@ -519,6 +519,72 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
+def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list):
+	
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+
+	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Samples.Genelist": diag, "Variants.annotation_variant": variants, "v.gene": gene}
+	conds = ""
+	
+	for k, v in cond_dict.items():
+		if v:
+			conds += k + " IN (" + str(v)[1:-1] +") AND " 
+
+	add_cond = ""
+	if cond_dict["Samples.Genelist"]:
+		add_cond += ("").join([f" AND GenelistsPerVariant LIKE '%{gl}%'" for gl in cond_dict["Samples.Genelist"]])
+	
+	if cond_dict["VariantsPerSample.sampleid"]:
+		add_cond += ("").join([f" AND SamplesPerVariant LIKE '%{s}%'" for s in cond_dict["VariantsPerSample.sampleid"]])
+
+	if cond_dict["VariantsPerSample.runid"]:
+		add_cond += ("").join([f" AND RunsPerVariant LIKE '%{r}%'" for r in cond_dict["VariantsPerSample.runid"]])
+
+	if cond_dict["v.gene"]:
+		add_cond += f" AND v.gene LIKE '{gene[0]}'"
+
+	stmt = f"""
+	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
+
+	group_concat(vs.sampleid,', ') SamplesPerVariant,
+	group_concat(s.Genelist, ', ') GenelistsPerVariant,
+	group_concat(s.runid, ', ') RunsPerVariant,
+
+	COUNT(DISTINCT s.Genelist) as FreqGenLis, 
+	COUNT(s.sampleid) as FreqSamples,
+
+	group_concat(v.CHROM_POS_ALTEND_DATE,', ') CPADListPerVariant
+
+	FROM Variants v
+	LEFT JOIN VariantsPerSample vs
+	ON v.CHROM_POS_ALTEND_DATE = 
+		vs.CHROM_POS_ALTEND_DATE 
+	LEFT JOIN Samples s 
+	ON vs.sampleid =  
+		s.sampleid 
+ 
+	WHERE v.annotation_variant in 
+		(SELECT Variants.annotation_variant
+		FROM Variants
+		LEFT JOIN VariantsPerSample
+		ON Variants.CHROM_POS_ALTEND_DATE = 
+			VariantsPerSample.CHROM_POS_ALTEND_DATE
+		LEFT JOIN Samples
+		ON VariantsPerSample.sampleid = 
+			Samples.sampleid 
+		WHERE {conds[:-4]} 
+		) 
+
+	GROUP BY v.CHROM, v.POS, v.annotation_variant 
+	HAVING FreqGenLis >= {len(diag)}{add_cond}
+	ORDER BY FreqGenLis DESC;
+	"""
+
+	print(stmt)
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json
 
 def insert_signoffdate(db, user, date, sampleid):
 	'''
@@ -680,6 +746,7 @@ def insert_variants(db, variant_dict):
 		result = conn.execute(text(stmtS))
 		conn.commit()
 
+
 def db_to_vcf(db,outvcf='exported.vcf'):
 	''' 
 	
@@ -728,13 +795,6 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	df_vcf_data[['FILTER']] = "."
 	
 	df_vcf_data[['CHROM','POS','REF','ALTEND','QUAL','FILTER','INFO']].to_csv('exported.vcf', sep="\t", header=False, index=False, mode='a',quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
-
-
-
-
-
-
-
 
 
 

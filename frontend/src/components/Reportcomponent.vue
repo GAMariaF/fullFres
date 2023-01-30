@@ -262,7 +262,7 @@ export default {
         {key: "Info"}
         ],
       filterRun: "",
-      filterRunOn: ["runid"],
+      //filterRunOn: ["runid"],
       // OBS: "Yes" på nyere data, "Ja" på eldre. 
       filterVar: "Yes",
       filterVarOn: ["Reply"],

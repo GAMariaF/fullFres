@@ -417,20 +417,19 @@ export default {
       this.variants.forEach((item, index) => {
         if (typeof this.variants[index].Reply === 'object' ) {
           console.log("NotE1")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();
+          this.variants[index].class = "Not evaluated";
+
         } else if (this.variants[index].Reply.length===0 ) {
           console.log("NotE2")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();              
+          this.variants[index].class = "Not evaluated";
         }
-        
-
       })
+      this.updateVariants();
+      this.sendVariants();
     },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
@@ -520,7 +519,7 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return(data.item['Variant_ID'][0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
@@ -595,6 +594,7 @@ export default {
           });
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
+      console.log(this.variants[0])
     },
 
     signOff() {
@@ -605,7 +605,7 @@ export default {
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated" & item.Reply != 'Yes, VN') {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
       })
@@ -634,11 +634,9 @@ export default {
         });
       } else { this.showDismissibleAlert=true }
     },
-
   },
 
   created: function() {
-
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
   },
 
@@ -648,7 +646,8 @@ export default {
     },
     variants: {
       get() {return this.$store.getters.variants;},
-      set(value) {this.$store.commit("SET_STORE", value)} 
+      set(value) {this.$store.commit("SET_STORE", value)},
+      
     }
   },
   watch: {
