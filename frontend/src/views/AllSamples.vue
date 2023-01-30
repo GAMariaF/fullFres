@@ -58,7 +58,9 @@ export default {
               {key: "Date_Signoff", label: "Date Sign off", sortable: true},
               {key: "User_Signoff", label: "User Sign off", sortable: false},
               {key: "Date_Approval", label: "Date Approval", sortable: true},
-              {key: "User_Approval", label: "User Approval", sortable: false},],
+              {key: "User_Approval", label: "User Approval", sortable: false},
+              {key: "Seq_Date", label: "Sequencing Date", sortable: false},
+              {key: "Status", label: "Status", sortable: false}],
       filter: '',
     };
   },

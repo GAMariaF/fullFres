@@ -25,7 +25,7 @@ def list_approved_samples(db, sampleid):
 	#list "tolkningsskjema"
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
     stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_date, Variants.gene, Variants.exon, Variants.transcript, \
+		Samples.Perc_Tumor, Samples.Seq_date, Samples.Status, Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
 		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \

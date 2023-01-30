@@ -17,6 +17,7 @@ const actions = {
 		if(payload.allVariants == false) {
 			util_funcs.query_backend(config.$backend_url,'variants_' + payload.sample_id).then(result => {
 				var variants = result['data'];
+				console.log(variants)
 				commit('SET_STORE', Object.values(variants));
 			})
 		} else {

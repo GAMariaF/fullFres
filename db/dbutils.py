@@ -199,6 +199,7 @@ def generate_db(db):
 		Genelist TEXT, \
 		Perc_Tumor TEXT, \
 		Seq_Date TEXT, \
+		Status TEXT, \
 		User_Signoff TEXT, \
 		Date_Signoff TEXT, \
 		User_Approval TEXT, \
@@ -374,12 +375,7 @@ def list_samples(db):
 def list_all_samples(db):
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT s.runid, s.sampleid,\
-			s.Date_Signoff, \
-			s.Date_Approval, \
-			s.User_Signoff, \
-			s.User_Approval \
-			FROM Samples s;"
+	stmt = "SELECT * FROM Samples s;"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -479,7 +475,7 @@ def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Variants.gene, Variants.exon, Variants.transcript, \
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, Variants.annotation_variant2, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
@@ -943,7 +939,7 @@ def data_report(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, \
 		VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Variants.gene, Variants.exon,\
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon,\
 		Variants.annotation_variant, \
 		Samples.Date_Approval, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
