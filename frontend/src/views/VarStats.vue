@@ -1,18 +1,18 @@
 <template>
   <div>
-    <AllStatsComponent :locked="locked"/>
+    <VarStatsComponent :locked="locked"/>
   </div>
 </template>
 
 
 <script>
-import AllStatsComponent from "../components/AllStatsComponent.vue";
+import VarStatsComponent from "../components/VarStatsComponent.vue";
 
 export default {
   props: ['locked'],
   components: {
    
-    AllStatsComponent
+    VarStatsComponent
 },
   data() {
     return {

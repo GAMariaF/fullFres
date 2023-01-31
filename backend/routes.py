@@ -171,9 +171,9 @@ def api(current_user, query):
             allsamples = list_all_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
-        elif query == "statistics":
+        elif query[:10] == "statistics":
             print("Sending stats")
-            stats = statistics(db_path)
+            stats = statistics(db_path, start_date=query[10:18], end_date=query[18:26])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
             return response
         elif query == "report":

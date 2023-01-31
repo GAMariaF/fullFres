@@ -73,16 +73,15 @@
                 :layout="pieLayout" 
                 :display-mode-bar="false" />
             </b-col>
-
-            <b-col> 
-              <br>
+              <br/>
+              <b-col>
               <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
                 <div class="sampleList">{{  makeSampleList(row.item) }} </div>
               </VuePerfectScrollbar> 
-            </b-col>
-
+              <br/>
+              <div><p style="text-align:left;">Classification: {{ row.item.ClassesPerVariant }}</p></div>
+            </b-col>           
           </b-row>
-
           <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
         </b-card>
       </template>
@@ -329,11 +328,12 @@ export default {
     makeSampleList(item) {
       var samples = item.SamplesPerVariant.split(', ');
       var geneLists = item.GenelistsPerVariant.split(', ');
+      var replyList = item.ReplyListPerVariant.split(', ');
 
-      var res_string = "";
+      var res_string = "Sample:          Gene List          Reply\n";
 
       for (var i=0; i<samples.length; i++){
-        res_string += samples[i] +': ' + geneLists[i] + '\n';
+        res_string += samples[i] +': ' + geneLists[i] + '  ' + replyList[i] + '\n';
       }
       return(res_string);
     },
@@ -351,7 +351,7 @@ export default {
         }
       this.pieLayout = {
         height: 460,
-        width: 800
+        width: 680
       };
       this.pieData = [{
         values,
@@ -450,7 +450,7 @@ div.sampleList {
 .scroll-area {
   position: relative;
   margin: auto;
-  width: 410px;
+  width: 440px;
   height: 360px;
   text-align: center;
 }

@@ -548,17 +548,23 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
-	group_concat(s.runid, ', ') RunsPerVariant,
+	group_concat(vs.Reply, ', ') ReplyListPerVariant,
+	group_concat(DISTINCT s.runid) RunsPerVariant,
+	group_concat(DISTINCT c.class) ClassesPerVariant,
 
 	COUNT(DISTINCT s.Genelist) as FreqGenLis, 
-	COUNT(s.sampleid) as FreqSamples,
+	COUNT(DISTINCT s.sampleid) as FreqSamples,
 
-	group_concat(v.CHROM_POS_ALTEND_DATE,', ') CPADListPerVariant
+	group_concat(DISTINCT v.CHROM_POS_ALTEND_DATE) CPADListPerVariant,
+	group_concat(DISTINCT c.DATE_CHANGED_VARIANT_BROWSER) DCVBListPerVariant
 
 	FROM Variants v
 	LEFT JOIN VariantsPerSample vs
 	ON v.CHROM_POS_ALTEND_DATE = 
-		vs.CHROM_POS_ALTEND_DATE 
+		vs.CHROM_POS_ALTEND_DATE
+	LEFT JOIN Classification c
+	ON vs.DATE_CHANGED_VARIANT_BROWSER = 
+		c.DATE_CHANGED_VARIANT_BROWSER 
 	LEFT JOIN Samples s 
 	ON vs.sampleid =  
 		s.sampleid 
@@ -572,7 +578,9 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		LEFT JOIN Samples
 		ON VariantsPerSample.sampleid = 
 			Samples.sampleid 
-		WHERE {conds[:-4]} 
+		WHERE
+			Samples.Status != 'FailedSample' AND
+			{conds[:-4]} 
 		) 
 
 	GROUP BY v.CHROM, v.POS, v.annotation_variant 
@@ -798,31 +806,46 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 
 
 
-def statistics(db):
+def statistics(db, start_date: str, end_date: str):
 	'''
 	input: database
 	outputs a json with different statistics from the database
-	
-	
 	'''
+	date_condition = ''
+	if start_date != '00000000':
+		date_condition += ' AND s.Seq_Date >= ' + start_date
+	if end_date != '00000000':
+		date_condition += ' AND s.Seq_Date <= ' + end_date
+
+	if date_condition != '':
+		first_condition = 'WHERE ' + date_condition[5:]
+	else:
+		first_condition = ''
+
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = ""
 	with engine.connect() as conn:
 		# Number of runs
-		n_runs = conn.execute(text("SELECT COUNT(DISTINCT(runid)) \
-			FROM Samples")).fetchone()[0]
+		n_runs = conn.execute(text(f"SELECT COUNT(DISTINCT(runid)) \
+			FROM Samples s {first_condition}")).fetchone()[0]
 
 		# Number of users
-		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
-			FROM Samples")).fetchone()[0]
+		n_users = conn.execute(text(f"SELECT COUNT(DISTINCT(User_Signoff)) \
+			FROM Samples s {first_condition}")).fetchone()[0]
 
 		# Number of samples
-		n_samples = conn.execute(text("SELECT COUNT(DISTINCT(sampleid)) \
-			FROM Samples")).fetchone()[0]
+		n_samples = conn.execute(text(f"SELECT COUNT(DISTINCT(sampleid)) \
+			FROM Samples s {first_condition}")).fetchone()[0]
 	
 		# Number of variants
-		n_variants = conn.execute(text("SELECT COUNT(*) \
-			FROM (SELECT DISTINCT chrom, pos, altend from Variants)")).fetchone()[0]
+		n_variants = conn.execute(text(f"SELECT COUNT(*) \
+			FROM (SELECT DISTINCT chrom, pos, altend from Variants v \
+					LEFT JOIN VariantsPerSample vps \
+					ON vps.CHROM_POS_ALTEND_DATE = \
+						v.CHROM_POS_ALTEND_DATE \
+					LEFT JOIN Samples s  \
+					ON s.sampleid = vps.sampleid \
+					{first_condition})")).fetchone()[0]
 
 		# Number of samples waiting for interpretation
 		n_samples_waiting = conn.execute(text("SELECT COUNT(*) FROM(SELECT DISTINCT sampleid, runid \
@@ -842,27 +865,28 @@ def statistics(db):
 													OR Date_Approval IS ''))")).fetchone()[0]
 
 		# Number of samples per genelist
-		n_samples_genelist = conn.execute(text("SELECT Genelist, COUNT(*) as Freq \
-													FROM Samples GROUP BY Genelist")).fetchall()
+		n_samples_genelist = conn.execute(text(f"SELECT Genelist, COUNT(*) as Freq \
+													FROM Samples s {first_condition} GROUP BY Genelist")).fetchall()
 		n_samples_genepd = pd.DataFrame(n_samples_genelist)
 		n_samples_genedict = n_samples_genepd.to_dict('list')
 
 		# Number of variants per genelist
-		n_variants_genelist = conn.execute(text("SELECT Genelist,COUNT(*) AS Freq FROM ( \
+		n_variants_genelist = conn.execute(text(f"SELECT Genelist,COUNT(*) AS Freq FROM ( \
 													SELECT DISTINCT chrom, pos, altend, Genelist FROM Samples s \
 													LEFT JOIN VariantsPerSample vps \
 													ON s.runid = vps.runid \
 													AND s.sampleid = vps.sampleid \
 													LEFT JOIN Variants v \
 													ON vps.CHROM_POS_ALTEND_DATE = \
-														v.CHROM_POS_ALTEND_DATE) \
+														v.CHROM_POS_ALTEND_DATE \
+													{first_condition})		\
 													GROUP BY Genelist")).fetchall()
 		n_variants_genepd = pd.DataFrame(n_variants_genelist)
 		n_variants_genedict = n_variants_genepd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
 		## class 1
-		n_variants_class1list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		n_variants_class1list = conn.execute(text(f"SELECT class, Genelist, COUNT(*) AS Freq \
 										FROM ( \
 										SELECT DISTINCT chrom, pos, altend, \
 										Genelist, class FROM Samples s \
@@ -877,14 +901,14 @@ def statistics(db):
 											c.CHROM_POS_ALTEND_DATE \
 										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
 											c.DATE_CHANGED_VARIANT_BROWSER \
-										WHERE c.class='1 - Benign') \
+										WHERE c.class='1 - Benign'{date_condition}) \
 										GROUP BY Genelist")).fetchall()
 		n_variants_class1pd = pd.DataFrame(n_variants_class1list)
 		n_variants_class1 = n_variants_class1pd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
 		## class 2
-		n_variants_class2list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		n_variants_class2list = conn.execute(text(f"SELECT class, Genelist, COUNT(*) AS Freq \
 										FROM ( \
 										SELECT DISTINCT chrom, pos, altend, \
 										Genelist, class FROM Samples s \
@@ -899,14 +923,14 @@ def statistics(db):
 											c.CHROM_POS_ALTEND_DATE \
 										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
 											c.DATE_CHANGED_VARIANT_BROWSER \
-										WHERE c.class='2 - Likely Benign') \
+										WHERE c.class='2 - Likely Benign'{date_condition}) \
 										GROUP BY Genelist")).fetchall()
 		n_variants_class2pd = pd.DataFrame(n_variants_class2list)
 		n_variants_class2 = n_variants_class2pd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
 		## class 3
-		n_variants_class3list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		n_variants_class3list = conn.execute(text(f"SELECT class, Genelist, COUNT(*) AS Freq \
 										FROM ( \
 										SELECT DISTINCT chrom, pos, altend, \
 										Genelist, class FROM Samples s \
@@ -921,14 +945,14 @@ def statistics(db):
 											c.CHROM_POS_ALTEND_DATE \
 										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
 											c.DATE_CHANGED_VARIANT_BROWSER \
-										WHERE c.class='3 - VUS') \
+										WHERE c.class='3 - VUS'{date_condition}) \
 										GROUP BY Genelist")).fetchall()
 		n_variants_class3pd = pd.DataFrame(n_variants_class3list)
 		n_variants_class3 = n_variants_class3pd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
 		## class 4
-		n_variants_class4list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		n_variants_class4list = conn.execute(text(f"SELECT class, Genelist, COUNT(*) AS Freq \
 										FROM ( \
 										SELECT DISTINCT chrom, pos, altend, \
 										Genelist, class FROM Samples s \
@@ -943,14 +967,14 @@ def statistics(db):
 											c.CHROM_POS_ALTEND_DATE \
 										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
 											c.DATE_CHANGED_VARIANT_BROWSER \
-										WHERE c.class='4 - Likely Oncogenic') \
+										WHERE c.class='4 - Likely Oncogenic'{date_condition}) \
 										GROUP BY Genelist")).fetchall()
 		n_variants_class4pd = pd.DataFrame(n_variants_class4list)
 		n_variants_class4 = n_variants_class4pd.to_dict('list')
 
 #### query to get no of variants grouped by class, Genelist
 		## class 5
-		n_variants_class5list = conn.execute(text("SELECT class, Genelist, COUNT(*) AS Freq \
+		n_variants_class5list = conn.execute(text(f"SELECT class, Genelist, COUNT(*) AS Freq \
 										FROM ( \
 										SELECT DISTINCT chrom, pos, altend, \
 										Genelist, class FROM Samples s \
@@ -965,28 +989,41 @@ def statistics(db):
 											c.CHROM_POS_ALTEND_DATE \
 										AND vps.DATE_CHANGED_VARIANT_BROWSER = \
 											c.DATE_CHANGED_VARIANT_BROWSER \
-										WHERE c.class='5 - Oncogenic') \
+										WHERE c.class='5 - Oncogenic'{date_condition}) \
 										GROUP BY Genelist")).fetchall()
 		n_variants_class5pd = pd.DataFrame(n_variants_class5list)
 		n_variants_class5 = n_variants_class5pd.to_dict('list')
 
 		# Number of users
-		n_users = conn.execute(text("SELECT COUNT(DISTINCT(User_Signoff)) \
-			FROM Samples")).fetchone()[0]
+		n_users = conn.execute(text(f"SELECT COUNT(DISTINCT(User_Signoff)) \
+			FROM Samples s {first_condition}")).fetchone()[0]
 
-		n_users_samples = conn.execute(text("SELECT User_Signoff, COUNT(*) AS Freq \
-												FROM Samples \
+		n_users_samples = conn.execute(text(f"SELECT User_Signoff, COUNT(*) AS Freq \
+												FROM Samples s \
+												{first_condition}	\
 												GROUP BY User_Signoff")).fetchall()
 		n_users_samplespd = pd.DataFrame(n_users_samples)
 		n_users_samplesdict = n_users_samplespd.to_dict('list')
+	
+		n_samples_success = conn.execute(text(f"SELECT COUNT(*) AS successFreq FROM Samples s \
+			WHERE s.Status = 'Success' {date_condition}")).fetchone()[0]
+		
+		n_samples_failed = conn.execute(text(f"SELECT COUNT(*) AS failedFreq FROM Samples s \
+			WHERE s.Status = 'Failed' {date_condition}")).fetchone()[0]
+		
+		n_samples_partial = conn.execute(text(f"SELECT COUNT(*) AS partialFreq FROM Samples s \
+			WHERE s.Status = 'Partial' {date_condition}")).fetchone()[0]
 
-	results = {"runs": n_runs, "samples": n_samples, "variants": n_variants, \
-				"samples_waiting": n_samples_waiting, \
-				"samples_signedoff": n_samples_signedoff, \
-				"samples_genelist": n_samples_genedict, \
-				"variants_genelist": n_variants_genedict, \
-				"users": n_users, \
-				"users_samples": n_users_samplesdict, \
+	results = {"runs": n_runs, "samples": n_samples, "variants": n_variants, 
+				"samples_waiting": n_samples_waiting, 
+				"samples_signedoff": n_samples_signedoff, 
+				"samples_genelist": n_samples_genedict,
+				"samples_success": n_samples_success,
+				"samples_failed": n_samples_failed,
+				"samples_partion": n_samples_partial,
+				"variants_genelist": n_variants_genedict, 
+				"users": n_users, 
+				"users_samples": n_users_samplesdict, 
 				"variants_class1": n_variants_class1,
 				"variants_class2": n_variants_class2,
 				"variants_class3": n_variants_class3,

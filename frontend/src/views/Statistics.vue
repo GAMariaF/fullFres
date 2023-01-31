@@ -13,7 +13,7 @@
         <b-col>
           <b-card
             title="Number of runs"
-            sub-title="Total number of runs in database" >
+            :sub-title="this.runText" >
             <b-card-text>
               <h4>{{stats.runs}}</h4>
             </b-card-text>
@@ -24,19 +24,19 @@
       <b-row> 
         <b-col>
           <b-card
-            title="Number of samples"
-            sub-title="Total number of samples in database"
+            title="Samples"
+            :sub-title="this.sampleText"
           >
             <b-card-text>
-              <h4><br>{{stats.samples}}</h4>
+              <h4>{{stats.samples}}</h4>
             </b-card-text>
           </b-card>
         </b-col>
         <!--  -->
         <b-col>
           <b-card
-            title="Number of samples wating for interpretation"
-            sub-title="Total number of samples Waiting for interpretation"
+            title="Interpretation"
+            sub-title="Number of samples waiting for interpretation"
           >
             <b-card-text>
               <h4>{{stats.samples_waiting}}</h4>
@@ -46,8 +46,8 @@
         <!--  -->
         <b-col>
           <b-card
-            title="Number of samples waiting for control"
-            sub-title="Total number of Samples waiting for control"
+            title="Control"
+            sub-title="Number of samples waiting for control"
           >
             <b-card-text>
               <h4>{{stats.samples_signedoff}}</h4>
@@ -55,6 +55,56 @@
           </b-card>
         </b-col>
       </b-row>
+      <br>
+      <b-row> 
+        <b-col>
+          <b-card
+            title="Successful samples"
+            sub-title="Number of successful samples"
+          >
+            <b-card-text>
+              <h4>{{stats.samples_success}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+        <!--  -->
+        <b-col>
+          <b-card
+            title="Failed samples"
+            sub-title="Number of failed samples"
+          >
+            <b-card-text>
+              <h4>{{stats.samples_failed}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+        <!--  -->
+        <b-col>
+          <b-card
+            title="Partial samples"
+            sub-title="Number of partially successful samples"
+          >
+            <b-card-text>
+              <h4>{{stats.samples_partion}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+
+
+      <br>
+      <b-row>
+        <b-col>
+          <b-input-group>
+            <b-input v-model="startDate" placeholder="Enter start date: yyyymmdd"></b-input>
+              <b-input v-model="endDate" placeholder="Enter end date: yyyymmdd"></b-input>
+           </b-input-group>
+          <br>
+          <b-button v-on:click="getstats();changeText()" type="button">Search date</b-button><span>&nbsp;</span>
+          <br>
+        </b-col>
+      </b-row>
+
       <br>
       <b-row>
       <!--Plotting variants per genelist -->    
@@ -157,6 +207,11 @@ export default {
   data() {
     return {
       loggedInStatus: false,
+      startDate: null,
+      endDate: null,
+      search: false,
+      runText: "Total number of runs in database",
+      sampleText: "Total number of samples in database",
       stats: {},
       items: [],
       loaded: true, 
@@ -199,7 +254,7 @@ export default {
       // Funksjon for å få data og tall fra backend
       const baseURI = config.$backend_url + "/api/statistics";
       axios
-        .get(baseURI)
+        .get(baseURI+this.generate_search())
         .then((response) => response.data)
         .then((data) => {
           this.stats = JSON.parse(data.data);
@@ -247,6 +302,24 @@ export default {
 
         });
     },
+    generate_search () {
+      var search = "";
+      if (this.startDate === null || this.startDate === ""){
+        search = "00000000";
+      } else {
+        search = this.startDate;
+      }
+      if (this.endDate === null || this.endDate === ""){
+        search += "00000000";
+      } else {
+        search += this.endDate;
+      }
+      return(search)
+    },
+    changeText() {
+      this.runText = "Number of runs in search"
+      this.sampleText = "Number of samples in search"
+    }
   },
   created: function () {
     // initstore sjekk innlogging
