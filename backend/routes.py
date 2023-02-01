@@ -35,6 +35,7 @@ from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
+from dbutils import insert_failedsample
 from dbutils import statistics
 from dbutils import data_report
 from dbutils import list_search
@@ -192,7 +193,7 @@ def api(current_user, query):
                     q[i] = []
            
             #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
-            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4])
+            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
         else:
@@ -229,6 +230,11 @@ def api(current_user, query):
             
             response = jsonify({'message': 'Approved sample!'})
             return response
+        elif query == "failedsample":
+            print("Running failed sample")
+            j = json.loads(json.dumps(request.json))
+            insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            response = jsonify({'message': 'Sample set to failed!!'})
 
 @app.route('/chklogin')
 @token_required

@@ -286,9 +286,18 @@
 
 
 
-    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have Yes, No or not evaluated in the Reply-field!!</b-alert>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button><p> </p>
-      <b-button v-on:click="fillReply" class="btn mr-1 btn-info"> Fill Reply </b-button>
+    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
+      <b-row>
+        <b-col>
+          <b-button v-on:click="failedSample" class="btn mr-1 btn-danger btn-m"> Failed Sample </b-button>
+          </b-col>
+          <b-col>
+          <b-button v-on:click="fillReply" class="btn mr-1 btn-warning btn-m"> Fill Reply </b-button>
+          </b-col>
+          <b-col>
+          <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-m"> Sign off </b-button>
+        </b-col>
+      </b-row>
       </div>
     <!--  -->
     <br>
@@ -511,6 +520,9 @@ export default {
     },
 
     typeSpecificValue(data) {
+      if(data.item['Type'] === null) {
+        return("")
+      }
       switch(data.item['Type'].toUpperCase()) {
         case 'SNP':
             return("AF: "+data.item['AF']);
@@ -595,6 +607,40 @@ export default {
       } 
       console.log("tester om sendvariants blir aktivert when leaving modal")
       console.log(this.variants[0])
+    },
+
+    failedSample() {
+
+      var all_reply = true
+      this.variants.forEach(item => {
+        console.log(item.Reply)
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
+          all_reply = false
+        }
+      })
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      const baseURI = config.$backend_url + "/api/failedsample";
+      if(all_reply) {
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.$route.params.id,
+            user: this.$store.getters.username,
+          },
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data);
+        });
+        this.$router.push({
+        name: "Samples"
+        });
+      } else { this.showDismissibleAlert=true }
     },
 
     signOff() {

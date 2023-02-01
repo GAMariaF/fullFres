@@ -3,7 +3,7 @@
     <!-- Header -->
     <b-jumbotron
       header="Statistics"
-      lead="Overview of samples, runs and variants"
+      lead="Overview of samples, runs, and variants"
     >
     </b-jumbotron>
 

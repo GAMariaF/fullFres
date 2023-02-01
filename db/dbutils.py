@@ -233,8 +233,16 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 	# add variants to table sample and add variants if new to table Variants
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
+		# If empty: add the sample data, and connect to failed sample variant.
 		print("Missing data to import to tables Variants, VariantsPerSample and Samples")
-		return
+		with engine.connect() as conn:
+			stmt = f"INSERT INTO Samples (runid, sampleid, Genelist, Perc_Tumor, Seq_Date) VALUES ( '{run_id}', '{sample_id}', '{sample_diseasetype}', '{percent_tumor}', '{sequencing_date}' );"
+			result = conn.execute(text(stmt))
+			conn.commit()
+			stmt = f"INSERT INTO VariantsPerSample (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER, runid, sampleid, Reply) VALUES ( 'FailedSampleFailedSamplenan230130164110', '220631060145', '{run_id}', '{sample_id}', 'No' );"
+			result = conn.execute(text(stmt))
+			conn.commit()
+		return 
 	dfvcf_copy = dfvcf.copy(deep=True)
 	dfvariant_copy = dfvariant.copy(deep=True)
 	# add chrom_pos_altend_date column
@@ -519,7 +527,7 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list):
+def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list):
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 
@@ -528,7 +536,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	
 	for k, v in cond_dict.items():
 		if v:
-			conds += k + " IN (" + str(v)[1:-1] +") AND " 
+			conds += " AND " + k + " IN (" + str(v)[1:-1] +")" 
 
 	add_cond = ""
 	if cond_dict["Samples.Genelist"]:
@@ -542,13 +550,26 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 
 	if cond_dict["v.gene"]:
 		add_cond += f" AND v.gene LIKE '{gene[0]}'"
+	
+	if reply:
+		if reply[0] == "Yes_A":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%No%'"
+		elif reply[0] == "Yes_No":
+			add_cond += " AND ReplyListPerVariant LIKE '%Yes%' AND ReplyListPerVariant LIKE '%No%'"
+		elif reply[0] == "Yes":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%N%'"
+		elif reply[0] == "Yes, VN":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%No%' AND ReplyListPerVariant NOT LIKE '%Yes|%' AND ReplyListPerVariant LIKE '%Yes, VN'"
+		elif reply[0] == "No":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%Yes%'"
+		
 
 	stmt = f"""
 	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
 
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
-	group_concat(vs.Reply, ', ') ReplyListPerVariant,
+	group_concat(vs.Reply, '|') ReplyListPerVariant,
 	group_concat(DISTINCT s.runid) RunsPerVariant,
 	group_concat(DISTINCT c.class) ClassesPerVariant,
 
@@ -579,13 +600,13 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		ON VariantsPerSample.sampleid = 
 			Samples.sampleid 
 		WHERE
-			Samples.Status != 'FailedSample' AND
-			{conds[:-4]} 
+			Samples.Status != 'FailedSample'
+			{conds}
 		) 
 
 	GROUP BY v.CHROM, v.POS, v.annotation_variant 
 	HAVING FreqGenLis >= {len(diag)}{add_cond}
-	ORDER BY FreqGenLis DESC;
+	ORDER BY FreqSamples DESC;
 	"""
 
 	print(stmt)
@@ -600,8 +621,7 @@ def insert_signoffdate(db, user, date, sampleid):
 	'''
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	print(sampleid)
-	stmt = "UPDATE Samples set User_Signoff = '"+user+"' ,Date_Signoff = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	stmt = "UPDATE Samples set User_Signoff = '"+user+"', Date_Signoff = '"+date+"', Status = 'Success' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
@@ -613,6 +633,16 @@ def insert_approvedate(db, user, date, sampleid):
 	print("running approve-date")
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "UPDATE Samples set User_Approval = '"+user+"', Date_Approval = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
+def insert_failedsample(db, user, date, sampleid):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = f"""UPDATE Samples set 
+		User_Signoff = '{user}', Date_Signoff = '{date}', 
+		User_Approval = '{user}', Date_Approval = '{date}', 
+		Status = 'Failed' WHERE sampleid = '{sampleid}';"""
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()

@@ -145,13 +145,15 @@
           </b-table>
                     
           <br><br>
-            
-          <div>
-            <h3 v-if="warning !== ''">{{ this.warning }}</h3>
-            <b-button v-on:click="approve" class="btn mr-1 btn-info"> Approve </b-button>
-            <p></p>
-            <b-button v-on:click="unApprove" class="btn mr-1 btn-info"> Send Back </b-button>
-          </div>
+          <h3 v-if="warning !== ''">{{ this.warning }}</h3>
+          <b-row>
+            <b-col>
+              <b-button v-on:click="unApprove" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
+            </b-col>
+            <b-col>
+              <b-button v-on:click="approve" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
+            </b-col>
+          </b-row>
           
           <br><br>
         </div>

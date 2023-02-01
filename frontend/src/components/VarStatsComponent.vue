@@ -23,6 +23,15 @@
 
               <b-input v-model="var_input" placeholder="Enter Variant(s)"></b-input>
               <b-input v-model="gene_input" placeholder="Enter Gene (One only)"></b-input>
+
+              <b-form-select
+                :options="replySearchOptions"
+                class="py-sm-0 form-control"
+                v-model="selectedReplyOption"
+                >
+    
+              </b-form-select>
+
            </b-input-group>
         </b-col>
         <div class="mt-3"><strong>Current gene lists search: {{ this.geneListSearch }}</strong></div>
@@ -179,7 +188,9 @@ export default {
       }],
       options: config.classOptions,
       geneListOptions: config.geneListOptions,
+      replySearchOptions: config.replySearchOptions,
       selectedGeneList: null,
+      selectedReplyOption: "",
       small: true,
       selectedRowIndex: 0,
       infoModal: {
@@ -246,13 +257,14 @@ export default {
         const diag_input_array = this.geneListSearch.split(' AND ')
         const var_input_array = var_input.split(' AND ')
         const gene_input_array = [gene_input]
+        const reply_input_array = [this.selectedReplyOption]
         console.log(gene_input)
         console.log(this.run_input_array)
 
 
-        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array]);
+        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array, reply_input_array]);
         console.log(array_1)
-        if (array_1 === '[[""],[""],[""],[""],[""]]'){
+        if (array_1 === '[[""],[""],[""],[""],[""],[""]]'){
           console.log('Empty Search')
           this.displayWarning("No search parameters provided!")
         } else {
@@ -279,6 +291,7 @@ export default {
       this.var_input = "";
       this.gene_input = "";
       this.selectedGeneList = null;
+      this.selectedReplyOption = "";
     },
 
     addGeneList(item){
@@ -328,7 +341,7 @@ export default {
     makeSampleList(item) {
       var samples = item.SamplesPerVariant.split(', ');
       var geneLists = item.GenelistsPerVariant.split(', ');
-      var replyList = item.ReplyListPerVariant.split(', ');
+      var replyList = item.ReplyListPerVariant.split('|');
 
       var res_string = "Sample:          Gene List          Reply\n";
 
@@ -428,7 +441,7 @@ export default {
     }
   },
   created: function() {
-    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""]]);
+    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""], [""]]);
     util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
       this.variants = Object.values(result['data']);     
     }) 
