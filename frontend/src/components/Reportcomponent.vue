@@ -453,8 +453,8 @@ export default {
         type = type + " ";
 
         var annoVar = "";
-        if (variant['annotation_variant'] !== ": ()"){
-          annoVar = variant['annotation_variant'] + " ";
+        if (variant['annotation_variant2'] !== ": ()"){
+          annoVar = variant['annotation_variant2'] + " ";
         }
         
 

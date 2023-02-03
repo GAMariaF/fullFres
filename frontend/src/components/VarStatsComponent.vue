@@ -1,7 +1,7 @@
 <template>
   <div  id="app" class="container-fluid">
-    <h1>Welcome to the most amazing statistics tab!</h1>
-    <h3>We promise to fulfill all your statistics wishes</h3>
+    <h1>Welcome to the most amazing variant lookup tab!</h1>
+    <h3>We promise to fulfill all your variant statistics wishes</h3>
     <h6 style="color: lightgray">(Accurate results not guaranteed)</h6>
     <br>
 

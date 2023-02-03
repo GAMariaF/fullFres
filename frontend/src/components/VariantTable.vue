@@ -195,6 +195,7 @@
                 @change="updateVariants();setChanged()" 
               >
               </b-form-select>
+              
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
@@ -205,6 +206,19 @@
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
         </b-row>
 
         <b-row class="mb-1">
@@ -413,11 +427,13 @@ export default {
   },
   methods: {
     changedatastate() {
+      // What is the point of this?
+      //(I changed it to false and false to avoid the previous behaviour)
       if (this.datastate == true) {
         this.datastate = false
         console.log('false')
       } else {
-        this.datastate = true
+        this.datastate = false
         }
      
     },

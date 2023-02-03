@@ -298,6 +298,19 @@
               ></b-form-select>
             </b-col>
         </b-row>
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
+        </b-row>
 
         <b-row class="mb-1">
           <b-col cols="12">

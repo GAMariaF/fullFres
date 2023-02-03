@@ -227,14 +227,14 @@ def api(current_user, query):
             print("running approve")
             j = json.loads(json.dumps(request.json))
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            
             response = jsonify({'message': 'Approved sample!'})
             return response
         elif query == "failedsample":
             print("Running failed sample")
             j = json.loads(json.dumps(request.json))
             insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            response = jsonify({'message': 'Sample set to failed!!'})
+            response = jsonify({'message': 'Sample set to failed!'})
+            return response
 
 @app.route('/chklogin')
 @token_required

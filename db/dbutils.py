@@ -678,7 +678,7 @@ def insert_variants(db, variant_dict):
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
-	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ALTEND", "DATE", "annotation_variant2"]
+	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "Locus", "ALTEND", "DATE", "annotation_variant2"]
 	# Dataframe to table Classification
 	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
 	dfVarClassification = dfVarClassification.fillna('')
@@ -774,14 +774,15 @@ def insert_variants(db, variant_dict):
 						'"+dfVariants.annotation_variant2[0]+"'\
 				WHERE \
 					CHROM = \
-						'"+dfVariants.CHROM[0]+"'\
-					POS = \
-						'"+dfVariants.POS[0]+"'\
-					ALTEND = \
+						'"+dfVariants.Locus[0].split(':')[0]+"'\
+					AND POS = \
+						'"+dfVariants.Locus[0].split(':')[1]+"'\
+					AND ALTEND = \
 						'"+dfVariants.ALTEND[0]+"'\
-					DATE = \
-						'"+dfVariants.DATE[0]+"';"
-		result = conn.execute(text(stmtS))
+					AND CHROM_POS_ALTEND_DATE = \
+						'"+dfVariants.CHROM_POS_ALTEND_DATE[0]+"';"
+		print(stmtV)
+		result = conn.execute(text(stmtV))
 		conn.commit()
 
 
