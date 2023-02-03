@@ -61,7 +61,6 @@
           <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false;alertMessage=''" variant="danger">{{ alertMessage }}</b-alert>
           <br>
           <b-button v-on:click="loadData" class="btn mr-1 btn-info"> LOAD DATA </b-button>
-          
         </b-col>
         </div>
       </div>

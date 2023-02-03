@@ -303,8 +303,6 @@
               <label>Alt Annotation:</label>
               <b-form-textarea
                 id="textarea"
-                :plaintext="datastate ? true : null"
-                @click="changedatastate"
                 v-model="variants[selectedRowIndex].annotation_variant2"
                 @change="updateVariants();setChanged()" 
               >

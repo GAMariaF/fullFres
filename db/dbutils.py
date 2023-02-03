@@ -380,10 +380,19 @@ def list_samples(db):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-def list_all_samples(db):
+def list_all_samples(db, args, date):
+
+	cond = "WHERE"
+	if args[1] == 'date':
+		cond += " s.Seq_Date <= " + date
+		cond += " AND s.Seq_Date >= " + str(int(date)-10000)
+	else:
+		cond += f" s.{args[1]} = '{args[2]}'"
+	
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT * FROM Samples s;"
+	stmt = f"SELECT * FROM Samples s {cond};"
+	print(stmt)
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -403,13 +412,20 @@ def list_signoff_samples(db):
 	samplelist_json = samplelist.to_dict('records')
 	return samplelist_json
 
-def list_approved_samples(db):
+def list_approved_samples(db, args):
 	#list all approved samples
+
+	if args[1] == "date":
+		cond = " AND Samples.runid IN (SELECT Samples.runid from Samples WHERE Samples.Date_Approval = (SELECT max(Samples.Date_Approval) FROM Samples)) "
+	else:
+		cond = f" AND Samples.{args[1]} = '{args[2]}'"
+
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "SELECT sampleid, runid, Date_Approval \
+	stmt = f"SELECT sampleid, runid, Date_Approval \
 				FROM Samples \
 				WHERE Samples.Date_Approval IS NOT NULL \
-				AND Samples.Date_Approval != '';"
+				AND Samples.Date_Approval != '' \
+				{cond};"
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -582,10 +598,12 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	FROM Variants v
 	LEFT JOIN VariantsPerSample vs
 	ON v.CHROM_POS_ALTEND_DATE = 
-		vs.CHROM_POS_ALTEND_DATE
+	   vs.CHROM_POS_ALTEND_DATE
 	LEFT JOIN Classification c
 	ON vs.DATE_CHANGED_VARIANT_BROWSER = 
 		c.DATE_CHANGED_VARIANT_BROWSER 
+	AND vs.CHROM_POS_ALTEND_DATE =
+		 c.CHROM_POS_ALTEND_DATE
 	LEFT JOIN Samples s 
 	ON vs.sampleid =  
 		s.sampleid 
@@ -781,7 +799,6 @@ def insert_variants(db, variant_dict):
 						'"+dfVariants.ALTEND[0]+"'\
 					AND CHROM_POS_ALTEND_DATE = \
 						'"+dfVariants.CHROM_POS_ALTEND_DATE[0]+"';"
-		print(stmtV)
 		result = conn.execute(text(stmtV))
 		conn.commit()
 

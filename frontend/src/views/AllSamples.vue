@@ -1,17 +1,25 @@
 <template>
   <div>
+    <br/>
     <h1>All samples</h1>
-    <br>
+    <br/>
+    <b-row>
+      <b-col></b-col>
+        <b-col>
+          <b-input-group>
+            <b-input v-model="runid" placeholder="Run ID"></b-input>
+            <b-input v-model="sampleid" placeholder="Sample ID"></b-input>
+           </b-input-group>
+          </b-col>
+          <b-col></b-col>
+        </b-row>
+        <br/>
+        <b-button v-on:click="getsamples()" type="button">Search</b-button><span>&nbsp;</span>
+        <br/>
+        <br/>
     <div class="container" id="login">
       <div class="row row justify-content-center">
         <div class="col-md-10">
-          <b-col lg="6" class="my-1">
-           <b-input-group size="sm">
-              <b-input v-model="filter" placeholder="Filter table.."></b-input> 
-           </b-input-group>
-          </b-col>
-
-          
           
           <b-table
             selectable
@@ -26,7 +34,7 @@
             :items="items"
             :fields="fields"
             :small="small"
-            :filter="filter"
+            
           >
           <!-- Formatting Type column -->
           <template #cell(runid)="data">
@@ -63,6 +71,8 @@ export default {
               {key: "User_Approval", label: "User Approval", sortable: false}],
 
       filter: '',
+      runid: "",
+      sampleid: "",
     };
   },
   methods: {
@@ -76,12 +86,20 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
+      var search = "|date"
+      if (this.runid !== ""){
+        search = "|runid|"+this.runid;
+      } else if(this.sampleid !== "") {
+        search = "|sampleid|"+this.sampleid;
+      }
       console.log("metode testaxios");
       const baseURI = config.$backend_url + "/api/allsamples";
       axios
-        .get(baseURI)
+        .get(baseURI+search)
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
+      this.runid = "";
+      this.sampleid = "";
     },
   },
   created: function () {

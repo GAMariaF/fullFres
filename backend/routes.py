@@ -167,9 +167,9 @@ def api(current_user, query):
             allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
-        elif query == "allsamples":
+        elif query[:10] == "allsamples":
             print("Sender alle prøver")
-            allsamples = list_all_samples(db_path)
+            allsamples = list_all_samples(db_path, query.split('|'), datetime.date.today().strftime('%Y%m%d'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
         elif query[:10] == "statistics":
@@ -177,12 +177,9 @@ def api(current_user, query):
             stats = statistics(db_path, start_date=query[10:18], end_date=query[18:26])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
             return response
-        elif query == "report":
+        elif query[:6] == "report":
             print("report")
-            samples = list_approved_samples(db_path)
-            print("--")
-            print(samples)
-            print("--")
+            samples = list_approved_samples(db_path, query.split('|'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query[:11] == 'stat_search':
