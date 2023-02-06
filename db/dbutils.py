@@ -618,7 +618,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		ON VariantsPerSample.sampleid = 
 			Samples.sampleid 
 		WHERE
-			Samples.Status != 'FailedSample'
+			Samples.Status != 'Failed'
 			{conds}
 		) 
 
