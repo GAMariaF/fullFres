@@ -4,6 +4,7 @@ import sys
 import zipfile
 import shutil
 import re
+import pandas as pd
 config = configparser.ConfigParser()
 config.read('backend/config.ini')
 sys.path.insert(0, config['Paths']['backend_path'])
@@ -60,13 +61,19 @@ def importVcfXls(folder):
             sequencing_date = get_sequencing_date(vcffile)
             # TRANSFER VCF TO DATAFRAME
             df = parse_thermo_vcf(vcffile,excelfile)
-            df = explode_format_gt(df)
-            df = explode_info(df)
-            dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
-            dfvariant = explode_func(dfvariant)
+            if df.shape[0] != 0:
+                df = explode_format_gt(df)
+                df = explode_info(df)
+                dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
+                dfvariant = explode_func(dfvariant)
             # Adding column for assigning possible correction of annotation
-            dfvariant['annotation_variant2']=dfvariant['annotation_variant']
+                dfvariant['annotation_variant2']=dfvariant['annotation_variant']
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
+
+            else:
+                df = pd.DataFrame()
+                dfvariant = pd.DataFrame()
+            
             populate_thermo_variantdb(db, df, dfvariant, \
                 run_id, sample_id, percent_tumor, sample_diseasetype, sequencing_date)
 

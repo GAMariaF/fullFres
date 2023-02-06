@@ -1,7 +1,7 @@
 <template>
   <div  id="app" class="container-fluid">
-    <h1>Welcome to the most amazing statistics tab!</h1>
-    <h3>We promise to fulfill all your statistics wishes</h3>
+    <h1>Welcome to the most amazing variant lookup tab!</h1>
+    <h3>We promise to fulfill all your variant statistics wishes</h3>
     <h6 style="color: lightgray">(Accurate results not guaranteed)</h6>
     <br>
 
@@ -23,6 +23,15 @@
 
               <b-input v-model="var_input" placeholder="Enter Variant(s)"></b-input>
               <b-input v-model="gene_input" placeholder="Enter Gene (One only)"></b-input>
+
+              <b-form-select
+                :options="replySearchOptions"
+                class="py-sm-0 form-control"
+                v-model="selectedReplyOption"
+                >
+    
+              </b-form-select>
+
            </b-input-group>
         </b-col>
         <div class="mt-3"><strong>Current gene lists search: {{ this.geneListSearch }}</strong></div>
@@ -73,16 +82,15 @@
                 :layout="pieLayout" 
                 :display-mode-bar="false" />
             </b-col>
-
-            <b-col> 
-              <br>
+              <br/>
+              <b-col>
               <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
                 <div class="sampleList">{{  makeSampleList(row.item) }} </div>
               </VuePerfectScrollbar> 
-            </b-col>
-
+              <br/>
+              <div><p style="text-align:left;">Classification: {{ row.item.ClassesPerVariant }}</p></div>
+            </b-col>           
           </b-row>
-
           <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
         </b-card>
       </template>
@@ -180,7 +188,9 @@ export default {
       }],
       options: config.classOptions,
       geneListOptions: config.geneListOptions,
+      replySearchOptions: config.replySearchOptions,
       selectedGeneList: null,
+      selectedReplyOption: "",
       small: true,
       selectedRowIndex: 0,
       infoModal: {
@@ -247,13 +257,14 @@ export default {
         const diag_input_array = this.geneListSearch.split(' AND ')
         const var_input_array = var_input.split(' AND ')
         const gene_input_array = [gene_input]
+        const reply_input_array = [this.selectedReplyOption]
         console.log(gene_input)
         console.log(this.run_input_array)
 
 
-        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array]);
+        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array, reply_input_array]);
         console.log(array_1)
-        if (array_1 === '[[""],[""],[""],[""],[""]]'){
+        if (array_1 === '[[""],[""],[""],[""],[""],[""]]'){
           console.log('Empty Search')
           this.displayWarning("No search parameters provided!")
         } else {
@@ -280,6 +291,7 @@ export default {
       this.var_input = "";
       this.gene_input = "";
       this.selectedGeneList = null;
+      this.selectedReplyOption = "";
     },
 
     addGeneList(item){
@@ -329,11 +341,12 @@ export default {
     makeSampleList(item) {
       var samples = item.SamplesPerVariant.split(', ');
       var geneLists = item.GenelistsPerVariant.split(', ');
+      var replyList = item.ReplyListPerVariant.split('|');
 
-      var res_string = "";
+      var res_string = "Sample:          Gene List          Reply\n";
 
       for (var i=0; i<samples.length; i++){
-        res_string += samples[i] +': ' + geneLists[i] + '\n';
+        res_string += samples[i] +': ' + geneLists[i] + '  ' + replyList[i] + '\n';
       }
       return(res_string);
     },
@@ -351,7 +364,7 @@ export default {
         }
       this.pieLayout = {
         height: 460,
-        width: 800
+        width: 680
       };
       this.pieData = [{
         values,
@@ -428,7 +441,7 @@ export default {
     }
   },
   created: function() {
-    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""]]);
+    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""], [""]]);
     util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
       this.variants = Object.values(result['data']);     
     }) 
@@ -450,7 +463,7 @@ div.sampleList {
 .scroll-area {
   position: relative;
   margin: auto;
-  width: 410px;
+  width: 440px;
   height: 360px;
   text-align: center;
 }

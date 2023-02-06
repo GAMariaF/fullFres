@@ -9,7 +9,7 @@ import AllVariants from '../views/AllVariants.vue';
 import Control from '../views/Control.vue';
 import Statistics from '../views/Statistics.vue';
 import Report from '../views/Report.vue';
-import AllStats from '../views/AllStats.vue';
+import VarStats from '../views/VarStats.vue';
 
 // temp?
 import login from '../views/LoginWorld.vue';
@@ -29,11 +29,6 @@ const routes = [
 		props: true
 	},
 	{
-		path: '/allstats',
-		name: 'AllStats',
-		component: AllStats,
-	},
-	{
 		path: '/samples',
 		name: 'Samples',
 		component: Samples
@@ -47,6 +42,11 @@ const routes = [
 		path: '/control',
 		name: 'Control',
 		component: Control
+	},
+	{
+		path: '/varstats',
+		name: 'VarStats',
+		component: VarStats,
 	},
 	{
 		path: '/statistics',

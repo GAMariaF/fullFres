@@ -153,9 +153,18 @@ config = {
     {value: "Pancreatic Cancer", text: "Pancreatic Cancer"},
     {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"},
     {value: "Controll -BRCA SLP", text: "Controll -BRCA SLP"},
-    {value: "Conrtoll - MMR Ex SLP", text: "Conrtoll - MMR Ex SLP"},
+    {value: "Controll - MMR Ex SLP", text: "Controll - MMR Ex SLP"},
     {value: "Melanoma+ERBB4", text: "Melanoma+ERBB4"},
-    ]               
+    ],
+
+    replySearchOptions: [
+        {value: "", text: "Any Reply"},
+        {value: "Yes_A", text: "All Yes"},
+        {value: "Yes", text: "Yes"},
+        {value: "Yes, VN", text: "Yes, VN"},
+        {value: "Yes_No", text: "Yes-No Mix"},
+        {value: "No", text: "No"},
+    ]            
 };
 
 export { config };
