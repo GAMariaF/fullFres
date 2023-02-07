@@ -35,8 +35,10 @@ from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
+from dbutils import insert_failedsample
 from dbutils import statistics
 from dbutils import data_report
+from dbutils import list_search
 
 from importutils import importVcfXls
 
@@ -134,8 +136,13 @@ def api(current_user, query):
             print("Running sample import function")
             args = request.args
             importfolder = args["0"]
-            importVcfXls(importfolder)
-            response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)
+            try:
+                importVcfXls(importfolder)
+                response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)            
+            except FileNotFoundError:
+                response = make_response(jsonify(isError=False, message="Missing file(s).", statusCode=204), 204)
+            except ValueError:
+                response = make_response(jsonify(isError=False, message="Wrong Type.", statusCode=205), 205)
             return response
         if query == "samples":
             samples = list_samples(db_path)
@@ -152,6 +159,7 @@ def api(current_user, query):
         elif query.startswith("variants_"):
             print("Sender varianter for sample id: " + query.split("ts_")[1])
             variants = list_interpretation(db_path, query.split("ts_")[1])
+            print(variants)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
@@ -159,26 +167,34 @@ def api(current_user, query):
             allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
-        elif query == "allsamples":
+        elif query[:10] == "allsamples":
             print("Sender alle prøver")
-            allsamples = list_all_samples(db_path)
+            allsamples = list_all_samples(db_path, query.split('|'), datetime.date.today().strftime('%Y%m%d'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
-        elif query == "statistics":
+        elif query[:10] == "statistics":
             print("Sending stats")
-            stats = statistics(db_path)
+            stats = statistics(db_path, start_date=query[10:18], end_date=query[18:26])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
             return response
-        elif query == "report":
+        elif query[:6] == "report":
             print("report")
-            samples = list_approved_samples(db_path)
-            print("--")
-            print(samples)
-            print("--")
+            samples = list_approved_samples(db_path, query.split('|'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
+        elif query[:11] == 'stat_search':
+            import ast
+            q = ast.literal_eval(query[11:])
+            for i in range(len(q)):
+                if len(q[i]) == 1 and q[i][0] == "":
+                    q[i] = []
+           
+            #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
+            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5])
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
+            return response
         else:
-            response = make_response(jsonify(isError=False, message="None", statusCode=201, data={0: 0}), 201)
+            response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)
             return response
     elif request.method == 'POST':
         if query == "updatevariants":
@@ -208,8 +224,13 @@ def api(current_user, query):
             print("running approve")
             j = json.loads(json.dumps(request.json))
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            
             response = jsonify({'message': 'Approved sample!'})
+            return response
+        elif query == "failedsample":
+            print("Running failed sample")
+            j = json.loads(json.dumps(request.json))
+            insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            response = jsonify({'message': 'Sample set to failed!'})
             return response
 
 @app.route('/chklogin')

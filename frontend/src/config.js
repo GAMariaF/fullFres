@@ -9,8 +9,9 @@ config = {
         // Obs - dont use 0 (it is reserved)
         { value: null, text: 'Please select an option' },
         { value: 'Yes', text: 'Yes' },
-        { value: 'No', text: 'No' },
-        { value: 'not evaluated', text: 'not evaluated' }		
+        { value: 'Yes, VN', text: 'Yes, vertification needed' },
+        { value: 'No', text: 'No' }
+        //{ value: 'Failed sample', text: 'Failed sample' }	
     ],
     functionalOptions: [
         // Obs - dont use 0 (it is reserved)
@@ -39,6 +40,7 @@ config = {
     classOptions: [
         // Obs - dont use 0 (it is reserved)
         { value: null, text: 'Please select an option' },
+        { value: 'Not evaluated', text: 'Not Evaluated' },
         { value: 'Not Relevant', text: 'Not Relevant' },
         { value: 'Technical', text: 'Technical' },
         { value: '1 - Benign', text: '1 - Benign ( - -7 )' },
@@ -126,17 +128,43 @@ config = {
                     'evidence_types',
                     'Oncogenicity',
                     'Tier'
-                  ],
-                  reportcodes: [
-                    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
-                    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
-                    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
-                    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-                    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
-                    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
-                  ]
+    ],
+
+    reportcodes: [
+    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
+    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
+    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
+    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
+    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
+    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
+    ],
+
+    geneListOptions: [
+    {value: "Non-Small Cell Lung Cancer", text: "Non-Small Cell Lung Cancer"},
+    {value: "Colorectal Cancer", text: "Colorectal Cancer"},
+    {value: "Melanoma", text: "Melanoma"},
+    {value: "Prostate Cancer", text: "Prostate Cancer"},
+    {value: "Breast Cancer", text: "Breast Cancer"},
+    {value: "Cholangiocarcinoma", text: "Cholanigiocarcinoma"},
+    {value: "Kidney Cancer", text: "Kidney Cancer"},
+    {value: "Bladder Urothelial Carcinoma", text: "Bladder Urothelial Carcinoma"},
+    {value: "Pancreatic Cancer", text: "Pancreatic Cancer"},
+    {value: "Other Solid Tumor:Schwannomatose", text: "Other Solid Tumor:Schwannomatose"},
+    {value: "Controll -BRCA SLP", text: "Controll -BRCA SLP"},
+    {value: "Controll - MMR Ex SLP", text: "Controll - MMR Ex SLP"},
+    {value: "Melanoma+ERBB4", text: "Melanoma+ERBB4"},
+    ],
+
+    replySearchOptions: [
+        {value: "", text: "Any Reply"},
+        {value: "Yes_A", text: "All Yes"},
+        {value: "Yes", text: "Yes"},
+        {value: "Yes, VN", text: "Yes, VN"},
+        {value: "Yes_No", text: "Yes-No Mix"},
+        {value: "No", text: "No"},
+    ]            
 };
 
 export { config };

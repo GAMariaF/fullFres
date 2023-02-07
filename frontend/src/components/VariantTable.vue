@@ -30,6 +30,10 @@
      <template #cell(Type)="data">
         <b class="text-info">{{ data.value.toUpperCase() }}</b>
      </template>
+     <!-- Get specific values for specific variant types -->
+     <template #cell(Specific)="data">
+        <b class="text-info">{{ typeSpecificValue(data) }}</b>
+      </template>
 
      <template #cell(Info)="row">
           <b-button
@@ -191,6 +195,7 @@
                 @change="updateVariants();setChanged()" 
               >
               </b-form-select>
+              
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
@@ -201,6 +206,19 @@
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                :plaintext="datastate ? true : null"
+                @click="changedatastate"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
         </b-row>
 
         <b-row class="mb-1">
@@ -282,9 +300,18 @@
 
 
 
-    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All samples must have Yes, No or not evaluated in the Reply-field!!</b-alert>
-      <b-button v-on:click="signOff" class="btn mr-1 btn-info"> SIGN OFF </b-button><p> </p>
-      <b-button v-on:click="fillReply" class="btn mr-1 btn-info"> Fill Reply </b-button>
+    <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
+      <b-row>
+        <b-col>
+          <b-button v-on:click="failedSample" class="btn mr-1 btn-danger btn-m"> Failed Sample </b-button>
+          </b-col>
+          <b-col>
+          <b-button v-on:click="fillReply" class="btn mr-1 btn-warning btn-m"> Fill Reply </b-button>
+          </b-col>
+          <b-col>
+          <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-m"> Sign off </b-button>
+        </b-col>
+      </b-row>
       </div>
     <!--  -->
     <br>
@@ -293,6 +320,7 @@
 <script>
 
 import { config } from '../config.js'
+//import util_funcs from "@/appUtils";
 export default {
   props: ['locked'],
   name: "varianttable",
@@ -387,7 +415,8 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
-        {key: "AF", label: "Allele fraction", sortable: true},
+        {key: "Specific", label: "Type Specific"},
+        //{key: "AF", label: "Allele fraction", sortable: true},
         {key: "Oncogenicity"},
         {key: "class"},
         {key: "Reply", label: "Reply (Svares ut)"},
@@ -398,11 +427,13 @@ export default {
   },
   methods: {
     changedatastate() {
+      // What is the point of this?
+      //(I changed it to false and false to avoid the previous behaviour)
       if (this.datastate == true) {
         this.datastate = false
         console.log('false')
       } else {
-        this.datastate = true
+        this.datastate = false
         }
      
     },
@@ -411,20 +442,19 @@ export default {
       this.variants.forEach((item, index) => {
         if (typeof this.variants[index].Reply === 'object' ) {
           console.log("NotE1")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();
+          this.variants[index].class = "Not evaluated";
+
         } else if (this.variants[index].Reply.length===0 ) {
           console.log("NotE2")
-          this.variants[index].Reply = 'not evaluated'
+          this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.updateVariants();
-          this.sendVariants();              
+          this.variants[index].class = "Not evaluated";
         }
-        
-
       })
+      this.updateVariants();
+      this.sendVariants();
     },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
@@ -463,6 +493,9 @@ export default {
         break;
       }
     })
+    if (this.oncoScore == 0){
+      this.oncoScore = "";
+    }
     this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
     },
     setChanged() {
@@ -502,6 +535,32 @@ export default {
       }
     },
 
+    typeSpecificValue(data) {
+      if(data.item['Type'] === null) {
+        return("")
+      }
+      switch(data.item['Type'].toUpperCase()) {
+        case 'SNP':
+            return("AF: "+data.item['AF']);
+          case 'DEL':
+            return("AF: "+data.item['AF']);
+          case 'MNP':
+            return("AF: "+data.item['AF']);
+          case 'FUSION':
+            return(data.item['Variant_ID'][0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'CNV':
+            return("CN: "+data.item['Copy_Number']);
+          case 'INS':
+            return("AF: "+data.item['AF']);
+          case 'RNAEXONVARIANT':
+            return("AF: "+data.item['AF']);
+          case 'COMPLEX':
+            return("AF: "+data.item['AF'])
+          default:
+            return("");
+      }
+    },
+
     rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
@@ -520,7 +579,8 @@ export default {
       if ((typeof(this.variants[this.selectedRowIndex].Prediktive_data) !== 'undefined') && (this.variants[this.selectedRowIndex].Prediktive_data !== null)) {
         this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
       }
-      this.infoModal.title = `Variant: ${index +1}`;
+      //this.infoModal.title = `Variant: ${index +1}`;
+      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.datastate = true;
     },
@@ -540,19 +600,48 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
-
-
-   
-
         console.log("Something has changed - sending updated data to db")
+        // Metode for  sende inn dato, og tolkede varianter til backend.
+        const baseURI = config.$backend_url + "/api/updatevariants";
+        this.$http
+          .post(
+            baseURI,
+            {
+              sampleid: this.$route.params.id,
+              variants: this.variants,
+              user: this.$store.getters.username,
+            },
+            {
+              withCredentials: true,
+              headers: { "Content-Type": "application/json" },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => {
+            console.log(data);
+          });
+      } 
+      console.log("tester om sendvariants blir aktivert when leaving modal")
+      console.log(this.variants[0])
+    },
+
+    failedSample() {
+
+      var all_reply = true
+      this.variants.forEach(item => {
+        console.log(item.Reply)
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
+          all_reply = false
+        }
+      })
       // Metode for  sende inn dato, og tolkede varianter til backend.
-      const baseURI = config.$backend_url + "/api/updatevariants";
+      const baseURI = config.$backend_url + "/api/failedsample";
+      if(all_reply) {
       this.$http
         .post(
           baseURI,
           {
             sampleid: this.$route.params.id,
-            variants: this.variants,
             user: this.$store.getters.username,
           },
           {
@@ -564,27 +653,27 @@ export default {
         .then((data) => {
           console.log(data);
         });
-      } 
-      console.log("tester om sendvariants blir aktivert when leaving modal")
+        this.$router.push({
+        name: "Samples"
+        });
+      } else { this.showDismissibleAlert=true }
     },
-
 
     signOff() {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
-      
       // Først - sjekk om alle rader har yes/no på reply
       var all_reply = true
       this.variants.forEach(item => {
         console.log(item.Reply)
-        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != "not evaluated") {
+        if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
       })
       // Metode for  sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/signoff";
-      if(all_reply == true) {
+      if(all_reply) {
       this.$http
         .post(
           baseURI,
@@ -605,28 +694,40 @@ export default {
         this.$router.push({
         name: "Samples"
         });
-      } else { this.showDismissibleAlert=true}
+      } else { this.showDismissibleAlert=true }
     },
-    
   },
+
   created: function() {
     this.$store.dispatch("initVariantStore", {"sample_id": this.$route.params.id, "selected": 'empty', "allVariants": false});
-    
   },
+
   computed: {
     currentRouteName() {
         return this.$route.name;
     },
     variants: {
       get() {return this.$store.getters.variants;},
-      set(value) {this.$store.commit("SET_STORE", value)} 
+      set(value) {this.$store.commit("SET_STORE", value)},
+      
     }
   },
   watch: {
-    // Useless?
+      // Use of loading?
       variants(newVars, oldVars) {
       console.log(`Changed from ${oldVars} to ${newVars}`);
       this.loading = false;
+      // When a new set of variants are selected they are checked for whether they are benigne or technical,
+      // then automatically assiged 'No' as reply.
+      this.variants.forEach(item => {
+            if ((item.class === "Technical" || item.class === "1 - Benign") && item.Reply === "") {
+                item.Reply = "No";
+                item.visibility = true;
+                item.changed = true;
+            }
+      })
+      this.$store.commit('SET_STORE', this.variants);
+      this.sendVariants();
     },
   },
 };

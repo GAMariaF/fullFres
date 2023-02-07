@@ -54,6 +54,10 @@
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
+            </template>
             <template #cell(Info)="row">
               <b-button
                 size="sm"
@@ -78,7 +82,7 @@
             :fields="variantFields"
             :small="small"
             :filter="filter2"
-            :filter-included-fields="filterOn"
+            :filter-function="filterTable"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -87,6 +91,10 @@
             <!-- Formatting Type column -->
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <!-- Get specific values for specific variant types -->
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
             </template>
             <template #cell(Info)="row">
               <b-button
@@ -99,7 +107,7 @@
             </template>
           </b-table>
           <br>
-          <h2><p style="text-align:left;">Not evaluated </p></h2>
+          <h2><p style="text-align:left;">Not evaluated and Technical </p></h2>
           <br>          
           <b-table
             selectable
@@ -112,7 +120,7 @@
             :fields="variantFields"
             :small="small"
             :filter="filter3"
-            :filter-included-fields="filterOn"
+            :filter-function="filterTable"
           >
             <!-- Adding index column -->
             <template #cell(Nr)="data">
@@ -121,6 +129,9 @@
             <!-- Formatting Type column -->
             <template #cell(Type)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
+            </template>
+            <template #cell(Specific)="data">
+              <b class="text-info">{{ typeSpecificValue(data) }}</b>
             </template>
             <template #cell(Info)="row">
               <b-button
@@ -134,13 +145,15 @@
           </b-table>
                     
           <br><br>
-            
-          <div>
-            <h3 v-if="warning !== ''">{{ this.warning }}</h3>
-            <b-button v-on:click="approve" class="btn mr-1 btn-info"> Approve </b-button>
-            <p></p>
-            <b-button v-on:click="unApprove" class="btn mr-1 btn-info"> Send Back </b-button>
-          </div>
+          <h3 v-if="warning !== ''">{{ this.warning }}</h3>
+          <b-row>
+            <b-col>
+              <b-button v-on:click="unApprove" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
+            </b-col>
+            <b-col>
+              <b-button v-on:click="approve" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
+            </b-col>
+          </b-row>
           
           <br><br>
         </div>
@@ -284,6 +297,17 @@
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
         </b-row>
 
         <b-row class="mb-1">
@@ -462,16 +486,19 @@ export default {
         {key: "annotation_variant", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
+        {key: "Specific", label: "Type Specific"},
         {key: "FILTER", label: "Filter"},
         {key: "Oncogenicity"},        
         {key: "class"},        
         {key: "Reply", label: "Reply"},           
         {key: "Info"}
         ],
+
       filter1: /Yes/,
-      filter2: /No/,
-      filter3: /not evaluated/,      
       filterOn: ["Reply"],
+
+      filter2: "row['Reply'] === 'No' && !['Not evaluated', 'Technical'].includes(row['class'])",
+      filter3: "row['Reply'] === 'No' && ['Not evaluated', 'Technical'].includes(row['class'])", 
     };
   },
   created: function () {
@@ -506,6 +533,7 @@ export default {
       this.$store.commit("SET_STORE", this.variants);
       console.log("updateVariants");
     },
+
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
     selectedoncogenicity_list.forEach(item => {
@@ -536,6 +564,9 @@ export default {
         break;
       }
     })
+    if (this.oncoScore == 0){
+      this.oncoScore = "";
+    }
     this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
     },
     setChanged() {
@@ -574,6 +605,36 @@ export default {
         this.variants[this.selectedRowIndex].evidence_types = tmplist.toString();
       }
     },
+
+    filterTable(row, filter) {
+      //console.log(row)
+      return(eval(filter));
+    },
+
+
+    typeSpecificValue(data) {
+      switch(data.item['Type'].toUpperCase()) {
+        case 'SNP':
+            return("AF: "+data.item['AF']);
+          case 'DEL':
+            return("AF: "+data.item['AF']);
+          case 'MNP':
+            return("AF: "+data.item['AF']);
+          case 'FUSION':
+            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          case 'CNV':
+            return("CN: "+data.item['Copy_Number']);
+          case 'INS':
+            return("AF: "+data.item['AF']);
+          case 'RNAEXONVARIANT':
+            return("AF: "+data.item['AF']);
+          case 'COMPLEX':
+            return("AF: "+data.item['AF'])
+          default:
+            return("");
+      }
+    },
+
     openInfoModal(item, index, button) {
       console.log("openInfoModal")
       index = this.variants.indexOf(item);

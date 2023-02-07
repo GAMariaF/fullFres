@@ -8,17 +8,24 @@
         <h2>Approved samples</h2>
         <br />
 
-        <div>
-          <b-form-select v-model="selected" @change="updateFilter" size="sm" class="mt-3">
-            <option v-for="run in runs" v-bind:value="{ id: run.value, text: run.text }" :key="run.value">{{ run.text }}
-            </option>
-          </b-form-select>
-        </div>
+        <b-row>
+          <b-col>
+            <b-input-group>
+              <b-input v-model="runid" placeholder="Run ID"></b-input>
+              <b-input v-model="sampleid" placeholder="Sample ID"></b-input>
+            </b-input-group>
+            <br>
+              <b-button v-on:click="getSamples()" type="button">Search</b-button><span>&nbsp;</span>
+            <br>
+          </b-col>
+        </b-row>
+
+        
         <br>
         
         <!-- Scrollbar for the run and samples table -->
         <!-- :filter-included-fields="filterRunOn" -->
-        <VuePerfectScrollbar class="scroll-area" :settings="settings">
+        
           <b-table
             selectable
             select-mode="single"
@@ -29,14 +36,13 @@
             :items="items"
             :fields="fields"
             :small="small"
-            :filter="filterRun"
-            :filter-function="filterTable">
+            >
             
             <template #cell(runid)="data">
               <b class="text-info">{{ data.value.toUpperCase() }}</b>
             </template>
           </b-table>
-        </VuePerfectScrollbar>
+        
       </b-col>
       <b-col>
         <br />
@@ -227,14 +233,11 @@
 
 import { config } from '../config.js'
 import util_funcs from "@/appUtils";
-import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
   props: ["locked"],
   name: "reportcomponent",
-  components: {
-        VuePerfectScrollbar
-      },
+
   data() {
     return {
       selectedRowIndex: 0,
@@ -262,7 +265,7 @@ export default {
         {key: "Info"}
         ],
       filterRun: "",
-      filterRunOn: ["runid"],
+      //filterRunOn: ["runid"],
       // OBS: "Yes" på nyere data, "Ja" på eldre. 
       filterVar: "Yes",
       filterVarOn: ["Reply"],
@@ -282,6 +285,8 @@ export default {
       reportArray: [],
       report: "",
       warning: "",
+      runid: "",
+      sampleid: "",
       fields: [
         { key: "runid", label: "Run id" },
         { key: "sampleid", label: "Sample id" },
@@ -364,11 +369,30 @@ export default {
       }
     },
 
+    getSamples() {
+      var search = "|date"
+      if (this.runid !== ""){
+        search = "|runid|"+this.runid;
+      } else if(this.sampleid !== "") {
+        search = "|sampleid|"+this.sampleid;
+      }
+
+      util_funcs.query_backend(config.$backend_url, "report"+search).then(data => {
+        this.items = data.data
+        this.getRuns()
+      });
+
+      this.runid = "";
+      this.sampleid = "";
+
+    },
+
     openReportModal(item, index, button) {
       console.log("openReportModal")
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
-      this.reportModal.title = `Variant: ${index + 1}`;
+      //this.reportModal.title = `Variant: ${index + 1}`;
+      this.reportModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
 
@@ -452,8 +476,8 @@ export default {
         type = type + " ";
 
         var annoVar = "";
-        if (variant['annotation_variant'] !== ": ()"){
-          annoVar = variant['annotation_variant'] + " ";
+        if (variant['annotation_variant2'] !== ": ()"){
+          annoVar = variant['annotation_variant2'] + " ";
         }
         
 
@@ -479,7 +503,7 @@ export default {
     },
 
     async copyToClipboard(text) { 
-      // Needs https to work
+      // Needs https to work, not currently active.
       try {
         await navigator.clipboard.writeText(text);
         console.log('Text copied to clipboard');
@@ -490,10 +514,7 @@ export default {
   },
 
   created: function () {
-    util_funcs.query_backend(config.$backend_url, "report").then(data => {
-      this.items = data.data
-      this.getRuns()
-    });
+    this.getSamples();
   },
 
   computed: {
@@ -507,12 +528,6 @@ export default {
 
 
 <style>
-.scroll-area {
-  position: relative;
-  margin: auto;
-  width: 410px;
-  height: 400px;
-}
 h5.report {
   white-space: pre-wrap;
   color: blue;
