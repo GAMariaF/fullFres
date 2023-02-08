@@ -38,7 +38,7 @@ RUN cd /opt/Python-3.9*/ && ./configure --enable-optimizations &&  make install
 # # Install node packages
 RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
 RUN cd /fullFres/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
-RUN cd /fullFres/frontend/ npx vue-cli-service build
+RUN cd /fullFres/frontend/ && npx vue-cli-service build
 
 # Install python packages:
 RUN cd /fullFres && pip3 uninstall -y setuptools 
