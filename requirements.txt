@@ -17,3 +17,4 @@ pyjwt==2.3.0
 flask-jwt-extended==4.4.4
 openpyxl==3.0.10
 maskpass==0.3.7
+waitress==2.1.2

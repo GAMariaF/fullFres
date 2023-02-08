@@ -23,7 +23,8 @@ if not in_virtualenv() and not in_docker():
 from backend import app
 
 if __name__ == '__main__':
+    from waitress import serve
     print( "in_virtualenv()")
-    app.run('0.0.0.0', port=5000, threaded=True, debug=True)
+    serve(app, host='0.0.0.0', port=5000)
     
    
