@@ -1,2 +1,2 @@
 #!/bin/bash
-npm run serve -- --port 8082
+npm run serve -- --port 8081
