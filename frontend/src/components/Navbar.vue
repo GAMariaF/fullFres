@@ -11,6 +11,7 @@
         <b-nav-item to="/varstats" v-show="state">Var Stats</b-nav-item>
         <b-nav-item to="/statistics" v-show="state">Statistics</b-nav-item>
         <b-nav-item to="/report" v-show="state">Report</b-nav-item>
+        <b-nav-item to="/documentation">Docs</b-nav-item>
         <b-nav-item to="/login" v-show="!state">Login</b-nav-item>
         
           <b-nav-item-dropdown right v-show="state">
