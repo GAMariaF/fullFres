@@ -49,15 +49,15 @@ export default {
       pages: [{"Page": "Samples", "Key": "samplesText"}, 
               {"Page": "Control", "Key": "controlText"}, 
               {"Page": "All Samples", "Key": "allSamplesText"}, 
-              {"Page": "Var Stats", "Key": "varStatsText"}, 
+              {"Page": "Variants", "Key": "varStatsText"}, 
               {"Page": "Statistics", "Key": "statisticsText"}, 
               {"Page": "Report", "Key": "reportText"}
             ],
-      page: "Documentation",
+      page: "User Guide",
       field: ["Page"],
       small: true,
       //texts: docTexts.docTexts,
-      text: ``,
+      text: docTexts['docText'],
     }
   },
   methods: {

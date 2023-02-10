@@ -513,7 +513,8 @@ def list_interpretation(db,sampleid):
 		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
 		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
-		VariantsPerSample.Valid_CNV_Amplicons, Classification.Populasjonsdata, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.CommentVPS, Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
@@ -690,7 +691,7 @@ def insert_variants(db, variant_dict):
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER","Reply"]
+								"DATE_CHANGED_VARIANT_BROWSER", "Reply", "CommentVPS"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -752,7 +753,8 @@ def insert_variants(db, variant_dict):
 					DATE_CHANGED_VARIANT_BROWSER = \
 						'"+dateChangedVariantBrowser+"',\
 					Reply = \
-						'"+dfVarVariantsPerSample['Reply'][0]+"'\
+						'"+dfVarVariantsPerSample['Reply'][0]+"',\
+					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"' \
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\

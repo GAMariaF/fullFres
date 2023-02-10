@@ -55,12 +55,12 @@
       :title="infoModal.title"
       ok-only
       size="lg"
-      @hide="resetInfoModal();sendVariants()"
+      @hide="resetInfoModal();sendVariants();allowClassification(false)"
     >
       <b-container fluid>
         <div v-if="locked === false">
         <b-row class="mb-1">
-          <b-col cols="6">
+          <b-col cols="4">
             <label>Reply (Svares ut)</label>
             <b-form-select
               :options="replyOptions"
@@ -70,22 +70,25 @@
             >
             </b-form-select>
           </b-col>            
-          <b-col cols="6">
-            <label>Date changed</label>
-            <td>{{ variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' +
-              variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
-              variants[selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)}}</td>
-          </b-col>            
+          <b-col cols="4">
+            <label>Classification date:</label>
+            <td>{{ getDate() }}</td>
+          </b-col> 
+          <b-col cols="4">
+            <b-button v-on:click="allowClassification(true)" class="btn mr-1 btn-info"> Edit Classification </b-button>
+          </b-col>          
         </b-row>
         <br>
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Population Data (GnomAD)<br><i>OP4: 2/152182 (+1)</i></label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Populasjonsdata }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants();setChanged()"
                 
@@ -94,11 +97,13 @@
           </b-col>
           <b-col cols="6">
             <label>Computational Evidence (Revel)<br><i>SBP1: 0,448 Benign (-1)</i></label>
-             <b-form-textarea
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Computational_evidens }}</p>
+            <b-form-textarea
                 id="textarea"
                 size="default"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants();setChanged()"
 
@@ -109,9 +114,11 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Functional Studies</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Funksjonsstudier }}</p>
               <b-form-select
                 :options="functionalOptions"
                 class="py-sm-0 form-control"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Funksjonsstudier"
                 @change="updateVariants();setChanged()" 
               >
@@ -119,9 +126,11 @@
           </b-col>
           <b-col cols="6">
             <label>Cancer Hotspots</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Cancer_hotspots }}</p>
             <b-form-select
               :options="cancerhotspotsOptions"
               class="py-sm-0 form-control"
+              v-if="allowEdit"
               v-model="variants[selectedRowIndex].Cancer_hotspots"
               @change="updateVariants();setChanged()" 
             >
@@ -133,11 +142,12 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Predictive Data </label>
+            <p v-if="!allowEdit"><i>See evidence</i></p>
             <b-form-select
               :options="predictiveOptions"
               multiple :select-size="6"              
               class="py-sm-0 form-control"
-             
+              v-if="allowEdit"
               v-model="predictive_data"
               @change="updateVariants();setChanged()" 
             >
@@ -145,15 +155,18 @@
           </b-col>       
           <b-col cols="6">
             <label>Conservation (PhyloP)</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Konservering }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
+              
           </b-col>
 
         </b-row>
@@ -161,11 +174,13 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>ClinVar</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].ClinVar }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants();setChanged()"
 
@@ -173,11 +188,13 @@
           </b-col>
           <b-col cols="6">
             <label>Other DB</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Andre_DB }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants();setChanged()"
 
@@ -188,9 +205,11 @@
         <b-row class="mb-1">
           <b-col cols="6">
               <label>Class</label>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].class }}</p>
               <b-form-select
                 :options="classOptions"
                 class="py-sm-0 form-control"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].class"
                 @change="updateVariants();setChanged()" 
               >
@@ -199,20 +218,41 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].Tier }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Tier"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
+        </b-row>
+
+        <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Classification Comment</label>
+            <pre v-if="!allowEdit">{{ variants[selectedRowIndex].Comment }}</pre>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                
+                @click="changedatastate"
+                placeholder=""
+                rows=4
+                v-if="allowEdit"
+                v-model="variants[selectedRowIndex].Comment"
+                @change="updateVariants();setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
         </b-row>
         <b-row>
           <b-col cols="12">
               <label>Alt Annotation:</label>
               <b-form-textarea
                 id="textarea"
-                :plaintext="datastate ? true : null"
+                
                 @click="changedatastate"
                 v-model="variants[selectedRowIndex].annotation_variant2"
                 @change="updateVariants();setChanged()" 
@@ -221,51 +261,48 @@
               </b-col>
         </b-row>
 
-        <b-row class="mb-1">
-          <b-col cols="12">
-            <label>Comment</label>
-             <b-form-textarea
-                id="textarea"
-                size="default"
-                :plaintext="datastate ? true : null"
-                @click="changedatastate"
-                placeholder=""
-                rows=4
-                v-model="variants[selectedRowIndex].Comment"
-                @change="updateVariants();setChanged()"
-
-              ></b-form-textarea>
-          </b-col>
-        </b-row>
-
         <hr />
         <b-row>
           <b-col cols="10">
-            <p>Gene Info:</p>
+            <label>Oncogenicity Info</label>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="12">
-          <h5>Available evidence types </h5>
+          <label>Available evidence types:</label>
+          <br>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item);updateVariants();setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+            <b-button v-if="allowEdit" v-on:click="oncogenicitySelected(item);updateVariants();setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
           </span>
+          <br>
+          <br>
+            <label v-if="allowEdit" >Adjust Oncogenicity</label>
+              <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
             <br>
-            <br>
+        
             <div>
             <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
-            
-            
-            </div>
-            <h5></h5>
-
-            <br>
-            <div>
-            <h5>Chosen evidence types</h5>
+            <label>Chosen evidence types:</label>
             </div>
             {{this.variants[this.selectedRowIndex].evidence_types}}
 
         </b-col>
+        </b-row>
+        <br>
+        <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Sample Variant Comment</label>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                @click="changedatastate"
+                placeholder=""
+                rows=4
+                v-model="variants[selectedRowIndex].CommentVPS"
+                @change="updateVariants();setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
         </b-row>
         <hr />     
         </div>   
@@ -330,6 +367,7 @@ export default {
       datastate: true,
       showDismissibleAlert: false,
       loading: true,
+      allowEdit: false,
       sortedIndex: [ 'runid',
                     'sampleid',
                     'Genelist',
@@ -382,6 +420,7 @@ export default {
                     'Tier'
                   ],
       oncoScore: 0,
+      oncoAdjust: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
       oncogenicityfields: [
@@ -440,21 +479,18 @@ export default {
     fillReply(){
       // Fills Not evaluated in the reply-col of the variants that are empty
       this.variants.forEach((item, index) => {
-        if (typeof this.variants[index].Reply === 'object' ) {
-          console.log("NotE1")
+        if ((typeof this.variants[index].Reply === 'object' ) || (this.variants[index].Reply.length===0 )) {
           this.variants[index].Reply = 'No'
           this.variants[index].changed = true;
-          this.variants[index].class = "Not evaluated";
-
-        } else if (this.variants[index].Reply.length===0 ) {
-          console.log("NotE2")
-          this.variants[index].Reply = 'No'
-          this.variants[index].changed = true;
-          this.variants[index].class = "Not evaluated";
+          if (this.variants[index].class.length === 0) {
+            this.variants[index].class = "Not evaluated";
+          }
         }
-      })
+      });
+          
       this.updateVariants();
       this.sendVariants();
+      
     },
     showAlert() {
         this.dismissCountDown = this.dismissSecs
@@ -491,19 +527,42 @@ export default {
       case 'bSupporting':
         this.oncoScore += -1
         break;
+      case 'adjust':
+        this.oncoScore += parseInt(this.oncoAdjust)
+        break;
       }
     })
+
     if (this.oncoScore == 0){
       this.oncoScore = "";
     }
     this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
     },
+
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
       console.log("setChanged");
     },
+
+    allowClassification (state) {
+      this.allowEdit = state;
+    },
+
+    getDate() {
+      var date =
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)
+      
+      if (date === '..') {
+        return("Not previously classified")
+      } else {
+        return(date)
+      }
+    },
+
     oncogenicitySelected(items) {
       console.log("selected row");
       console.log("--");
@@ -520,13 +579,18 @@ export default {
         // Legge til hvis ikke tilstede
         this.selectedoncogenicity_list.push(items);
       }
+
+
       // Legg til en tabell hvor default styrke er valgt
       // Tabellen vises kun hvis lengden av this.selectedACMG != 0
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
+        console.log(this.selectedoncogenicity_list)
         this.oncoScoring(this.selectedoncogenicity_list);
         // Apply evidence to table:
+        
+        console.log(this.selectedoncogenicity_list);
         var tmplist = []
         this.selectedoncogenicity_list.forEach(function (arrayItem) {
           tmplist.push(arrayItem.tag)
@@ -732,3 +796,9 @@ export default {
   },
 };
 </script>
+<style>
+label {
+  color: rgb(7, 7, 129);
+  font-size: large;
+}
+</style>

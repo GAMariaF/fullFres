@@ -5,13 +5,13 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
      <b-navbar-nav>
         <b-nav-item to="/samples" v-show="state">Samples</b-nav-item>
-        <b-nav-item to="/control" v-show="state">Control</b-nav-item>        
-        <b-nav-item to="/allvariants" v-show="state">All Variants</b-nav-item>
+        <b-nav-item to="/control" v-show="state">Control</b-nav-item> 
+        <b-nav-item to="/report" v-show="state">Report</b-nav-item>      
+        <!--<b-nav-item to="/allvariants" v-show="state">All Variants</b-nav-item>-->
+        <b-nav-item to="/varstats" v-show="state">Variants</b-nav-item>
         <b-nav-item to="/allsamples" v-show="state">All Samples</b-nav-item>
-        <b-nav-item to="/varstats" v-show="state">Var Stats</b-nav-item>
         <b-nav-item to="/statistics" v-show="state">Statistics</b-nav-item>
-        <b-nav-item to="/report" v-show="state">Report</b-nav-item>
-        <b-nav-item to="/documentation">Docs</b-nav-item>
+        <b-nav-item to="/documentation">Guide</b-nav-item>
         <b-nav-item to="/login" v-show="!state">Login</b-nav-item>
         
           <b-nav-item-dropdown right v-show="state">
