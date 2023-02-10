@@ -62,10 +62,7 @@ def explode_format_gt(df):
     '''
     df.reset_index(inplace=True,drop=True)
     df.rename(columns = {'GT':'GTFORMAT'}, inplace = True)
-<<<<<<< HEAD
     #df.to_csv('test.csv')
-=======
->>>>>>> c3a406123fb03ce79c4a7f285cc083fa8d6ae29c
     ny = pd.DataFrame(list(dict(zip(a,b)) for a,b in zip(df['FORMAT'].str.split(":"), df['GTFORMAT'].str.split(":"))))
     for i in ["AF","AO","DP","FAO","FDP","FRO","FSAF","FSAR","FSRF","FSRR","RO","SAF","SAR","SRF","SRR"]: #1
         try:
