@@ -129,7 +129,8 @@ config = {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier'
+                    'Tier',
+                    'CommentVPS'
     ],
 
     reportcodes: [
