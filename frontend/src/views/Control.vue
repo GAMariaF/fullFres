@@ -166,7 +166,7 @@
     :title="infoModal.title"
     ok-only
     size="lg"
-    @hide="resetInfoModal();sendVariants();"
+    @hide="resetInfoModal();sendVariants();allowClassification(false)"
     >
       <b-container fluid>
         <b-row class="mb-1">
@@ -180,14 +180,23 @@
             >
             </b-form-select>
           </b-col>            
+          <b-col cols="4">
+            <label>Classification date:</label>
+            <td>{{ getDate() }}</td>
+          </b-col>  
+          <b-col cols="4">
+            <b-button v-on:click="allowClassification(true)" class="btn mr-1 btn-info"> Edit Classification </b-button>
+          </b-col>                        
         </b-row>
         <br>
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Population Data (GnomAD)<br><i>OP4: 2/152182 (+1)</i></label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Populasjonsdata }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Populasjonsdata"
                 @change="updateVariants();setChanged()"
 
@@ -195,9 +204,11 @@
           </b-col>
           <b-col cols="6">
             <label>Computational Evidence (Revel)<br><i>SBP1: 0,448 Benign (-1)</i></label>
-             <b-form-textarea
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Computational_evidens }}</p> 
+            <b-form-textarea
                 id="textarea"
                 size="default"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Computational_evidens"
                 @change="updateVariants();setChanged()"
 
@@ -208,9 +219,11 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Functional Studies</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Funksjonsstudier }}</p>
             <b-form-select
               :options="functionalOptions"
               class="py-sm-0 form-control"
+              v-if="allowEdit"
               v-model="variants[selectedRowIndex].Funksjonsstudier"
               @change="updateVariants();setChanged()" 
             >
@@ -218,9 +231,11 @@
           </b-col>
           <b-col cols="6">
             <label>Cancer Hotspots</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Cancer_hotspots }}</p>
             <b-form-select
               :options="cancerhotspotsOptions"
               class="py-sm-0 form-control"
+              v-if="allowEdit"
               v-model="variants[selectedRowIndex].Cancer_hotspots"
               @change="updateVariants();setChanged()" 
             >
@@ -232,10 +247,12 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Predictive Data</label>
+            <p v-if="!allowEdit"><i>See evidence</i></p>
             <b-form-select
               :options="predictiveOptions"
               multiple :select-size="6"              
               class="py-sm-0 form-control"
+              v-if="allowEdit"
               v-model="predictive_data"
               @change="updateVariants();setChanged()" 
             >
@@ -243,9 +260,11 @@
           </b-col>       
           <b-col cols="6">
             <label>Conservation (PhyloP)</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Konservering }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Konservering"
                 @change="updateVariants();setChanged()"
 
@@ -257,9 +276,11 @@
         <b-row class="mb-1">
           <b-col cols="6">
             <label>ClinVar</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].ClinVar }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].ClinVar"
                 @change="updateVariants();setChanged()"
 
@@ -267,9 +288,11 @@
           </b-col>
           <b-col cols="6">
             <label>Other DB</label>
+            <p v-if="!allowEdit">{{ variants[selectedRowIndex].Andre_DB }}</p>
              <b-form-textarea
                 id="textarea"
                 size="default"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Andre_DB"
                 @change="updateVariants();setChanged()"
 
@@ -280,9 +303,11 @@
         <b-row class="mb-1">
           <b-col cols="6">
               <label>Class</label>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].class }}</p>
               <b-form-select
                 :options="classOptions"
                 class="py-sm-0 form-control"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].class"
                 @change="updateVariants();setChanged()" 
               >
@@ -290,13 +315,31 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].Tier }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
+                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].Tier"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
+        </b-row>
+        <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Classification Comment</label>
+            <pre v-if="!allowEdit">{{ variants[selectedRowIndex].Comment }}</pre>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                placeholder=""
+                rows=4
+                v-if="allowEdit"
+                v-model="variants[selectedRowIndex].Comment"
+                @change="updateVariants();setChanged()"
+
+              ></b-form-textarea>
+          </b-col>
         </b-row>
         <b-row>
           <b-col cols="12">
@@ -310,46 +353,48 @@
               </b-col>
         </b-row>
 
+        <hr />
+        <b-row>
+          <b-col cols="10">
+            <label>Oncogenicity Info</label>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+          <label v-if="allowEdit">Available evidence types:</label>
+          <br>
+          <span v-for="item in oncogenicitycriteria" :key="item.tag">
+            <b-button v-if="allowEdit" v-on:click="oncogenicitySelected(item);updateVariants();setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
+          </span>
+          <br>
+          <br>
+            <label v-if="allowEdit" >Adjust Oncogenicity</label>
+              <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
+            <br>
+        
+            <div>
+            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
+            
+            <label>Chosen evidence types:</label>
+            </div>
+            {{this.variants[this.selectedRowIndex].evidence_types}}
+
+        </b-col>
+        </b-row>
+        <br>
         <b-row class="mb-1">
           <b-col cols="12">
-            <label>Comment</label>
+            <label>Sample Variant Comment</label>
              <b-form-textarea
                 id="textarea"
                 size="default"
                 placeholder=""
                 rows=4
-                v-model="variants[selectedRowIndex].Comment"
+                v-model="variants[selectedRowIndex].CommentVPS"
                 @change="updateVariants();setChanged()"
 
               ></b-form-textarea>
           </b-col>
-        </b-row>
-
-        <hr />
-        <b-row>
-          <b-col cols="10">
-            <p>Gene Info:</p>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="12">
-          <h5>Available evidence types </h5>
-          <span v-for="item in oncogenicitycriteria" :key="item.tag">
-            <b-button v-on:click="oncogenicitySelected(item)" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
-          </span>
-            <br>
-            <br>
-            <div>
-            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
-            </div>
-            <h5></h5>
-
-            <br>
-            <div>
-            <h5>Chosen evidence types</h5>
-            </div>
-              {{this.variants[this.selectedRowIndex].evidence_types}}
-        </b-col>
         </b-row>
         <hr />        
 
@@ -391,6 +436,7 @@ export default {
     return {
       //classVariants: [],
       //notClassVariants: [],
+      allowEdit: false,
       sortedIndex: [ 'runid',
                     'sampleid',
                     'Genelist',
@@ -443,6 +489,7 @@ export default {
                   ],
       predictive_data: [],
       oncoScore: 0,
+      oncoAdjust: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
       oncogenicityfields: [
@@ -532,6 +579,23 @@ export default {
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
       console.log("updateVariants");
+    },
+
+    allowClassification (state) {
+      this.allowEdit = state;
+    },
+
+    getDate() {
+      var date =
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)
+      
+      if (date === '..') {
+        return("Not previously classified")
+      } else {
+        return(date)
+      }
     },
 
     oncoScoring(selectedoncogenicity_list) {
@@ -644,7 +708,8 @@ export default {
         this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
         console.log(this.predictive_data)
       }
-      this.infoModal.title = `Variant: ${index + 1}`;
+      //this.infoModal.title = `Variant: ${index + 1}`;
+      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);  
     },
     resetInfoModal() {
@@ -791,3 +856,9 @@ export default {
   },
 };
 </script>
+<style>
+label {
+  color: rgb(7, 7, 129);
+  font-size: large;
+}
+</style>

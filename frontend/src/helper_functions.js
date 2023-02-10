@@ -13,7 +13,7 @@ export default helper_funcs;
 export function get_ip() {
 
     //const { readIniFile } = require('read-ini-file')
-    const path = '/illumina/analysis/dev/2022/sigvla/fullFres_dev/db/config_ip.ini'
+    const path = '/illumina/analysis/dev/2023/fullFres_beta/fullFres/db/config_ip.ini'
     //const { fs } = require('fs')
 
     var text = fs.readFileSync(path,'utf8')

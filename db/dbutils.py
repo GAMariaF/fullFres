@@ -154,6 +154,7 @@ def generate_db(db):
 		HS TEXT, \
 		SUBSET TEXT, \
 		MISC TEXT, \
+		CommentVPS TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
         )"))
 		result_variants = conn.execute(text("CREATE TABLE IF NOT EXISTS Variants ( \
@@ -314,10 +315,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 			else:
 				# if variant not previously in database, add new variant
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
-		dfvcf_copy = dfvcf_copy.drop(columns=['CHROM','POS', \
-						'REF', 'ALTEND', 'FUNC', 'TYPE','SVTYPE', \
-						'Oncomine Gene Class','Oncomine Variant Class'], \
-						errors='ignore')
+		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User_Classification', 'Variant_ID', 'Variant_Name', 'Key_Variant', 'Oncomine_Reporter_Evidence', 'Type', 'Call', 'Call_Details', 'Phred_QUAL_Score', 'Zygosity', 'P_Value', 'PPA', 'Read_Counts_Per_Million', 'Oncomine_Driver_Gene', 'Gene_Isoform', 'NormalizedReadCount', 'Imbalance_Score', 'Copy_Number', 'P_Value_1', 'CNV_Confidence', 'Valid_CNV_Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS'])]
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
 				'Variant ID': 'Variant_ID', \
@@ -515,7 +513,8 @@ def list_interpretation(db,sampleid):
 		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
 		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
-		VariantsPerSample.Valid_CNV_Amplicons, Classification.Populasjonsdata, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.CommentVPS, Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
@@ -692,7 +691,7 @@ def insert_variants(db, variant_dict):
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER","Reply"]
+								"DATE_CHANGED_VARIANT_BROWSER", "Reply", "CommentVPS"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -754,7 +753,8 @@ def insert_variants(db, variant_dict):
 					DATE_CHANGED_VARIANT_BROWSER = \
 						'"+dateChangedVariantBrowser+"',\
 					Reply = \
-						'"+dfVarVariantsPerSample['Reply'][0]+"'\
+						'"+dfVarVariantsPerSample['Reply'][0]+"',\
+					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"' \
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\

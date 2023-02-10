@@ -43,6 +43,7 @@ config = {
         { value: 'Not evaluated', text: 'Not Evaluated' },
         { value: 'Not Relevant', text: 'Not Relevant' },
         { value: 'Technical', text: 'Technical' },
+        { value: 'Homopolymer', text: 'Homopolymer' },
         { value: '1 - Benign', text: '1 - Benign ( - -7 )' },
         { value: '2 - Likely Benign', text: '2 - Likely Benign ( -6 - -1 )' },
         { value: '3 - VUS', text: '3 - VUS ( 0 - 5 )' },
@@ -77,7 +78,8 @@ config = {
         {tag: "SBP2",  class: 'btn mr-1 btn-success btn-sm',	title: 'A synonymous (silent) variant for which splicing prediction algorithms predict no impact to the splice consensus sequence nor the creation of a new splice site AND the nucleotide is not highly conserved.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
         {tag: "SBP1",  class: 'btn mr-1 btn-success btn-sm',	title: 'All utilized lines of computational evidence suggest no impact of a variant (conservation/ evolutionary, splicing impact, etc.). Caveat: Because many in silico algorithms use the same or very similar input for their predictions, each algorithm cannot be counted as an independent criterion. Can be used only once in any evaluation of a variant.', default: "bSupporting", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
         {tag: "SBS1",  class: 'btn mr-1 btn-success btn-sm',	title: 'Minor allele frequency is >1% in Genome Aggregation Database (gnomAD) in any of 5 general continental populations: African, East Asian, European (Non-Finnish), Latino, and South Asian. If the somatic variant is in a gene known to cause predisposition to hereditary cancer, ACMG/AMP ClinGen germline expert panel gene specific guidelines (if they exist) must be consulted to establish a cutoff that takes disease prevalence into account.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
-        {tag: "SBS2",  class: 'btn mr-1 btn-success btn-sm',	title: 'Well-established in vitro or in vivo functional studies show no oncogenic effects.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] }
+        {tag: "SBS2",  class: 'btn mr-1 btn-success btn-sm',	title: 'Well-established in vitro or in vivo functional studies show no oncogenic effects.', default: "bStrong", categories: ["bVery Strong", "bStrong", "bModerate", "bSupporting"] },
+        {tag: "ADJUST",  class: 'btn mr-1 btn-info btn-sm',	title: 'Adjust the score', default: "adjust"}
     ],
     sortedIndex: [ 'runid',
                     'sampleid',
@@ -127,7 +129,8 @@ config = {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier'
+                    'Tier',
+                    'CommentVPS'
     ],
 
     reportcodes: [
