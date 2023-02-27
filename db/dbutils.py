@@ -295,6 +295,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 										+dfdb_variant_latest.CHROM_POS_ALTEND_DATE.iloc[0]+"';"
 					dfdbClassification = \
 						pd.read_sql_query(text(stmtClassification), con = conn)
+
 					if not dfdbClassification.empty:
 						dfvcf_copy.loc[row, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 							dfdbClassification.DATE_CHANGED_VARIANT_BROWSER.max()	
@@ -310,12 +311,16 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 								dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row], " is already in database")
 						dfvcf_copy = dfvcf_copy.drop(row)
 				else:
+					# What does FUNC mean??
 					# if FUNC not in db, i.e existing variant but with new FUNC
 					dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
+
 			else:
-				# if variant not previously in database, add new variant
+				# if variant not previously in database, add new variant		
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
-		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User_Classification', 'Variant_ID', 'Variant_Name', 'Key_Variant', 'Oncomine_Reporter_Evidence', 'Type', 'Call', 'Call_Details', 'Phred_QUAL_Score', 'Zygosity', 'P_Value', 'PPA', 'Read_Counts_Per_Million', 'Oncomine_Driver_Gene', 'Gene_Isoform', 'NormalizedReadCount', 'Imbalance_Score', 'Copy_Number', 'P_Value_1', 'CNV_Confidence', 'Valid_CNV_Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS'])]
+		
+		# list in line below is possibly not entierly correct.
+		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User Classification', 'Variant ID', 'Variant Name', 'Key Variant', 'Oncomine Reporter Evidence', 'Type', 'Call', 'Call Details', 'Phred QUAL Score', 'Zygosity', 'P-Value', 'PPA', 'Read Counts Per Million', 'Oncomine Driver Gene', 'Gene Isoform', 'NormalizedReadCount', 'Imbalance Score', 'Copy Number', 'P-Value.1', 'CNV Confidence', 'Valid CNV Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS'])]
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
 				'Variant ID': 'Variant_ID', \
@@ -344,6 +349,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
 		dfvcf_copy.AF *= 100
 		dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
+		
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
@@ -513,7 +519,8 @@ def list_interpretation(db,sampleid):
 		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
 		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
-		VariantsPerSample.Valid_CNV_Amplicons, Classification.Populasjonsdata, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.CommentVPS, Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
@@ -690,7 +697,7 @@ def insert_variants(db, variant_dict):
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER","Reply"]
+								"DATE_CHANGED_VARIANT_BROWSER", "Reply", "CommentVPS"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -739,6 +746,13 @@ def insert_variants(db, variant_dict):
 			dfVarClassification.to_sql('Classification', engine, \
 				if_exists='append', index=False)
 			conn.commit()
+			stmt = f"""UPDATE VariantsPerSample set 
+						DATE_CHANGED_VARIANT_BROWSER = '{dateChangedVariantBrowser}'
+					WHERE VariantsPerSample.CHROM_POS_ALTEND_DATE = '{dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]}'
+					AND (VariantsPerSample.Reply IS NULL OR VariantsPerSample.Reply = '');"""
+			result = conn.execute(text(stmt))
+			conn.commit()
+
 	else:
 		print('not new in classification')
 		# If already in DB choose most recent entry DATE_CHANGED_VARIANT_BROWSER
@@ -752,7 +766,8 @@ def insert_variants(db, variant_dict):
 					DATE_CHANGED_VARIANT_BROWSER = \
 						'"+dateChangedVariantBrowser+"',\
 					Reply = \
-						'"+dfVarVariantsPerSample['Reply'][0]+"'\
+						'"+dfVarVariantsPerSample['Reply'][0]+"',\
+					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"' \
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\

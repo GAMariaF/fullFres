@@ -21,9 +21,10 @@ def parse_thermo_vcf(vcf,excel):
     # With RNAExonVariant
     df_excel_wRNA = df_excel.loc[df_excel['Type'] == 'RNAExonVariant']
     if not df_excel_wRNA.empty:
-        df_excel_wRNA = df_excel_wRNA.assign(ID = df_excel_wRNA.loc[:,'Variant ID'])
+        df_excel_wRNA = df_excel_wRNA.assign(ID = df_excel_wRNA.loc[:,'Variant ID'] + "_1")
         df3 = pd.merge(df_excel_wRNA,df_vcf,on='ID',how='left')
         df3.loc[:,'ID']=df3.loc[:,'Variant ID']
+        
     # Without fusion and without RNAExonVariant
     df_excel_wo = df_excel.loc[df_excel['Type'] != 'Fusion']
     df_excel_wo = df_excel_wo.loc[df_excel_wo['Type'] != 'RNAExonVariant']
@@ -36,6 +37,7 @@ def parse_thermo_vcf(vcf,excel):
         df2 = pd.merge(df_excel_wo,df_vcf,\
                     left_on=['Locus','Variant ID'],right_on=['Locus_vcf','ID'],how='left')
         df2 = df2.drop(columns=['Locus_vcf'])
+
     df = pd.concat([df1,df2,df3])
     df = df.reset_index(drop='True')
     df = df.rename(columns={'ALT':'ALTEND'})
@@ -62,6 +64,7 @@ def explode_format_gt(df):
     '''
     df.reset_index(inplace=True,drop=True)
     df.rename(columns = {'GT':'GTFORMAT'}, inplace = True)
+    #print(df)
     ny = pd.DataFrame(list(dict(zip(a,b)) for a,b in zip(df['FORMAT'].str.split(":"), df['GTFORMAT'].str.split(":"))))
     for i in ["AF","AO","DP","FAO","FDP","FRO","FSAF","FSAR","FSRF","FSRR","RO","SAF","SAR","SRF","SRR"]: #1
         try:
@@ -71,6 +74,7 @@ def explode_format_gt(df):
     dfOut = pd.concat([df, ny], axis=1)
     del dfOut["GTFORMAT"]
     del dfOut["FORMAT"]
+    
     return dfOut
 
 def replace_semi(inputstring):
@@ -89,10 +93,12 @@ def explode_info(df):
     ny2 = pd.DataFrame([dict(w.split('=', 1) for w in x) for x in df["INFO"].str.split(";")])
     dfOut = pd.concat([df, ny2], axis=1)
     del dfOut["INFO"]
+
     if 'END' in dfOut.columns:
             dfOut['ALTEND'] = dfOut['ALTEND'].replace('<CNV>',np.nan)
             temp1 = dfOut.ALTEND
             temp2 = dfOut.END
+
             dfOut.ALTEND = temp1.combine_first(temp2)
     dfOut = dfOut.drop(columns=['NOCALL_REASON'], errors='ignore')
     return dfOut

@@ -530,7 +530,7 @@ export default {
 <style>
 h5.report {
   white-space: pre-wrap;
-  color: blue;
+  color: rgb(9, 9, 180);
   text-align: left;
 }
 </style> 
