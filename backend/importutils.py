@@ -69,6 +69,7 @@ def importVcfXls(folder):
             # Adding column for assigning possible correction of annotation
                 dfvariant['annotation_variant2']=dfvariant['annotation_variant']
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
+                #exit()
 
             else:
                 df = pd.DataFrame()

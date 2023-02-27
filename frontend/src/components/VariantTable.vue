@@ -479,11 +479,11 @@ export default {
     fillReply(){
       // Fills Not evaluated in the reply-col of the variants that are empty
       this.variants.forEach((item, index) => {
-        if ((typeof this.variants[index].Reply === 'object' ) || (this.variants[index].Reply.length===0 )) {
-          this.variants[index].Reply = 'No'
+        if ((this.variants[index].Reply === null ) || (this.variants[index].Reply.length === 0 )) {
+          this.variants[index].Reply = 'No';
           this.variants[index].changed = true;
-          if (this.variants[index].class.length === 0) {
-            this.variants[index].class = "Not evaluated";
+          if ((this.variants[index].class === null) || (this.variants[index].class.length === 0)) {
+            this.variants[index].class = 'Not evaluated';
           }
         }
       });
@@ -611,13 +611,13 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_ID'][0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
             return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
-            return("AF: "+data.item['AF']);
+            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'COMPLEX':
             return("AF: "+data.item['AF'])
           default:
@@ -784,7 +784,7 @@ export default {
       // When a new set of variants are selected they are checked for whether they are benigne or technical,
       // then automatically assiged 'No' as reply.
       this.variants.forEach(item => {
-            if ((item.class === "Technical" || item.class === "1 - Benign") && item.Reply === "") {
+            if ((item.class === "Technical" || item.class === "1 - Benign") && (item.Reply === null || item.Reply === "")) {
                 item.Reply = "No";
                 item.visibility = true;
                 item.changed = true;
