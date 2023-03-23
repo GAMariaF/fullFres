@@ -715,7 +715,7 @@ def insert_variants(db, variant_dict):
 	dfVariants = pd.DataFrame(dfVariant, columns = colVariants)
 	dfVariants = dfVariants.fillna('')
 
-	"""engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select * from Classification \
 				where CHROM_POS_ALTEND_DATE = '"+	dfVarClassification['CHROM_POS_ALTEND_DATE'][0]			+"' \
 				AND COSMIC='"+          			dfVarClassification['COSMIC'][0]						+"' \
@@ -734,30 +734,30 @@ def insert_variants(db, variant_dict):
 				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
-	if dfInDB.empty:"""
+	if dfInDB.empty or (dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] != "" and int(dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER']) > dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int)):
 	# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date
-	print('new classifiction')
-	dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-	dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] = \
-	dateChangedVariantBrowser
-	# Since Classification not in table it has to be added
-	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	with engine.connect() as conn:
-		dfVarClassification.to_sql('Classification', engine, \
-			if_exists='append', index=False)
-		conn.commit()
-		stmt = f"""UPDATE VariantsPerSample set 
-					DATE_CHANGED_VARIANT_BROWSER = '{dateChangedVariantBrowser}'
-				WHERE VariantsPerSample.CHROM_POS_ALTEND_DATE = '{dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]}'
-				AND (VariantsPerSample.Reply IS NULL OR VariantsPerSample.Reply = '');"""
-		result = conn.execute(text(stmt))
-		conn.commit()
+		print('new classifiction')
+		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+		dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] = \
+		dateChangedVariantBrowser
+		# Since Classification not in table it has to be added
+		engine = create_engine("sqlite:///"+db, echo=False, future=True)
+		with engine.connect() as conn:
+			dfVarClassification.to_sql('Classification', engine, \
+				if_exists='append', index=False)
+			conn.commit()
+			stmt = f"""UPDATE VariantsPerSample set 
+						DATE_CHANGED_VARIANT_BROWSER = '{dateChangedVariantBrowser}'
+					WHERE VariantsPerSample.CHROM_POS_ALTEND_DATE = '{dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]}'
+					AND (VariantsPerSample.Reply IS NULL OR VariantsPerSample.Reply = '');"""
+			result = conn.execute(text(stmt))
+			conn.commit()
 
-	"""else:
+	else:
 		print('not new in classification')
 		# If already in DB choose most recent entry DATE_CHANGED_VARIANT_BROWSER
 		dateChangedVariantBrowser = \
-			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)"""	
+			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
 	print(dateChangedVariantBrowser)
 	# Update table VariantsPerSample with DATE_CHANGED_VARIANT_BROWSER
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
