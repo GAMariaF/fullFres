@@ -1,7 +1,7 @@
 # Build like: docker build -t fullfres .
 FROM ubuntu:20.04
 
-LABEL maintainer="Maria.Fahlstrom@sthf.no & oyvindbusk@gmail.com"
+LABEL maintainer="Sigve.strand.Landa@sthf.no"
 LABEL description="Image based on Ubuntu for running the cancer interpretation utility"
 
 ENV AM_I_IN_A_DOCKER_CONTAINER Yes

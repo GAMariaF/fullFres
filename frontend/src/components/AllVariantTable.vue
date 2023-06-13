@@ -187,10 +187,6 @@ export default {
       console.log("setChanged")
       },
     oncogenicitySelected(items) {
-      console.log("selected row")
-      console.log("--")
-      console.log(items)
-      console.log("--")
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.

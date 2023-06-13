@@ -35,7 +35,7 @@
                         id="defaultFormLoginEmailEx"
                         class="form-control input is-rounded"
                         dir="auto"
-                        value="buso"
+                        
                       />
                       <br />
                       <label for="defaultFormLoginPasswordEx" class="grey-text"
@@ -47,7 +47,7 @@
                         v-model="password"
                         class="form-control input is-rounded"
                         dir="auto"
-                        value="buso123"
+                        
                       />
                       <div class="text-center mt-4">
                     <b-button variant="primary" @click="doLogin" size="lg">Login</b-button>
@@ -99,8 +99,8 @@ import { config } from '../config.js'
 export default {
   name: "Login",
   data: () => ({
-    username: "buso",
-    password: "buso123",
+    username: "",
+    password: "",
     tempdata: "",
     login_URL: config.$backend_url + "/login"    
   }),

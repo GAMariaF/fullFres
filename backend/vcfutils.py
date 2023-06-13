@@ -81,6 +81,14 @@ def replace_semi(inputstring):
     '''  Hvor det finnes semikolon inne i curly braces i INFO-kolonnen gjoeres denne om til underscore - ellers blir det feilmelding'''
     return re.sub(r"{[^{}]+}", lambda x: x.group(0).replace(";", "_"), inputstring)
 
+def fix_info(input_string):
+    '''Catches any other cases of missing info'''
+    info = input_string.split('=', 1)
+    if len(info) == 1:
+        return info + ['NA']
+    else:
+        return info
+
 def explode_info(df):
     ''' Eksploderer INFO-kolonnen til egne kolonner'''
     df.reset_index(inplace=True,drop=True)
@@ -90,7 +98,7 @@ def explode_info(df):
     # ok???? ';HS;',';HS=NA;' --> 'HS;','HS=NA;' /mfahls
     df['INFO'] = df['INFO'].str.replace('HS;','HS=NA;')
     df['INFO'] = df['INFO'].str.replace('Non-Targeted;','Non-Targeted=1;')
-    ny2 = pd.DataFrame([dict(w.split('=', 1) for w in x) for x in df["INFO"].str.split(";")])
+    ny2 = pd.DataFrame([dict(fix_info(w) for w in x) for x in df["INFO"].str.split(";")])
     dfOut = pd.concat([df, ny2], axis=1)
     del dfOut["INFO"]
 
@@ -165,7 +173,9 @@ def get_run_id(vcf):
     run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2}/Auto',line) 
             for line in open(vcf)]
     run_string=[string for string in run_list if len(string) > 0][0][0]
-    run_string=run_string[-15:-8]
+    # A bit weird maybe, but 'GX' has been hardcoded in above anyway.
+    run_string='GX' + run_string[:-8].split('GX')[1]
+    print(run_string)
     return run_string
 #GNXS-0297-18-GX_0016_22/Auto
 

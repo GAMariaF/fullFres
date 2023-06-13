@@ -19,7 +19,7 @@
             </div>
         </template>
         <br>
-        <b-button v-on:click="loadData" class="btn mr-1 btn-info"> IMPORT SAMPLES </b-button>
+        <b-button v-on:click="loadData" class="btn mr-1 btn-info"> Import Samples </b-button>
       </b-col>
     </div>
     <div class="container" id="login" v-if="items.length!==0">
@@ -102,7 +102,6 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      console.log("metode testaxios");
       const baseURI = config.$backend_url + "/api/samples";
       axios
         .get(baseURI)

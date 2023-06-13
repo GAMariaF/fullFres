@@ -470,7 +470,6 @@ export default {
       //(I changed it to false and false to avoid the previous behaviour)
       if (this.datastate == true) {
         this.datastate = false
-        console.log('false')
       } else {
         this.datastate = false
         }
@@ -499,44 +498,50 @@ export default {
       this.$store.commit("SET_STORE", this.variants);
       console.log("updateVariants");
     },
-    oncoScoring(selectedoncogenicity_list) {
-    this.oncoScore = 0;
-    selectedoncogenicity_list.forEach(item => {
-    switch(item.default) {
-      case 'Very Strong':
-        this.oncoScore += 8
-        break;
-      case 'Strong':
-        this.oncoScore += 4
-        break;
-      case 'Moderate':
-        this.oncoScore += 2
-        break;
-      case 'Supporting':
-        this.oncoScore += 1
-        break;
-      case 'bVery Strong':
-        this.oncoScore += -8
-        break;
-      case 'bStrong':
-        this.oncoScore += -4
-        break;
-      case 'bModerate':
-        this.oncoScore += -2
-        break;
-      case 'bSupporting':
-        this.oncoScore += -1
-        break;
-      case 'adjust':
-        this.oncoScore += parseInt(this.oncoAdjust)
-        break;
-      }
-    })
 
-    if (this.oncoScore == 0){
-      this.oncoScore = "";
-    }
-    this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
+    oncoScoring(selectedoncogenicity_list) {
+      if (selectedoncogenicity_list.length == 0) {
+        this.variants[this.selectedRowIndex].Oncogenicity = "";
+      } else {
+
+        this.oncoScore = 0;
+        selectedoncogenicity_list.forEach(item => {
+        switch(item.default) {
+          case 'Very Strong':
+            this.oncoScore += 8
+            break;
+          case 'Strong':
+            this.oncoScore += 4
+            break;
+          case 'Moderate':
+            this.oncoScore += 2
+            break;
+          case 'Supporting':
+            this.oncoScore += 1
+            break;
+          case 'bVery Strong':
+            this.oncoScore += -8
+            break;
+          case 'bStrong':
+            this.oncoScore += -4
+            break;
+          case 'bModerate':
+            this.oncoScore += -2
+            break;
+          case 'bSupporting':
+            this.oncoScore += -1
+            break;
+          case 'adjust':
+            this.oncoScore += parseInt(this.oncoAdjust)
+            break;
+          }
+        })
+
+        if (this.oncoScore == 0){
+          this.oncoScore = "0";
+        }
+        this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+      }
     },
 
     setChanged() {
@@ -564,10 +569,6 @@ export default {
     },
 
     oncogenicitySelected(items) {
-      console.log("selected row");
-      console.log("--");
-      console.log(items);
-      console.log("--");
   
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
@@ -586,11 +587,9 @@ export default {
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
-        console.log(this.selectedoncogenicity_list)
         this.oncoScoring(this.selectedoncogenicity_list);
         // Apply evidence to table:
         
-        console.log(this.selectedoncogenicity_list);
         var tmplist = []
         this.selectedoncogenicity_list.forEach(function (arrayItem) {
           tmplist.push(arrayItem.tag)
@@ -628,10 +627,8 @@ export default {
     rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
-        console.log(items)
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected");
       }
     },
 
@@ -680,20 +677,14 @@ export default {
               headers: { "Content-Type": "application/json" },
             }
           )
-          .then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
+          .then((response) => response.data);
       } 
-      console.log("tester om sendvariants blir aktivert when leaving modal")
-      console.log(this.variants[0])
     },
 
     failedSample() {
 
       var all_reply = true
       this.variants.forEach(item => {
-        console.log(item.Reply)
         if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
@@ -713,10 +704,7 @@ export default {
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        .then((response) => response.data);
         this.$router.push({
         name: "Samples"
         });
@@ -730,7 +718,6 @@ export default {
       // Først - sjekk om alle rader har yes/no på reply
       var all_reply = true
       this.variants.forEach(item => {
-        console.log(item.Reply)
         if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
@@ -751,10 +738,7 @@ export default {
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        .then((response) => response.data);
         this.$router.push({
         name: "Samples"
         });

@@ -306,8 +306,6 @@ export default {
       return(row['runid']===filter);
     },
     getRuns() {
-      console.log("getRuns!!! Running!! ")
-      console.log(this.items)
 
       var runs = []
       var result = []
@@ -325,8 +323,6 @@ export default {
     },
 
     rowSelected(items) {
-      console.log("rowSelect items: ")
-      console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
@@ -345,7 +341,6 @@ export default {
       if (items.length === 1) {
 
         this.selectedSample = items[0].sampleid;
-        console.log(this.selectedSample);
          //Get variants for that sample:
 
         //this.$store.dispatch("initVariantStore", {
@@ -356,7 +351,6 @@ export default {
         
         // Query and commit to store here instead of having the store do it.
         await util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
-          console.log(typeof result);
           var variants = Object.values(result['data']);
           this.variants = variants}) 
         
@@ -480,7 +474,6 @@ export default {
           annoVar = variant['annotation_variant2'] + " ";
         }
         
-
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)

@@ -566,7 +566,6 @@ export default {
     sampleRowSelected(items) {
       if (items.length === 1) {
         this.selectedSample = items[0].sampleid;
-        console.log(this.selectedSample)
         // Get variants for that sample:
         this.$store.dispatch("initVariantStore", {"sample_id": this.selectedSample, "selected": 'empty', "allVariants": false});
         this.variants =  this.$store.getters.variants;
@@ -640,10 +639,7 @@ export default {
       console.log("setChanged");
     },
     oncogenicitySelected(items) {
-      console.log("selected row");
-      console.log("--");
-      console.log(items);
-      console.log("--");
+
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
@@ -706,7 +702,6 @@ export default {
       // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
       if ((typeof(this.variants[this.selectedRowIndex].Prediktive_data) !== 'undefined') && (this.variants[this.selectedRowIndex].Prediktive_data !== null)) {
         this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
-        console.log(this.predictive_data)
       }
       //this.infoModal.title = `Variant: ${index + 1}`;
       this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
@@ -754,13 +749,8 @@ export default {
               headers: { "Content-Type": "application/json" },
             }
           )
-          .then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
+          .then((response) => response.data);
       } 
-      console.log("tester om sendvariants blir aktivert when leaving modal")
-      console.log(this.variants)
     },
 
 
@@ -772,7 +762,6 @@ export default {
       // Metode for  sende inn dato, og tolkede varianter til backend.
       
       // Må sjekke om noko har blitt endra.
-      console.log(this.somethingChanged)
       if(this.somethingChanged) {
         this.warning = "You are not allowed to approve after making changes."
       } else if(this.sampleUserSignoff === this.$store.getters.username) {
@@ -792,10 +781,7 @@ export default {
               headers: { "Content-Type": "application/json" },
             }
           )
-          .then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
+          .then((response) => response.data);
           this.$router.push({
           name: "Samples"
         });}
@@ -823,10 +809,7 @@ export default {
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        .then((response) => response.data);
         this.$router.push({
         name: "Samples"
         });
