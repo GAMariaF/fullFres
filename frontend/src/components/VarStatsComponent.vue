@@ -85,7 +85,7 @@
               <br/>
               <b-col>
               <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
-                <div class="sampleList">{{  makeSampleList(row.item) }} </div>
+                <div class="sampleList">{{ makeSampleList(row.item) }} </div>
               </VuePerfectScrollbar> 
               <br/>
               <div><p style="text-align:left;">Classification: {{ row.item.ClassesPerVariant }}</p></div>
@@ -340,13 +340,13 @@ export default {
 
     makeSampleList(item) {
       var samples = item.SamplesPerVariant.split(', ');
-      var geneLists = item.GenelistsPerVariant.split(', ');
+      var geneList = item.GenelistsPerVariant.split(', ');
       var replyList = item.ReplyListPerVariant.split('|');
 
-      var res_string = "Sample:          Gene List          Reply\n";
+      var res_string = "Sample:          Reply          Gene List\n";
 
       for (var i=0; i<samples.length; i++){
-        res_string += samples[i] +': ' + geneLists[i] + '  ' + replyList[i] + '\n';
+        res_string += samples[i] +': ' + replyList[i] + '  ' + geneList[i] + '\n';
       }
       return(res_string);
     },
@@ -381,10 +381,6 @@ export default {
       console.log("setChanged")
       },
     oncogenicitySelected(items) {
-      console.log("selected row")
-      console.log("--")
-      console.log(items)
-      console.log("--")
 
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
@@ -408,6 +404,7 @@ export default {
       if (items.length===1) {
         this.selectedVariant = items;
         console.log("test")
+        //console.log(items)
 
       } else if (items.length===0) {
         this.selectedVariant = "";

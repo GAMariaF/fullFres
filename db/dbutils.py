@@ -664,8 +664,8 @@ def insert_failedsample(db, user, date, sampleid):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"""UPDATE Samples set 
 		User_Signoff = '{user}', Date_Signoff = '{date}', 
-		User_Approval = '{user}', Date_Approval = '{date}', 
 		Status = 'Failed' WHERE sampleid = '{sampleid}';"""
+	#(middle above)#User_Approval = '{user}', Date_Approval = '{date}', 
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
@@ -728,7 +728,7 @@ def insert_variants(db, variant_dict):
 				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
-				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
+				AND Oncogenicity='"+				str(dfVarClassification['Oncogenicity'][0])					+"' \
 				AND evidence_types='"+				dfVarClassification['evidence_types'][0]				+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"

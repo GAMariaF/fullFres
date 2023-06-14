@@ -29,7 +29,12 @@
           <h2>Variants for sample {{ selectedSample }}</h2>
           <h5>Signed off by {{ this.sampleUserSignoff }}</h5>
           <br><br>
-          <h5>Gene List: <b>{{this.variants[0].Genelist}}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+          <h5>Gene List: <b>{{ this.variants[0].Genelist }}</b> 
+            | Tumor %: <b>{{ this.variants[0].Perc_Tumor }}</b> 
+            | Status: 
+                <b style="color:rgb(100, 207, 100);" v-show="this.variants[0].Status=='Success'">Success</b>
+                <b style="color:red;" v-show="this.variants[0].Status=='Failed'">Failed</b>
+          </h5>
           <br>
           <h2><p style="text-align:left;">Reply (Svares ut)</p></h2>
           <br>          
