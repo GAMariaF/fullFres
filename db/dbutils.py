@@ -45,6 +45,10 @@ from sqlalchemy import create_engine
 from sqlalchemy import text
 import csv
 import os
+import logging
+
+# For debug logging
+logging.basicConfig(level=logging.DEBUG)
 
 #sqlite syntax...
 def generate_db(db):
@@ -235,7 +239,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
 		# If empty: add the sample data, and connect to failed sample variant.
-		print("Missing data to import to tables Variants, VariantsPerSample and Samples")
+		logging.warning("Missing data to import to tables Variants, VariantsPerSample and Samples")
 		with engine.connect() as conn:
 			stmt = f"INSERT INTO Samples (runid, sampleid, Genelist, Perc_Tumor, Seq_Date) VALUES ( '{run_id}', '{sample_id}', '{sample_diseasetype}', '{percent_tumor}', '{sequencing_date}' );"
 			result = conn.execute(text(stmt))
@@ -306,7 +310,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 							AND CHROM_POS_ALTEND_DATE = '"+dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row]+"';"
 					dfdb_vcf = pd.read_sql_query(text(stmtvcf), con = conn)
 					if not dfdb_vcf.empty:
-						print(dfvcf_copy.runid.loc[row], \
+						logging.warning(dfvcf_copy.runid.loc[row], \
 							dfvcf_copy.sampleid.loc[row], \
 								dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row], " is already in database")
 						dfvcf_copy = dfvcf_copy.drop(row)
@@ -344,7 +348,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],\
 					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype],\
 					'Seq_Date': [sequencing_date]})
-		print(run_id,sample_id,percent_tumor,sample_diseasetype,sequencing_date)
+		logging.debug(f"{run_id}, {sample_id}, {percent_tumor}, {sample_diseasetype}, {sequencing_date}")
 		# Transfer data to database
 		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
 		dfvcf_copy.AF *= 100
@@ -357,7 +361,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		try:			
 			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
 		except:
-			print('There is an error trying to add '+run_id+','+sample_id+' \
+			logging.error('There is an error trying to add '+run_id+','+sample_id+' \
 				to table Samples. Is it already in database?')
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i Variants-tabell 
@@ -396,7 +400,6 @@ def list_all_samples(db, args, date):
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"SELECT * FROM Samples s {cond};"
-	print(stmt)
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -454,17 +457,6 @@ def list_all_variants(db):
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
-	"""
-	To print (some) duplicates to check the data.
-	temp = samplelist[['CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER)', 'DATE_CHANGED_VARIANT_BROWSER', 'ID', 'Type', ]].reset_index()
-	for i in range(temp.shape[0]-100, temp.shape[0]):
-		print(i)
-		temp2 = temp.loc[i, :]
-		temp2.sort_index(inplace=True)
-		for c in temp2.items():
-			print(c)
-		print("----------new var-------------")
-		"""
 	return samplelist_json
 
 '''
@@ -632,7 +624,6 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	ORDER BY FreqSamples DESC;
 	"""
 
-	print(stmt)
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')
@@ -653,7 +644,7 @@ def insert_approvedate(db, user, date, sampleid):
 	''' 
 	When hitting the approve-button in the browser - set approved date and approved user
 	'''
-	print("running approve-date")
+	logging.debug("running approve-date")
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "UPDATE Samples set User_Approval = '"+user+"', Date_Approval = '"+date+"' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
@@ -709,8 +700,8 @@ def insert_variants(db, variant_dict):
 	dfVarVariantsPerSample = pd.DataFrame(dfVariant, columns = colVariantsPerSample)
 	dfVarVariantsPerSample = dfVarVariantsPerSample.fillna('')
 	# Dataframe to table Samples
-	dfVarSamples = pd.DataFrame(dfVariant, columns = colSamples)
-	dfVarSamples = dfVarSamples.fillna('')
+	#dfVarSamples = pd.DataFrame(dfVariant, columns = colSamples)
+	#dfVarSamples = dfVarSamples.fillna('')
 	# Dataframe to table Variants
 	dfVariants = pd.DataFrame(dfVariant, columns = colVariants)
 	dfVariants = dfVariants.fillna('')
@@ -728,15 +719,15 @@ def insert_variants(db, variant_dict):
 				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
-				AND Oncogenicity='"+				str(dfVarClassification['Oncogenicity'][0])					+"' \
+				AND Oncogenicity='"+				str(dfVarClassification['Oncogenicity'][0])				+"' \
 				AND evidence_types='"+				dfVarClassification['evidence_types'][0]				+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
 	if dfInDB.empty or (dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] != "" and int(dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER']) > dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int)):
-	# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date
-		print('new classifiction')
+	# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date. If already exists but with an earlier date than the most recent classification of the variant, also insert again.
+		logging.debug('new classifiction')
 		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 		dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 		dateChangedVariantBrowser
@@ -754,11 +745,10 @@ def insert_variants(db, variant_dict):
 			conn.commit()
 
 	else:
-		print('not new in classification')
+		logging.debug('not new in classification')
 		# If already in DB choose most recent entry DATE_CHANGED_VARIANT_BROWSER
 		dateChangedVariantBrowser = \
 			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
-	print(dateChangedVariantBrowser)
 	# Update table VariantsPerSample with DATE_CHANGED_VARIANT_BROWSER
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
@@ -777,26 +767,28 @@ def insert_variants(db, variant_dict):
 						'"+dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]+"';"
 		result = conn.execute(text(stmtVPS))
 		conn.commit()
+	# Necessary??
 	# Update table Samples with data for User and Date (Sign_off)
 	# and User and Date (Approval)
-	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	with engine.connect() as conn:
-		stmtS = "UPDATE Samples set \
-					User_Signoff = \
-						'"+dfVarSamples.User_Signoff[0]+"',\
-					Date_Signoff = \
-						'"+dfVarSamples.Date_Signoff[0]+"',\
-					User_Approval = \
-						'"+dfVarSamples.User_Approval[0]+"',\
-					Date_Approval = \
-						'"+dfVarSamples.Date_Approval[0]+"'\
-				WHERE \
-					runid = \
-						'"+dfVarSamples.runid[0]+"'\
-					AND sampleid = \
-						'"+dfVarSamples.sampleid[0]+"';"
-		result = conn.execute(text(stmtS))
-		conn.commit()
+	#engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	#dfVarSamples.to_csv("Test.tsv", sep='\t')
+	#with engine.connect() as conn:
+	#	stmtS = "UPDATE Samples set \
+	#				User_Signoff = \
+	#					'"+dfVarSamples.User_Signoff[0]+"',\
+	#				Date_Signoff = \
+	#					'"+dfVarSamples.Date_Signoff[0]+"',\
+	#				User_Approval = \
+	#					'"+dfVarSamples.User_Approval[0]+"',\
+	#				Date_Approval = \
+	#					'"+dfVarSamples.Date_Approval[0]+"'\
+	#			WHERE \
+	#				runid = \
+	#					'"+dfVarSamples.runid[0]+"'\
+	#				AND sampleid = \
+	#					'"+dfVarSamples.sampleid[0]+"';"
+	#	result = conn.execute(text(stmtS))
+	#	conn.commit()
 	# Update table Variants with annotation_variant2
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
@@ -820,7 +812,7 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	''' 
 	
 	'''
-	print("test")
+	logging.debug("test")
 	writer = csv.writer(open(outvcf,'w'), delimiter="\t", quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
 	vcf_header = ['##fileformat=VCFv4.1',
 		'##fileDate=20170821',

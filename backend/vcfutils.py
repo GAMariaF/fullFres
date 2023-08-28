@@ -4,6 +4,12 @@ import re
 import json
 #from tkinter.ttk import Separator
 
+class CustomFileError(Exception):
+    """Raised when some thing went wrong with the input files."""
+    def __init__(self, message="Something went wrong with the files."):
+        self.message = message
+        super().__init__(self.message)
+
 def parse_thermo_vcf(vcf,excel):
     ''' Les inn vcf og excel, slå de sammen til en pandas dataframe'''
     df_vcf = pd.read_csv(vcf, sep="\t", comment='#', names=["CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT","GT"])

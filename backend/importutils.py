@@ -9,15 +9,7 @@ config = configparser.ConfigParser()
 config.read('backend/config.ini')
 sys.path.insert(0, config['Paths']['backend_path'])
 sys.path.insert(0, config['Paths']['db_path'])
-from vcfutils import parse_thermo_vcf
-from vcfutils import explode_format_gt
-from vcfutils import explode_info
-from vcfutils import explode_func
-from vcfutils import get_sample_id
-from vcfutils import get_run_id
-from vcfutils import get_percent_tumor
-from vcfutils import get_sample_diseasetype
-from vcfutils import get_sequencing_date
+from vcfutils import *
 from dbutils import populate_thermo_variantdb
 
 # list files and directories in import directory
@@ -38,7 +30,7 @@ def importVcfXls(folder):
                     excelfile = folder + '/' + fileexcel   
                     break
             else:
-                raise ValueError 
+                raise CustomFileError 
 
             # unzip vcf-file
             with zipfile.ZipFile(folder +'/'+ file, 'r') as zip_ref:
@@ -80,10 +72,12 @@ def importVcfXls(folder):
 
         elif not file.endswith('.xlsx'):
             # Should only be zip and excel files in the folder.
-            raise ValueError
+            print("Wrong files present.")
+            raise CustomFileError
             
     if num_zip == 0:
-        raise ValueError
+        print("Zip file missing.")
+        raise CustomFileError
 
     rm_dir_list = os.listdir(folder)
     for rm_file in rm_dir_list:

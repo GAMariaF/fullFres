@@ -121,12 +121,9 @@ export default {
 
           if (response.status === 200){
             window.location.reload(true);
-        } else if (response.status === 204) {
+        } else if (response.status >= 204 & response.status <= 207) {
             this.showDismissibleAlert = true;
-            this.alertMessage = "Missing or too many file(s).";
-        } else if (response.status === 205) {
-            this.showDismissibleAlert = true;
-            this.alertMessage = "File(s) of wrong type.";
+            this.alertMessage = response.data.message;
         } else if (response.status === 500) {
             this.showDismissibleAlert = true;
             this.alertMessage = "Someting went wrong, check that the files are correct. If the error persists, contact support.";
