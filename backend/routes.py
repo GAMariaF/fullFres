@@ -37,6 +37,7 @@ from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
 from dbutils import insert_failedsample
+from dbutils import insert_comment
 from dbutils import statistics
 from dbutils import data_report
 from dbutils import list_search
@@ -241,6 +242,12 @@ def api(current_user, query):
             j = json.loads(json.dumps(request.json))
             insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Sample set to failed!'})
+            return response
+        elif query == "commentsample":
+            logging.debug("Running comment update for sample")
+            j = json.loads(json.dumps(request.json))
+            insert_comment(db_path, j["commentsamples"], j["sampleid"])
+            response = jsonify({'message': 'Comment updated for sample!'})
             return response
 
 @app.route('/chklogin')

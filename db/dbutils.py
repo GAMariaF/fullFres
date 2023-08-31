@@ -159,6 +159,7 @@ def generate_db(db):
 		SUBSET TEXT, \
 		MISC TEXT, \
 		CommentVPS TEXT, \
+		TierVPS TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
         )"))
 		result_variants = conn.execute(text("CREATE TABLE IF NOT EXISTS Variants ( \
@@ -209,6 +210,7 @@ def generate_db(db):
 		Date_Signoff TEXT, \
 		User_Approval TEXT, \
 		Date_Approval TEXT, \
+		CommentSamples TEXT, \
 		PRIMARY KEY (runid, sampleid) \
 		)"))
 		result_classification = conn.execute(text("CREATE TABLE IF NOT EXISTS Classification ( \
@@ -324,7 +326,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
 		
 		# list in line below is possibly not entierly correct.
-		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User Classification', 'Variant ID', 'Variant Name', 'Key Variant', 'Oncomine Reporter Evidence', 'Type', 'Call', 'Call Details', 'Phred QUAL Score', 'Zygosity', 'P-Value', 'PPA', 'Read Counts Per Million', 'Oncomine Driver Gene', 'Gene Isoform', 'NormalizedReadCount', 'Imbalance Score', 'Copy Number', 'P-Value.1', 'CNV Confidence', 'Valid CNV Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS'])]
+		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User Classification', 'Variant ID', 'Variant Name', 'Key Variant', 'Oncomine Reporter Evidence', 'Type', 'Call', 'Call Details', 'Phred QUAL Score', 'Zygosity', 'P-Value', 'PPA', 'Read Counts Per Million', 'Oncomine Driver Gene', 'Gene Isoform', 'NormalizedReadCount', 'Imbalance Score', 'Copy Number', 'P-Value.1', 'CNV Confidence', 'Valid CNV Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS', 'TierVPS'])]
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
 				'Variant ID': 'Variant_ID', \
@@ -495,7 +497,8 @@ def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon, Variants.transcript, \
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Samples.CommentSamples, \
+		Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, Variants.annotation_variant2, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
@@ -512,7 +515,8 @@ def list_interpretation(db,sampleid):
 		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
 		VariantsPerSample.Valid_CNV_Amplicons, \
-		VariantsPerSample.CommentVPS, Classification.Populasjonsdata, \
+		VariantsPerSample.CommentVPS, VariantsPerSample.TierVPS,\
+		Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
@@ -661,6 +665,14 @@ def insert_failedsample(db, user, date, sampleid):
 		result = conn.execute(text(stmt))
 		conn.commit()
 
+def insert_comment(db, comment, sampleid):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = f"""UPDATE Samples set 
+		CommentSamples = '{comment}' WHERE sampleid = '{sampleid}';"""
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
 def insert_variants(db, variant_dict):
 	# update DATE_CHANGED_VARIANT_BROWSER !!!
     # Check if classification has a copy in database 
@@ -688,7 +700,8 @@ def insert_variants(db, variant_dict):
 								"changed", \
 								"visibility"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER", "Reply", "CommentVPS"]
+								"DATE_CHANGED_VARIANT_BROWSER", "Reply", \
+								"CommentVPS", "TierVPS"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -757,7 +770,8 @@ def insert_variants(db, variant_dict):
 						'"+dateChangedVariantBrowser+"',\
 					Reply = \
 						'"+dfVarVariantsPerSample['Reply'][0]+"',\
-					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"' \
+					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"', \
+					TierVPS = '"+dfVarVariantsPerSample['TierVPS'][0]+"' \
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\
@@ -1089,7 +1103,9 @@ def data_report(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, \
 		VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon,\
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, \
+		Samples.CommentSamples, \
+		Variants.gene, Variants.exon,\
 		Variants.annotation_variant, \
 		Samples.Date_Approval, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
@@ -1097,6 +1113,7 @@ def data_report(db):
 		VariantsPerSample.DP, \
 		VariantsPerSample.CNV_Confidence, \
 		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.TierVPS, \
 		VariantsPerSample.chrom_pos_altend_date, \
 		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER \
 			from VariantsPerSample \
