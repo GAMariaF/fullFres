@@ -9,6 +9,7 @@
         <b-table
           selectable
           select-mode="single"
+          selected-variant="warning"
           @row-selected="sampleRowSelected"
           striped
           hover
@@ -24,7 +25,7 @@
       </b-col>
       <b-col>
         <br>
-        <h2 v-if="selectedSample === ''">Please select a sample</h2>
+        <h2 v-if="selectedSample === ''">Please select a sample to begin control</h2>
         <div v-if="selectedSample !== ''">
           <h2>Variants for sample {{ selectedSample }}</h2>
           <h5>Signed off by {{ this.sampleUserSignoff }}</h5>
@@ -603,46 +604,57 @@ export default {
     },
 
     oncoScoring(selectedoncogenicity_list) {
-    this.oncoScore = 0;
-    selectedoncogenicity_list.forEach(item => {
-    switch(item.default) {
-      case 'Very Strong':
-        this.oncoScore += 8
-        break;
-      case 'Strong':
-        this.oncoScore += 4
-        break;
-      case 'Moderate':
-        this.oncoScore += 2
-        break;
-      case 'Supporting':
-        this.oncoScore += 1
-        break;
-      case 'bVery Strong':
-        this.oncoScore += -8
-        break;
-      case 'bStrong':
-        this.oncoScore += -4
-        break;
-      case 'bModerate':
-        this.oncoScore += -2
-        break;
-      case 'bSupporting':
-        this.oncoScore += -1
-        break;
-      }
-    })
-    if (this.oncoScore == 0){
-      this.oncoScore = "";
-    }
-    this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+      if (selectedoncogenicity_list.length == 0) {
+        this.variants[this.selectedRowIndex].Oncogenicity = "";
+      } else {
+
+        this.oncoScore = 0;
+        selectedoncogenicity_list.forEach(item => {
+        switch(item.default) {
+          case 'Very Strong':
+            this.oncoScore += 8
+            break;
+          case 'Strong':
+            this.oncoScore += 4
+            break;
+          case 'Moderate':
+            this.oncoScore += 2
+            break;
+          case 'Supporting':
+            this.oncoScore += 1
+            break;
+          case 'bVery Strong':
+            this.oncoScore += -8
+            break;
+          case 'bStrong':
+            this.oncoScore += -4
+            break;
+          case 'bModerate':
+            this.oncoScore += -2
+            break;
+          case 'bSupporting':
+            this.oncoScore += -1
+            break;
+          case 'adjust':
+            this.oncoScore += parseInt(this.oncoAdjust)
+            break;
+          }
+        })
+
+        if (this.oncoScore == 0){
+          this.oncoScore = "0";
+        }
+        this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+      }    
     },
+
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
       console.log("setChanged");
     },
+
     oncogenicitySelected(items) {
 
 
@@ -786,10 +798,12 @@ export default {
               headers: { "Content-Type": "application/json" },
             }
           )
-          .then((response) => response.data);
-          this.$router.push({
-          name: "Samples"
-        });}
+          //.then((response) => response.data);
+          //this.$router.push({
+          //name: "Control"
+        //});
+        location.reload();
+      }
     },
 
     unApprove() {
@@ -798,7 +812,7 @@ export default {
       // This if only for signing off the user when interpretation is done. 
       console.log("Sign off method");
       
-      // Metode for  sende inn dato, og tolkede varianter til backend.
+      // Metode for sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/unsignoff";
       this.$http
         .post(
@@ -815,9 +829,10 @@ export default {
           }
         )
         .then((response) => response.data);
-        this.$router.push({
-        name: "Samples"
-        });
+        //this.$router.push({
+        //name: "Control"
+        //});
+        location.reload();
     },
   },
 

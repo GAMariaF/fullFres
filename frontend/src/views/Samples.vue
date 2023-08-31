@@ -32,6 +32,7 @@
           <b-table
             selectable
             select-mode="single"
+            selected-variant="warning"
             @row-selected="rowSelected"
             striped
             hover
