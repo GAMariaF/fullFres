@@ -1,7 +1,7 @@
 let config;
 
 config = {
-    $backend_url: 'http://172.16.0.3:5000',
+    $backend_url: 'http://172.16.0.3:5001',
     $signout_url: function() {
         return this.$backend_url + '/newlogout';
     },
@@ -27,7 +27,12 @@ config = {
         { value: 'OM1: Functional domain (+2)', text: 'OM1: Functional domain (+2)' },
         { value: 'OM2: Protein length changes (+2)', text: 'OM2: Protein length changes (+2)' },
         { value: 'OM3: Different AA in known oncogenic site (+2)', text: 'OM3: Different AA in known oncogenic site (+2)' },
-        { value: 'OVS1: Nullvariant (+8)', text: 'OVS1: Nullvariant (+8)' }
+        { value: 'OVS1: Nullvariant (+8)', text: 'OVS1: Nullvariant (+8)' },
+        { value: 'SBVS1: (-8)', text: 'SBVS1: (-8)'},
+        { value: 'SBP2: (-1)', text: 'SBP2: (-1)'},
+        { value: 'SBP1: (-1)', text: 'SBP1: (-1)'},
+        { value: 'SBS1: (-4)', text: 'SBS1: (-4)'},
+        { value: 'SBS2: (-4)', text: 'SBS2: (-4)'},
     ],
     cancerhotspotsOptions: [
         // Obs - dont use 0 (it is reserved)

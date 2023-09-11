@@ -218,12 +218,12 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
-              <p v-if="!allowEdit">{{ variants[selectedRowIndex].Tier }}</p>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].TierVPS }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
                 v-if="allowEdit"
-                v-model="variants[selectedRowIndex].Tier"              
+                v-model="variants[selectedRowIndex].TierVPS"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
@@ -328,14 +328,34 @@
         </b-row>
       </b-container>
     </b-modal>
+    <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Sample Comment</label>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                
+                @click="changedatastate"
+                placeholder=""
+                rows=4
+                v-model="variants[0].CommentSamples"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+        <b-col>
+          <br>
+          <b-button v-on:click="updateComment" class="btn mr-1 btn-info"> Update Comment </b-button>
+          <br>
+        </b-col>
+        
+     <br>       
+    <b >{{ this.variants[0] }}</b>
       <br>
       <br>
       <div v-if="locked === false">
       <h5>When interpretation is done, please sign off here</h5>
       <br>
-
-
-
 
     <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
       <b-row>
@@ -368,7 +388,7 @@ export default {
       showDismissibleAlert: false,
       loading: true,
       allowEdit: false,
-      sortedIndex: [ 'runid',
+      sortedIndex: ['runid',
                     'sampleid',
                     'Genelist',
                     'Perc_Tumor',
@@ -417,7 +437,7 @@ export default {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier'
+                    'TierVPS'
                   ],
       oncoScore: 0,
       oncoAdjust: 0,
@@ -654,6 +674,20 @@ export default {
       this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
       this.predictive_data = [];
       console.log("infomodal lukket");
+    },
+    updateComment() {
+      var comment = this.variants[0].CommentSamples
+      const baseURI = config.$backend_url + "/api/commentsample";
+        this.$http.post(baseURI,
+          {
+            commentsamples: comment,
+            sampleid: this.$route.params.id,
+          },
+          {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+          }
+        ).then((response) => response.data);
     },
 
 
