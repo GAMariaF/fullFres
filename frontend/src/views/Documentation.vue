@@ -47,11 +47,11 @@ export default {
   data() {
     return {
       pages: [{"Page": "Samples", "Key": "samplesText"}, 
-              {"Page": "Control", "Key": "controlText"}, 
+              {"Page": "Control", "Key": "controlText"},
+              {"Page": "Report", "Key": "reportText"},
               {"Page": "All Samples", "Key": "allSamplesText"}, 
               {"Page": "Variants", "Key": "varStatsText"}, 
-              {"Page": "Statistics", "Key": "statisticsText"}, 
-              {"Page": "Report", "Key": "reportText"}
+              {"Page": "Statistics", "Key": "statisticsText"}
             ],
       page: "User Guide",
       field: ["Page"],

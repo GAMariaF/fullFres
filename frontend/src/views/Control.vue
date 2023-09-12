@@ -341,12 +341,12 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
-              <p v-if="!allowEdit">{{ variants[selectedRowIndex].Tier }}</p>
+              <p v-if="!allowEdit">{{ variants[selectedRowIndex].TierVPS }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
                 v-if="allowEdit"
-                v-model="variants[selectedRowIndex].Tier"              
+                v-model="variants[selectedRowIndex].TierVPS"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
@@ -511,7 +511,7 @@ export default {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier'
+                    'TierVPS'
                   ],
       predictive_data: [],
       oncoScore: 0,
