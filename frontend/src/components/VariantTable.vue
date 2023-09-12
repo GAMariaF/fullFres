@@ -354,7 +354,7 @@
       <br>
       <br>
       <div v-if="locked === false">
-      <h5>When interpretation is done, please sign off here</h5>
+      <h5>When interpretation is done, please sign off here:</h5>
       <br>
 
     <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
@@ -689,7 +689,6 @@ export default {
           }
         ).then((response) => response.data);
     },
-
 
     sendVariants() {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed

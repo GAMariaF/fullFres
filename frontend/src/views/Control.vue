@@ -37,8 +37,6 @@
                 <b style="color:red;" v-show="this.variants[0].Status=='Failed'">Failed</b>
           </h5>
           <br>
-          <h5>{{ this.variants[0].CommentSamples }}</h5>
-          <br>
           <h2><p style="text-align:left;">Reply (Svares ut)</p></h2>
           <br>          
           <b-table
@@ -151,12 +149,32 @@
               </b-button>
             </template>
           </b-table>
+          <br>
+          <b-row class="mb-1">
+          <b-col cols="12">
+            <label>Sample Comment</label>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                
+                placeholder=""
+                rows=4
+                v-model="variants[0].CommentSamples"
+
+              ></b-form-textarea>
+          </b-col>
+        </b-row>
+        <b-col>
+          <br>
+          <b-button v-on:click="updateComment" class="btn mr-1 btn-info"> Update Comment </b-button>
+          <br>
+        </b-col>
                     
           <br><br>
           <h3 v-if="warning !== ''">{{ this.warning }}</h3>
           <b-row>
             <b-col>
-              <b-button v-on:click="unApprove" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
+              <b-button v-on:click="unApprove();location.reload()" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
             </b-col>
             <b-col>
               <b-button v-on:click="approve" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
@@ -445,7 +463,7 @@ export default {
       //classVariants: [],
       //notClassVariants: [],
       allowEdit: false,
-      sortedIndex: [ 'runid',
+      sortedIndex: ['runid',
                     'sampleid',
                     'Genelist',
                     'Perc_Tumor',
@@ -750,6 +768,7 @@ export default {
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
         // Viss noko har blitt endra, er det ikkje lenger mulig å godkjenne.
+        this.unApprove();
         this.somethingChanged = true
         console.log("Something has changed - sending updated data to db")
       // Metode for  sende inn dato, og tolkede varianter til backend.
@@ -770,6 +789,21 @@ export default {
           )
           .then((response) => response.data);
       } 
+    },
+
+    updateComment() {
+      var comment = this.variants[0].CommentSamples
+      const baseURI = config.$backend_url + "/api/commentsample";
+        this.$http.post(baseURI,
+          {
+            commentsamples: comment,
+            sampleid: this.selectedSample,
+          },
+          {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+          }
+        ).then((response) => response.data);
     },
 
 
@@ -810,8 +844,7 @@ export default {
 
     unApprove() {
       // If the sample is not ready and needs to be sent back to the interpretation-list this button is used.
-      // The button does the opposite of the sign-off
-      // This if only for signing off the user when interpretation is done. 
+      // The button does the opposite of the sign-off 
       console.log("Sign off method");
       
       // Metode for sende inn dato, og tolkede varianter til backend.
@@ -834,7 +867,7 @@ export default {
         //this.$router.push({
         //name: "Control"
         //});
-        location.reload();
+        //location.reload();
     },
   },
 
