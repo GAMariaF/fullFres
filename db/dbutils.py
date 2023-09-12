@@ -352,9 +352,14 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					'Seq_Date': [sequencing_date]})
 		logging.debug(f"{run_id}, {sample_id}, {percent_tumor}, {sample_diseasetype}, {sequencing_date}")
 		# Transfer data to database
-		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
-		dfvcf_copy.AF *= 100
-		dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
+		try:
+			dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
+			dfvcf_copy.AF *= 100
+			dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
+		except AttributeError:
+			# Satser på at det går greit å hoppe over dette i visse tilfeller.
+			# Når en prøve kun har f.eks. strukturelle variantar er ikkje AF feltet inkludert.
+			logging.debug(f"{run_id}, {sample_id}, (Likely:) AttributeError: 'DataFrame' object has no attribute 'AF'")
 		
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:

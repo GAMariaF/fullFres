@@ -26,5 +26,7 @@ if __name__ == '__main__':
     from waitress import serve
     print( "in_virtualenv()")
     serve(app, host='0.0.0.0', port=5000)
+    # For running not in docker:
+    #app.run(host='172.16.0.3', port=5001, threaded=True, debug=True)
     
    
