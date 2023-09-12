@@ -55,6 +55,10 @@
             Gene List: <b>{{ this.variants[0].Genelist }}</b> | Tumor %:
             <b>{{ this.variants[0].Perc_Tumor }}</b>
           </h5>
+          <br>
+          <br>
+          <h5><p style="text-align: left">Sample Comment:</p></h5>
+          <p style="text-align: left">{{ this.variants[0].CommentSamples }}</p>
           <br />
           <h2><p style="text-align: left">Classified variants:</p></h2>
           <br />
