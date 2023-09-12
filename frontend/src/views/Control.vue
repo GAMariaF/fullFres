@@ -215,6 +215,7 @@
           </b-col>                        
         </b-row>
         <br>
+        
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Population Data (GnomAD)<br><i>OP4: 2/152182 (+1)</i></label>
@@ -338,6 +339,7 @@
                 @change="updateVariants();setChanged()" 
               >
               </b-form-select>
+
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
@@ -351,6 +353,7 @@
               ></b-form-select>
             </b-col>
         </b-row>
+
         <b-row class="mb-1">
           <b-col cols="12">
             <label>Classification Comment</label>
@@ -367,6 +370,7 @@
               ></b-form-textarea>
           </b-col>
         </b-row>
+
         <b-row>
           <b-col cols="12">
               <label>Alt Annotation:</label>

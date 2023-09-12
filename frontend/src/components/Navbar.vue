@@ -17,7 +17,7 @@
           <b-nav-item-dropdown right v-show="state">
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em v-show="state">{{username}}</em>
+            <em v-show="state">{{ username }}</em>
             <em v-show="!state">User</em>
           </template>
           <b-dropdown-item to="/profile">Profile</b-dropdown-item>

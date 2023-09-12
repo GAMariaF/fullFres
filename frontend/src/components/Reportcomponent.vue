@@ -259,7 +259,7 @@ export default {
         {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
-        {key: "annotation_variant", label: "Annotation Variant"},
+        {key: "annotation_variant2", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "Specific", label: "Type Specific"},
