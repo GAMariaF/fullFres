@@ -174,7 +174,7 @@
           <h3 v-if="warning !== ''">{{ this.warning }}</h3>
           <b-row>
             <b-col>
-              <b-button v-on:click="unApprove();location.reload()" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
+              <b-button v-on:click="unApprove();reloadPage()" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
             </b-col>
             <b-col>
               <b-button v-on:click="approve" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
@@ -215,7 +215,7 @@
           </b-col>                        
         </b-row>
         <br>
-        
+
         <b-row class="mb-1">
           <b-col cols="6">
             <label>Population Data (GnomAD)<br><i>OP4: 2/152182 (+1)</i></label>
@@ -343,11 +343,10 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
-              <p v-if="!allowEdit">{{ variants[selectedRowIndex].TierVPS }}</p>
+              <p>{{ variants[selectedRowIndex].TierVPS }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
-                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].TierVPS"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
@@ -391,20 +390,29 @@
         </b-row>
         <b-row>
           <b-col cols="12">
-          <label v-if="allowEdit">Available evidence types:</label>
+          <label>Available evidence types:</label>
           <br>
           <span v-for="item in oncogenicitycriteria" :key="item.tag">
             <b-button v-if="allowEdit" v-on:click="oncogenicitySelected(item);updateVariants();setChanged()" v-b-tooltip.hover type="button" :title="item.title" :class="item.class">{{item.tag}}</b-button><span>&nbsp;</span>
           </span>
           <br>
           <br>
-            <label v-if="allowEdit" >Adjust Oncogenicity</label>
-              <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
-            <br>
-        
-            <div>
-            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
+        </b-col>
+        </b-row>
+        <b-row>
             
+            <label v-if="allowEdit" >Adjust Oncogenicity</label>
+            <b-col cols="2">
+              <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
+            </b-col>
+            <b-col cols="10"></b-col>
+            <br>
+            </b-row>
+            <b-row>
+          <b-col>
+            <div>
+              <br>
+            <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
             <label>Chosen evidence types:</label>
             </div>
             {{this.variants[this.selectedRowIndex].evidence_types}}
@@ -590,7 +598,6 @@ export default {
         
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected")
       }
     },
     sampleRowSelected(items) {
@@ -607,11 +614,14 @@ export default {
     },
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
-      console.log("updateVariants");
     },
 
     allowClassification (state) {
       this.allowEdit = state;
+    },
+
+    reloadPage() {
+      location.reload();
     },
 
     getDate() {
@@ -676,7 +686,6 @@ export default {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
-      console.log("setChanged");
     },
 
     oncogenicitySelected(items) {
@@ -708,7 +717,6 @@ export default {
     },
 
     filterTable(row, filter) {
-      //console.log(row)
       return(eval(filter));
     },
 
@@ -737,7 +745,6 @@ export default {
     },
 
     openInfoModal(item, index, button) {
-      console.log("openInfoModal")
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
@@ -751,15 +758,12 @@ export default {
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
-      console.log("infomodal lukket")
       this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
       this.predictive_data = [];
-      console.log("infomodal lukket");
     },
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      console.log("method to get signed off samples");
       const baseURI = config.$backend_url + "/api/signoff_samples";
       this.$http
         .get(baseURI)
@@ -774,7 +778,6 @@ export default {
         // Viss noko har blitt endra, er det ikkje lenger mulig å godkjenne.
         this.unApprove();
         this.somethingChanged = true
-        console.log("Something has changed - sending updated data to db")
       // Metode for  sende inn dato, og tolkede varianter til backend.
       // OBS: fjerner også signoff, altså prøven blir sendt tilbake til samples.
         const baseURI = config.$backend_url + "/api/updatevariants";
@@ -814,7 +817,6 @@ export default {
     approve() {
       // Sending approval date to database
       // This if only for signing off the user when interpretation is done. 
-      console.log("Sign off method");
       
       // Metode for  sende inn dato, og tolkede varianter til backend.
       
@@ -849,7 +851,6 @@ export default {
     unApprove() {
       // If the sample is not ready and needs to be sent back to the interpretation-list this button is used.
       // The button does the opposite of the sign-off 
-      console.log("Sign off method");
       
       // Metode for sende inn dato, og tolkede varianter til backend.
       const baseURI = config.$backend_url + "/api/unsignoff";

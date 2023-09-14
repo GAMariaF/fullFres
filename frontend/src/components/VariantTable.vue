@@ -218,11 +218,10 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
-              <p v-if="!allowEdit">{{ variants[selectedRowIndex].TierVPS }}</p>
+              <p>{{ variants[selectedRowIndex].TierVPS }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
-                v-if="allowEdit"
                 v-model="variants[selectedRowIndex].TierVPS"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
@@ -276,11 +275,21 @@
           </span>
           <br>
           <br>
+        </b-col>
+        </b-row>
+        <b-row>
+            
             <label v-if="allowEdit" >Adjust Oncogenicity</label>
+            <b-col cols="2">
               <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
+            </b-col>
+            <b-col cols="10"></b-col>
             <br>
-        
+            </b-row>
+            <b-row>
+          <b-col>
             <div>
+              <br>
             <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
             <label>Chosen evidence types:</label>
             </div>
@@ -516,7 +525,6 @@ export default {
       },
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
-      console.log("updateVariants");
     },
 
     oncoScoring(selectedoncogenicity_list) {
@@ -568,7 +576,6 @@ export default {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
       this.updateVariants();
-      console.log("setChanged");
     },
 
     allowClassification (state) {
@@ -653,7 +660,6 @@ export default {
     },
 
     openInfoModal(item, index, button) {
-      console.log("openInfoModal");
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
@@ -673,7 +679,6 @@ export default {
       // Get Prediktive_data-field into variants for this specific variant
       this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
       this.predictive_data = [];
-      console.log("infomodal lukket");
     },
     updateComment() {
       var comment = this.variants[0].CommentSamples
@@ -694,7 +699,6 @@ export default {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
-        console.log("Something has changed - sending updated data to db")
         // Metode for  sende inn dato, og tolkede varianter til backend.
         const baseURI = config.$backend_url + "/api/updatevariants";
         this.$http
@@ -746,7 +750,6 @@ export default {
 
     signOff() {
       // This if only for signing off the user when interpretation is done. 
-      console.log("Sign off method");
       
       // Først - sjekk om alle rader har yes/no på reply
       var all_reply = true
