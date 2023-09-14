@@ -638,13 +638,13 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def insert_signoffdate(db, user, date, sampleid):
+def insert_signoffdate(db, user, date, sampleid, state):
 	'''
 	When hitting the signoff-button in the browser - set signoff date and signoff user
 	'''
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "UPDATE Samples set User_Signoff = '"+user+"', Date_Signoff = '"+date+"', Status = 'Success' WHERE sampleid = '"+sampleid+"';"
+	stmt = "UPDATE Samples set User_Signoff = '"+user+"', Date_Signoff = '"+date+"', Status = '"+state+"' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()

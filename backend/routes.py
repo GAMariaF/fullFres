@@ -223,7 +223,7 @@ def api(current_user, query):
             return response
         elif query == "signoff":
             j = json.loads(json.dumps(request.json))
-            insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"], j["state"],)
             response = jsonify({'message': 'Signed off sample!'})
             return response
         elif query == "unsignoff":

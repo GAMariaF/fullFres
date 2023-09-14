@@ -362,21 +362,29 @@
     <b >{{ this.variants[0] }}</b>
       <br>
       <br>
+      <b-row>
+        <b-col>
+            <b-button v-on:click="fillReply" class="btn mr-1 btn-info btn-m"> Fill Reply </b-button>
+        </b-col>
+      </b-row>
+    <br><br>
       <div v-if="locked === false">
-      <h5>When interpretation is done, please sign off here:</h5>
+      <h5>When interpretation is finished, please sign off here:</h5>
       <br>
-
+    
     <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
       <b-row>
+        <b-col></b-col>
         <b-col>
           <b-button v-on:click="failedSample" class="btn mr-1 btn-danger btn-m"> Failed Sample </b-button>
           </b-col>
           <b-col>
-          <b-button v-on:click="fillReply" class="btn mr-1 btn-warning btn-m"> Fill Reply </b-button>
+          <b-button v-on:click="signOff(false)" class="btn mr-1 btn-warning btn-m"> Partial Success </b-button>
           </b-col>
           <b-col>
-          <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-m"> Sign off </b-button>
+          <b-button v-on:click="signOff(true)" class="btn mr-1 btn-success btn-m"> Success </b-button>
         </b-col>
+        <b-col></b-col>
       </b-row>
       </div>
     <!--  -->
@@ -748,11 +756,16 @@ export default {
       } else { this.showDismissibleAlert=true }
     },
 
-    signOff() {
-      // This if only for signing off the user when interpretation is done. 
-      
+    signOff(status) {
+      // This if only for signing off the user when interpretation is done.
+      var state = ""; 
+      if (status) {
+        state = "Success";
+      } else {
+        state = "Partial";
+      }
       // Først - sjekk om alle rader har yes/no på reply
-      var all_reply = true
+      var all_reply = true;
       this.variants.forEach(item => {
         if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
@@ -768,6 +781,7 @@ export default {
             sampleid: this.$route.params.id,
             variants: this.variants,
             user: this.$store.getters.username,
+            state: state,
           },
           {
             withCredentials: true,

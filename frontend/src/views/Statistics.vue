@@ -70,6 +70,16 @@
         <!--  -->
         <b-col>
           <b-card
+            title="Partial Successes"
+            sub-title="Number of partial successes"
+          >
+            <b-card-text>
+              <h4>{{stats.samples_partion}}</h4>
+            </b-card-text>
+          </b-card>
+        </b-col>
+        <b-col>
+          <b-card
             title="Failed samples"
             sub-title="Number of failed samples"
           >
