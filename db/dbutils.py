@@ -281,6 +281,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				cols = dfvariant_copy.columns.tolist()
 				cols.remove('DATE')
 				cols.remove('CHROM_POS_ALTEND_DATE')
+				cols.remove('annotation_variant2')
 				dfvariant_copy = dfvariant_copy.astype(str)
 				dfdb_variant_latest = dfdb_variant_latest.astype(str)
 				# check if variant in database except key chrom_pos_altend_date
@@ -357,7 +358,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 			dfvcf_copy.AF *= 100
 			dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
 		except AttributeError:
-			# Satser på at det går greit å hoppe over dette i visse tilfeller.
+			# Satser på at det går greit å hoppe over dette på denne måten.
 			# Når en prøve kun har f.eks. strukturelle variantar er ikkje AF feltet inkludert.
 			logging.debug(f"{run_id}, {sample_id}, (Likely:) AttributeError: 'DataFrame' object has no attribute 'AF'")
 		
