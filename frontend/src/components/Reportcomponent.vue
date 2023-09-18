@@ -259,7 +259,7 @@ export default {
         {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
-        {key: "annotation_variant2", label: "Annotation Variant"},
+        {key: "annotation_variant2", label: "Annotation (Alt)"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "Specific", label: "Type Specific"},
@@ -410,13 +410,13 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return(data.item['Variant_ID'].split('.')[0]+'.'+data.item['Variant_ID'].split('.')[1]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
             return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
-            return("AF: "+data.item['AF']);
+            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'COMPLEX':
             return("AF: "+data.item['AF'])
           default:
@@ -457,7 +457,7 @@ export default {
             break;
           case 'FUSION':
             type = 'fusjonen';
-            name = variant['Variant_Name'].split(' ')[0];
+            name = variant['Variant_ID'].split('.')[0]+'.'+variant['Variant_ID'].split('.')[1]+"\nRPM: "+variant['Read_Counts_Per_Million'];
             break;
           case 'CNV':
             type = 'kopitallsvarianten';
@@ -467,6 +467,7 @@ export default {
             break;
           case 'RNAEXONVARIANT':
             type = "exonvarianten";
+            name = variant['Variant_ID']+"\nRPM: "+variant['Read_Counts_Per_Million'];
             break;
           case 'COMPLEX':
             type = "kompleksvarianten"

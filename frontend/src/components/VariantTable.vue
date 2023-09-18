@@ -645,7 +645,7 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          return(data.item['Variant_ID'].split('.')[0]+'.'+data.item['Variant_ID'].split('.')[1]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
