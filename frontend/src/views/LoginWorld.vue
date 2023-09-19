@@ -10,7 +10,7 @@
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
                   <h4 class="mt-2">
-                    <div>Welcome to fullFres!</div>
+                    <div>Welcome to the Variant Browser!</div>
                     <span></span>
                   </h4>
                 </div>
