@@ -56,10 +56,13 @@ def importVcfXls(folder):
             if df.shape[0] != 0:
                 df = explode_format_gt(df)
                 df = explode_info(df)
+                if not 'FUNC' in df.columns:
+                    df['FUNC'] = "[{}]"
                 dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
                 dfvariant = explode_func(dfvariant)
             # Adding column for assigning possible correction of annotation
-                dfvariant['annotation_variant2']=dfvariant['annotation_variant']
+                #dfvariant['annotation_variant2']=dfvariant['annotation_variant']
+                dfvariant['annotation_variant2'] = dfvariant.apply(lambda x: x['ID'] if x["annotation_variant"] == "" else x["annotation_variant"], axis=1)
             # INSERT DATA INTO TABLE SAMPLE, VARIANT AND INTERPRETATION
                 #exit()
 
