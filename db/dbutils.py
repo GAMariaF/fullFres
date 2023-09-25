@@ -530,6 +530,7 @@ def list_interpretation(db,sampleid):
 		Classification.evidence_types, \
 		Classification.Andre_DB, Classification.Oncogenicity, \
 		Classification.Tier, Classification.Comment, \
+		Classification.User_Class, \
 		VariantsPerSample.chrom_pos_altend_date, \
 		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER, \
 		Classification.changed, \
@@ -704,7 +705,8 @@ def insert_variants(db, variant_dict):
 								"class", \
 								"evidence_types", \
 								"changed", \
-								"visibility"]
+								"visibility",\
+								"User_Class"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
 								"DATE_CHANGED_VARIANT_BROWSER", "Reply", \
 								"CommentVPS", "TierVPS"]

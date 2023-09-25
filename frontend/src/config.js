@@ -1,7 +1,7 @@
 let config;
 
 config = {
-    $backend_url: 'http://172.16.0.3:5000',
+    $backend_url: 'http://172.16.0.3:5001',
     $signout_url: function() {
         return this.$backend_url + '/newlogout';
     },
@@ -18,7 +18,8 @@ config = {
         { value: null, text: '' },
         { value: 'OS2: Ja (ref) (+4)', text: 'OS2: Ja (ref) (+4)' },
         { value: 'OS2: OncoKB: Likely oncogenic (+4)', text: 'OS2: OncoKB: Likely oncogenic (+4)' },		
-        { value: 'OS2: OncoKB: Oncogenic (+4)', text: 'OS2: OncoKB: Oncogenic (+4)' }
+        { value: 'OS2: OncoKB: Oncogenic (+4)', text: 'OS2: OncoKB: Oncogenic (+4)' },
+        { value: 'SBS2: Ja (ref) (-4)', text: 'SBS2: Ja (ref) (-4)'},
     ],
     predictiveOptions: [
         // Obs - dont use 0 (it is reserved)
@@ -32,7 +33,7 @@ config = {
         { value: 'SBP2: (-1)', text: 'SBP2: (-1)'},
         { value: 'SBP1: (-1)', text: 'SBP1: (-1)'},
         { value: 'SBS1: (-4)', text: 'SBS1: (-4)'},
-        { value: 'SBS2: (-4)', text: 'SBS2: (-4)'},
+        
     ],
     cancerhotspotsOptions: [
         // Obs - dont use 0 (it is reserved)
@@ -139,14 +140,14 @@ config = {
     ],
 
     reportcodes: [
-    {value: "Test", class: 'btn mr-1 btn-success btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet er av usikker klinisk betydning."},
-    {value: "NGS8", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${type}${annoVar}i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er av usikker klinisk betydning."},
-    {value: "NGS2", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}% er relevant for behandling av pasientens xxkreft (referanse)."},
-    {value: "NGS3", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av annen krefttype (referanse)."},
-    {value: "NGS4", class: 'btn mr-1 btn-danger btn-sm', text: "Den påviste sekvensvarianten ${annoVar}i ${variant['gene']}-genet med allelfraksjon ${variant['AF']}%  (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for prognose av tumortype/diagnose av pasientens xxkreft (referanse)."},
-    {value: "NGS5", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste ${name} fusjonen med ${variant['Read_Counts_Per_Million']} reads/million (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."},
-    {value: "NGS6", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${variant['Copy_Number']} kopier) er relevant for behandling av pasientens xxkreft (referanse)."},
-    {value: "NGS7", class: 'btn mr-1 btn-warning btn-sm', text: "Den påviste delesjonen av ekson X i ${variant['gene']}-genet (xxbiopsi med ${variant['Perc_Tumor']}% tumor) er relevant for behandling av pasientens xxkreft (referanse)."}
+    {value: "NGS-N", class: "btn mr-1 btn-warning btn-sm", text: "Det er ikke påvist mutasjoner relevante for behandling, prognose eller diagnose (referanse)."},
+    {value: "NGS-P1", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste sekvensvarianten ${name} (${annoVar}) med allelfraksjon ${Math.round(variant['AF'])}% er relevant for behandling (referanse)."},
+    {value: "NGS-P2", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste sekvensvarianten ${name} (${annoVar}) med allelfraksjon ${Math.round(variant['AF'])}% er relevant for behandling av annen krefttype (referanse), og kan være relevant for inkludering i kliniske studier (ClinicalTrials.gov)"},
+    {value: "NGS-P3", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste sekvensvarianten ${name} (${annoVar}) med allelfraksjon ${Math.round(variant['AF'])}% kan være relevant for inkludering i kliniske studier (ClinicalTrials.gov)."},
+    {value: "NGS-F", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste fusjonen ${name} med ${Math.round(variant['Read_Counts_Per_Million'])} reads/million er relevant for behandling (referanse)."},
+    {value: "NGS-CNV", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${Math.round(variant['Copy_Number'])-2}+2 kopier) er relevant for behandling (referanse). «Varianten bør verifiseres før den benyttes klinisk.»"},
+    {value: "NGS-MIS", class: "btn mr-1 btn-warning btn-sm", text: "Analysen kunne ikke fullføres pga. for lite/uegnet prøvemateriale eller tekniske problemer.\nDersom annet egnet prøvemateriale er tilgjengelig kan om ønskelig ny analyse rekvireres. (tumorandel > 20 % foretrekkes)."},
+    {value: "NGS-VUS", class: "btn mr-1 btn-warning btn-sm", text: "Det ble påviste en ${type} av usikker betydning i ${variant['gene']}-genet. Det betyr at varianten ikke kan klassifiseres som sannsynlig benign eller sannsynlig onkogen med dagens kunnskap. Det er pr. i dag ikke indikasjon for behandling."}
     ],
 
     geneListOptions: [
@@ -172,7 +173,9 @@ config = {
         {value: "Yes, VN", text: "Yes, VN"},
         {value: "Yes_No", text: "Yes-No Mix"},
         {value: "No", text: "No"},
-    ]            
+    ],
+
+    
 };
 
 export { config };

@@ -72,7 +72,8 @@
           </b-col>            
           <b-col cols="4">
             <label>Classification date:</label>
-            <td>{{ getDate() }}</td>
+            <p v-if="old" style="color:rgb(255, 0, 0)">{{ getDate() }}</p>
+            <p v-if="!old">{{ getDate() }}</p>
           </b-col> 
           <b-col cols="4">
             <b-button v-on:click="allowClassification(true)" class="btn mr-1 btn-info"> Edit Classification </b-button>
@@ -246,19 +247,6 @@
               ></b-form-textarea>
           </b-col>
         </b-row>
-        <b-row>
-          <b-col cols="12">
-              <label>Alt Annotation:</label>
-              <b-form-textarea
-                id="textarea"
-                
-                @click="changedatastate"
-                v-model="variants[selectedRowIndex].annotation_variant2"
-                @change="updateVariants();setChanged()" 
-              >
-              </b-form-textarea>
-              </b-col>
-        </b-row>
 
         <hr />
         <b-row>
@@ -287,7 +275,7 @@
             <br>
             </b-row>
             <b-row>
-          <b-col>
+              <b-col cols="8">
             <div>
               <br>
             <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
@@ -295,7 +283,22 @@
             </div>
             {{this.variants[this.selectedRowIndex].evidence_types}}
 
-        </b-col>
+            </b-col>
+        </b-row>
+        <br>
+        <hr />
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                
+                @click="changedatastate"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
         </b-row>
         <br>
         <b-row class="mb-1">
@@ -498,7 +501,7 @@ export default {
         {key: "Reply", label: "Reply (Svares ut)"},
         {key: "Info"}
         ],
-        
+      old: false,
     };
   },
   methods: {
@@ -521,6 +524,7 @@ export default {
           if ((this.variants[index].class === null) || (this.variants[index].class.length === 0)) {
             this.variants[index].class = 'Not evaluated';
           }
+          this.variants[index].User_Class = this.$store.getters.username;
         }
       });
           
@@ -583,6 +587,7 @@ export default {
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
+      this.variants[this.selectedRowIndex].User_Class = this.$store.getters.username;
       this.updateVariants();
     },
 
@@ -594,12 +599,19 @@ export default {
       var date =
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
-      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yy = today.getFullYear()-2000;
+      today = Number(yy+mm+dd)
+      this.old = today-this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,6)>600;
       
       if (date === '..') {
-        return("Not previously classified")
+        return("Not previously classified");
       } else {
-        return(date)
+        return(date + " by " + this.variants[this.selectedRowIndex].User_Class);
       }
     },
 
@@ -676,7 +688,7 @@ export default {
       }
       //this.infoModal.title = `Variant: ${index +1}`;
 
-      this.infoModal.title = `${item['gene']}, ${item['Type']}: ${item['annotation_variant2']}`;
+      this.infoModal.title = `${item['gene']}, ${item['Type'].toUpperCase()}: ${item['annotation_variant2']}`;
       
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.datastate = true;

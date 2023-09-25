@@ -634,7 +634,7 @@ export default {
       if (date === '..') {
         return("Not previously classified")
       } else {
-        return(date)
+        return(date + " by " + this.variants[this.selectedRowIndex].User_Class)
       }
     },
 
@@ -686,6 +686,7 @@ export default {
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
+      this.variants[this.selectedRowIndex].User_Class = this.$store.getters.username;
       this.updateVariants();
     },
 

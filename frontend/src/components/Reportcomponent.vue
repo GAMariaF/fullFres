@@ -429,13 +429,13 @@ export default {
         console.log("No row selected")
         this.report = "No row selected";
       } else {
-        this.reportArray = [`${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`];
+        this.reportArray = [`Rapport prøve ${this.variants[0]['sampleid']}\n\n`];
         this.generateReport();
       }
     },
 
     generateVarRep(category) {
-
+      let aaDictionary = {"Ala": "A", "Arg": "R", "Asn": "N", "Asp": "D", "Cys": "C", "Glu": "E", "Gly": "G", "His": "H", "Ile": "I", "Leu": "L", "Lys": "K", "Met": "M", "Phe": "F", "Pro": "P", "Ser": "S", "Thr": "T", "Trp": "W", "Tyr": "Y", "Val": "V"};
       if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
         this.warning = "No variant selected"
@@ -448,6 +448,10 @@ export default {
         switch (variant['Type'].toUpperCase()) {
           case 'SNP':
             type = 'sekvensvarianten';
+            var aa_1 = aaDictionary[variant['protein'].slice(2, 5)];
+            var aa_2 = aaDictionary[variant['protein'].slice(-3)];
+            var pos = variant['protein'].slice(5, -3);
+            name = variant['gene']+ " "+ aa_1+pos+aa_2;
             break;
           case 'DEL':
             type = 'delesjonen';
@@ -457,7 +461,8 @@ export default {
             break;
           case 'FUSION':
             type = 'fusjonen';
-            name = variant['Variant_ID'].split('.')[0]+'.'+variant['Variant_ID'].split('.')[1]+"\nRPM: "+variant['Read_Counts_Per_Million'];
+            var genes = variant['Variant_ID'].split('.')[0].split('-');
+            name = genes[0]+'::'+genes[1];
             break;
           case 'CNV':
             type = 'kopitallsvarianten';
@@ -467,7 +472,7 @@ export default {
             break;
           case 'RNAEXONVARIANT':
             type = "exonvarianten";
-            name = variant['Variant_ID']+"\nRPM: "+variant['Read_Counts_Per_Million'];
+            name = variant['Variant_ID'];
             break;
           case 'COMPLEX':
             type = "kompleksvarianten"
@@ -475,10 +480,7 @@ export default {
         }
         type = type + " ";
 
-        var annoVar = "";
-        if (variant['annotation_variant2'] !== ": ()"){
-          annoVar = variant['annotation_variant2'] + " ";
-        }
+        var annoVar = variant['annotation_variant2'];
         
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
