@@ -201,7 +201,7 @@
         <hr />
         <b-row>
           <b-col cols="10">
-            <p>Gene Info:</p>
+            <p>Variant Classified {{ getDate() }}</p>
           </b-col>
         </b-row>
 
@@ -391,7 +391,7 @@ export default {
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       //this.reportModal.title = `Variant: ${index + 1}`;
-      this.reportModal.title = `${item['gene']}: ${item['annotation_variant']}`;
+      this.reportModal.title = `${item['gene']}: ${item['annotation_variant2']}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
 
@@ -501,6 +501,26 @@ export default {
 
     generateReport() {
       this.report = this.reportArray.join('')
+    },
+
+    getDate() {
+      var date =
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yy = today.getFullYear()-2000;
+      today = Number(yy+mm+dd)
+      this.old = today-this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,6)>600;
+      
+      if (date === '..') {
+        return("Not previously classified");
+      } else {
+        return(date + " by " + this.variants[this.selectedRowIndex].User_Class);
+      }
     },
 
     async copyToClipboard(text) { 

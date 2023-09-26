@@ -178,7 +178,10 @@
               <b-button v-on:click="unApprove();reloadPage()" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
             </b-col>
             <b-col>
-              <b-button v-on:click="approve" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
+              <b-button v-if="warning !== ''" v-on:click="approve(true)" class="btn mr-1 btn-warning btn-lg"> Override </b-button>
+            </b-col>
+            <b-col>
+              <b-button v-on:click="approve(false)" class="btn mr-1 btn-success btn-lg"> Approve </b-button>
             </b-col>
           </b-row>
           
@@ -816,7 +819,7 @@ export default {
     },
 
 
-    approve() {
+    approve(override) {
       // Sending approval date to database
       // This if only for signing off the user when interpretation is done. 
       
@@ -825,7 +828,7 @@ export default {
       // Må sjekke om noko har blitt endra.
       if(this.somethingChanged) {
         this.warning = "You are not allowed to approve after making changes."
-      } else if(this.sampleUserSignoff === this.$store.getters.username) {
+      } else if(!override & this.sampleUserSignoff === this.$store.getters.username) {
         this.warning = "You are not allowed to both sign off on and approve a sample."
       } else {
 
