@@ -589,7 +589,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		
 
 	stmt = f"""
-	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
+	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant2, 
 
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
@@ -635,6 +635,61 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	ORDER BY FreqSamples DESC;
 	"""
 
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json
+
+def get_classifications(db, data):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = f"select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Samples.CommentSamples, \
+		Variants.gene, Variants.exon, Variants.transcript, \
+		Variants.annotation_variant, Variants.annotation_variant2, \
+		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
+		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
+		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \
+		VariantsPerSample.Variant_Name, VariantsPerSample.Key_Variant, \
+		VariantsPerSample.Oncomine_Reporter_Evidence, \
+		VariantsPerSample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, \
+		VariantsPerSample.FILTER, \
+		Variants.chrom || ':' || Variants.pos as Locus, Variants.protein, Variants.ref, \
+		Variants.altend, VariantsPerSample.Call, VariantsPerSample.DP, \
+		VariantsPerSample.FDP, VariantsPerSample.FAO, \
+		Variants.coding, \
+		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
+		VariantsPerSample.Oncomine_Driver_Gene, \
+		VariantsPerSample.CNV_Confidence, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.CommentVPS, VariantsPerSample.TierVPS,\
+		Classification.Populasjonsdata, \
+		Classification.Funksjonsstudier, Classification.Prediktive_data, \
+		Classification.Cancer_hotspots, Classification.Computational_evidens, \
+		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
+		Classification.class, \
+		Classification.evidence_types, \
+		Classification.Andre_DB, Classification.Oncogenicity, \
+		Classification.Tier, Classification.Comment, \
+		Classification.User_Class, \
+		VariantsPerSample.chrom_pos_altend_date, \
+		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER, \
+		Classification.changed, \
+		Classification.visibility \
+			from VariantsPerSample \
+			left join Variants \
+			on VariantsPerSample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \
+			left join Classification \
+			on VariantsPerSample.chrom_pos_altend_date = Classification.chrom_pos_altend_date \
+			AND VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER = \
+											Classification.DATE_CHANGED_VARIANT_BROWSER \
+			LEFT JOIN Samples \
+			on VariantsPerSample.runid = Samples.runid \
+			and VariantsPerSample.sampleid = Samples.sampleid \
+			WHERE Samples.Status != 'Failed' and \
+				Variants.CHROM = '{data[1]}' and \
+				Variants.POS = '{data[2]}' and \
+				Variants.REF = '{data[3]}' and \
+				Variants.ALTEND = '{data[4]}';"
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')

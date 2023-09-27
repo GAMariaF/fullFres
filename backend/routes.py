@@ -41,6 +41,7 @@ from dbutils import insert_comment
 from dbutils import statistics
 from dbutils import data_report
 from dbutils import list_search
+from dbutils import get_classifications
 
 from importutils import importVcfXls
 
@@ -200,10 +201,14 @@ def api(current_user, query):
             for i in range(len(q)):
                 if len(q[i]) == 1 and q[i][0] == "":
                     q[i] = []
-           
             #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
             res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
+            return response
+        elif query[:9] == "get_class":
+            logging.debug("getting classifications")
+            samples = get_classifications(db_path, query.split('|'))
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
             response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)

@@ -508,13 +508,6 @@ export default {
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
-
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, '0');
-      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-      var yy = today.getFullYear()-2000;
-      today = Number(yy+mm+dd)
-      this.old = today-this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,6)>600;
       
       if (date === '..') {
         return("Not previously classified");
