@@ -827,7 +827,10 @@ export default {
       
       // Må sjekke om noko har blitt endra.
       if(this.somethingChanged) {
-        this.warning = "You are not allowed to approve after making changes."
+          if(override){
+            this.warning="Nice try! This only works when when no changes have been made."
+          } else {
+            this.warning = "You are not allowed to approve after making changes."}
       } else if(!override & this.sampleUserSignoff === this.$store.getters.username) {
         this.warning = "You are not allowed to both sign off on and approve a sample."
       } else {
