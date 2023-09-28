@@ -94,6 +94,7 @@ config = {
                     'gene',
                     'transcript',
                     'annotation_variant',
+                    'annotation_variant2',
                     'Reads',
                     'FILTER',
                     'AF',
@@ -135,8 +136,9 @@ config = {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier',
-                    'CommentVPS'
+                    'TierVPS',
+                    'CommentVPS',
+                    'User_Class'
     ],
 
     reportcodes: [

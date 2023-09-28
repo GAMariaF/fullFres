@@ -21,7 +21,7 @@ def main():
     parser.add_argument("-S", metavar="sampleid", default=std_in, help="The ID of the sample which should be unapproved and unsigned.")
     args = parser.parse_args()
 
-    db = "/illumina/analysis/dev/2023/sigvla/fullFres_dev/db/variantdb_2.db"
+    db = "/illumina/analysis/fullFres/db/variantdb.db"
 
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
 

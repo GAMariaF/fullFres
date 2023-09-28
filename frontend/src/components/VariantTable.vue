@@ -341,7 +341,10 @@
       </b-container>
     </b-modal>
     <b-row class="mb-1">
+      
           <b-col cols="12">
+            <div v-if="locked === false">
+            
             <label>Sample Comment</label>
              <b-form-textarea
                 id="textarea"
@@ -353,25 +356,26 @@
                 v-model="variants[0].CommentSamples"
 
               ></b-form-textarea>
-          </b-col>
-        </b-row>
-        <b-col>
+              
           <br>
           <b-button v-on:click="updateComment" class="btn mr-1 btn-info"> Update Comment </b-button>
           <br>
+        </div>
         </b-col>
-        
-     <br>       
-    <b >{{ this.variants[0] }}</b>
+      </b-row>
+     <br>
+      <h5><p v-if="locked === true" style="text-align: left">Sample Comment:</p></h5>
+      <p v-if="locked === true" style="text-align: left">{{ variants[0].CommentSamples }}</p>
       <br>
       <br>
+      <div v-if="locked === false">
       <b-row>
         <b-col>
-            <b-button v-on:click="fillReply" class="btn mr-1 btn-info btn-m"> Fill Reply </b-button>
+            <b-button v-if="locked === false" v-on:click="fillReply" class="btn mr-1 btn-info btn-m"> Fill Reply </b-button>
         </b-col>
       </b-row>
     <br><br>
-      <div v-if="locked === false">
+      
       <h5>When interpretation is finished, please sign off here:</h5>
       <br>
     
