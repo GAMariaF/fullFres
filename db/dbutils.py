@@ -45,6 +45,10 @@ from sqlalchemy import create_engine
 from sqlalchemy import text
 import csv
 import os
+import logging
+
+# For debug logging
+logging.basicConfig(level=logging.DEBUG)
 
 #sqlite syntax...
 def generate_db(db):
@@ -155,6 +159,7 @@ def generate_db(db):
 		SUBSET TEXT, \
 		MISC TEXT, \
 		CommentVPS TEXT, \
+		TierVPS TEXT, \
 		PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) \
         )"))
 		result_variants = conn.execute(text("CREATE TABLE IF NOT EXISTS Variants ( \
@@ -205,6 +210,7 @@ def generate_db(db):
 		Date_Signoff TEXT, \
 		User_Approval TEXT, \
 		Date_Approval TEXT, \
+		CommentSamples TEXT, \
 		PRIMARY KEY (runid, sampleid) \
 		)"))
 		result_classification = conn.execute(text("CREATE TABLE IF NOT EXISTS Classification ( \
@@ -235,7 +241,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	if dfvcf.empty:
 		# If empty: add the sample data, and connect to failed sample variant.
-		print("Missing data to import to tables Variants, VariantsPerSample and Samples")
+		logging.warning("Missing data to import to tables Variants, VariantsPerSample and Samples")
 		with engine.connect() as conn:
 			stmt = f"INSERT INTO Samples (runid, sampleid, Genelist, Perc_Tumor, Seq_Date) VALUES ( '{run_id}', '{sample_id}', '{sample_diseasetype}', '{percent_tumor}', '{sequencing_date}' );"
 			result = conn.execute(text(stmt))
@@ -275,6 +281,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				cols = dfvariant_copy.columns.tolist()
 				cols.remove('DATE')
 				cols.remove('CHROM_POS_ALTEND_DATE')
+				cols.remove('annotation_variant2')
 				dfvariant_copy = dfvariant_copy.astype(str)
 				dfdb_variant_latest = dfdb_variant_latest.astype(str)
 				# check if variant in database except key chrom_pos_altend_date
@@ -306,7 +313,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 							AND CHROM_POS_ALTEND_DATE = '"+dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row]+"';"
 					dfdb_vcf = pd.read_sql_query(text(stmtvcf), con = conn)
 					if not dfdb_vcf.empty:
-						print(dfvcf_copy.runid.loc[row], \
+						logging.warning(dfvcf_copy.runid.loc[row], \
 							dfvcf_copy.sampleid.loc[row], \
 								dfvcf_copy.CHROM_POS_ALTEND_DATE.loc[row], " is already in database")
 						dfvcf_copy = dfvcf_copy.drop(row)
@@ -320,7 +327,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 				dfvcf_copy.loc[row,'CHROM_POS_ALTEND_DATE'] = dfvariant_copy.CHROM_POS_ALTEND_DATE.loc[row]
 		
 		# list in line below is possibly not entierly correct.
-		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User Classification', 'Variant ID', 'Variant Name', 'Key Variant', 'Oncomine Reporter Evidence', 'Type', 'Call', 'Call Details', 'Phred QUAL Score', 'Zygosity', 'P-Value', 'PPA', 'Read Counts Per Million', 'Oncomine Driver Gene', 'Gene Isoform', 'NormalizedReadCount', 'Imbalance Score', 'Copy Number', 'P-Value.1', 'CNV Confidence', 'Valid CNV Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS'])]
+		dfvcf_copy = dfvcf_copy.loc[:,dfvcf_copy.columns.isin(['runid', 'sampleid', 'CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER', 'Reply', 'User Classification', 'Variant ID', 'Variant Name', 'Key Variant', 'Oncomine Reporter Evidence', 'Type', 'Call', 'Call Details', 'Phred QUAL Score', 'Zygosity', 'P-Value', 'PPA', 'Read Counts Per Million', 'Oncomine Driver Gene', 'Gene Isoform', 'NormalizedReadCount', 'Imbalance Score', 'Copy Number', 'P-Value.1', 'CNV Confidence', 'Valid CNV Amplicons', 'ID', 'QUAL', 'FILTER', 'GT', 'GQ', 'CN', 'READ_COUNT', 'GENE_NAME', 'EXON_NUM', 'RPM', 'NORM_COUNT', 'NORM_COUNT_TO_HK', 'FUSION_DRIVER_GENE', 'ANNOTATION', 'PASS_REASON', 'Non_Targeted', 'PRECISE', 'END', 'NUMTILES', 'SD', 'CDF_MAPD', 'RAW_CN', 'REF_CN', 'PVAL', 'CI', 'AF', 'AO', 'DP', 'FAO', 'FDP', 'FDVR', 'FR', 'FRO', 'FSAF', 'FSAR', 'FSRF', 'FSRR', 'FWDB', 'FXX', 'GCM', 'HRUN', 'HS_ONLY', 'LEN', 'MLLD', 'OALT', 'OID', 'OMAPALT', 'OPOS', 'OREF', 'PB', 'PBP', 'PPD', 'QD', 'RBI', 'REFB', 'REVB', 'RO', 'SAF', 'SAR', 'SPD', 'SRF', 'SRR', 'SSEN', 'SSEP', 'SSSB', 'STB', 'STBP', 'VARB', 'NID', 'MISA', 'CLSF', 'VCFALT', 'VCFPOS', 'VCFREF', 'HS', 'SUBSET', 'MISC', 'CommentVPS', 'TierVPS'])]
 		dfvcf_copy = dfvcf_copy.rename(columns={ \
 				'User Classification': 'User_Classification', \
 				'Variant ID': 'Variant_ID', \
@@ -344,11 +351,16 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		dfSamples = pd.DataFrame({'runid': [run_id], 'sampleid': [sample_id],\
 					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype],\
 					'Seq_Date': [sequencing_date]})
-		print(run_id,sample_id,percent_tumor,sample_diseasetype,sequencing_date)
+		logging.debug(f"{run_id}, {sample_id}, {percent_tumor}, {sample_diseasetype}, {sequencing_date}")
 		# Transfer data to database
-		dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
-		dfvcf_copy.AF *= 100
-		dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
+		try:
+			dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
+			dfvcf_copy.AF *= 100
+			dfvcf_copy.AF = dfvcf_copy.AF.astype(str)
+		except AttributeError:
+			# Satser på at det går greit å hoppe over dette på denne måten.
+			# Når en prøve kun har f.eks. strukturelle variantar er ikkje AF feltet inkludert.
+			logging.debug(f"{run_id}, {sample_id}, (Likely:) AttributeError: 'DataFrame' object has no attribute 'AF'")
 		
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
@@ -357,7 +369,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		try:			
 			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
 		except:
-			print('There is an error trying to add '+run_id+','+sample_id+' \
+			logging.error('There is an error trying to add '+run_id+','+sample_id+' \
 				to table Samples. Is it already in database?')
 
 #BRUK kombinasjon chrom,pos,ref,alt og sjekk om denne er med i Variants-tabell 
@@ -396,7 +408,6 @@ def list_all_samples(db, args, date):
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"SELECT * FROM Samples s {cond};"
-	print(stmt)
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -454,17 +465,6 @@ def list_all_variants(db):
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
-	"""
-	To print (some) duplicates to check the data.
-	temp = samplelist[['CHROM_POS_ALTEND_DATE', 'DATE_CHANGED_VARIANT_BROWSER)', 'DATE_CHANGED_VARIANT_BROWSER', 'ID', 'Type', ]].reset_index()
-	for i in range(temp.shape[0]-100, temp.shape[0]):
-		print(i)
-		temp2 = temp.loc[i, :]
-		temp2.sort_index(inplace=True)
-		for c in temp2.items():
-			print(c)
-		print("----------new var-------------")
-		"""
 	return samplelist_json
 
 '''
@@ -503,7 +503,8 @@ def list_interpretation(db,sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon, Variants.transcript, \
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Samples.CommentSamples, \
+		Variants.gene, Variants.exon, Variants.transcript, \
 		Variants.annotation_variant, Variants.annotation_variant2, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
@@ -520,7 +521,8 @@ def list_interpretation(db,sampleid):
 		VariantsPerSample.Oncomine_Driver_Gene, \
 		VariantsPerSample.CNV_Confidence, \
 		VariantsPerSample.Valid_CNV_Amplicons, \
-		VariantsPerSample.CommentVPS, Classification.Populasjonsdata, \
+		VariantsPerSample.CommentVPS, VariantsPerSample.TierVPS,\
+		Classification.Populasjonsdata, \
 		Classification.Funksjonsstudier, Classification.Prediktive_data, \
 		Classification.Cancer_hotspots, Classification.Computational_evidens, \
 		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
@@ -528,6 +530,7 @@ def list_interpretation(db,sampleid):
 		Classification.evidence_types, \
 		Classification.Andre_DB, Classification.Oncogenicity, \
 		Classification.Tier, Classification.Comment, \
+		Classification.User_Class, \
 		VariantsPerSample.chrom_pos_altend_date, \
 		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER, \
 		Classification.changed, \
@@ -586,7 +589,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		
 
 	stmt = f"""
-	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant, 
+	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant2, 
 
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
@@ -632,19 +635,73 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	ORDER BY FreqSamples DESC;
 	"""
 
-	print(stmt)
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def insert_signoffdate(db, user, date, sampleid):
+def get_classifications(db, data):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = f"select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Samples.CommentSamples, \
+		Variants.gene, Variants.exon, Variants.transcript, \
+		Variants.annotation_variant, Variants.annotation_variant2, \
+		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
+		VariantsPerSample.Copy_Number, round(VariantsPerSample.AF,1) as AF, Classification.COSMIC, \
+		VariantsPerSample.Reply, VariantsPerSample.User_Classification, VariantsPerSample.Variant_ID, \
+		VariantsPerSample.Variant_Name, VariantsPerSample.Key_Variant, \
+		VariantsPerSample.Oncomine_Reporter_Evidence, \
+		VariantsPerSample.Type, Variants.oncomineGeneClass, Variants.oncomineVariantClass, \
+		VariantsPerSample.FILTER, \
+		Variants.chrom || ':' || Variants.pos as Locus, Variants.protein, Variants.ref, \
+		Variants.altend, VariantsPerSample.Call, VariantsPerSample.DP, \
+		VariantsPerSample.FDP, VariantsPerSample.FAO, \
+		Variants.coding, \
+		VariantsPerSample.P_Value, VariantsPerSample.Read_Counts_Per_Million, \
+		VariantsPerSample.Oncomine_Driver_Gene, \
+		VariantsPerSample.CNV_Confidence, \
+		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.CommentVPS, VariantsPerSample.TierVPS,\
+		Classification.Populasjonsdata, \
+		Classification.Funksjonsstudier, Classification.Prediktive_data, \
+		Classification.Cancer_hotspots, Classification.Computational_evidens, \
+		Classification.Konservering, Classification.ClinVar, VariantsPerSample.CLSF, \
+		Classification.class, \
+		Classification.evidence_types, \
+		Classification.Andre_DB, Classification.Oncogenicity, \
+		Classification.Tier, Classification.Comment, \
+		Classification.User_Class, \
+		VariantsPerSample.chrom_pos_altend_date, \
+		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER, \
+		Classification.changed, \
+		Classification.visibility \
+			from VariantsPerSample \
+			left join Variants \
+			on VariantsPerSample.chrom_pos_altend_date = Variants.chrom_pos_altend_date \
+			left join Classification \
+			on VariantsPerSample.chrom_pos_altend_date = Classification.chrom_pos_altend_date \
+			AND VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER = \
+											Classification.DATE_CHANGED_VARIANT_BROWSER \
+			LEFT JOIN Samples \
+			on VariantsPerSample.runid = Samples.runid \
+			and VariantsPerSample.sampleid = Samples.sampleid \
+			WHERE Samples.Status != 'Failed' and \
+				Variants.CHROM = '{data[1]}' and \
+				Variants.POS = '{data[2]}' and \
+				Variants.REF = '{data[3]}' and \
+				Variants.ALTEND = '{data[4]}';"
+	with engine.connect() as conn:
+		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	list_json = interpretationlist.to_dict('records')
+	return list_json
+
+def insert_signoffdate(db, user, date, sampleid, state):
 	'''
 	When hitting the signoff-button in the browser - set signoff date and signoff user
 	'''
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = "UPDATE Samples set User_Signoff = '"+user+"', Date_Signoff = '"+date+"', Status = 'Success' WHERE sampleid = '"+sampleid+"';"
+	stmt = "UPDATE Samples set User_Signoff = '"+user+"', Date_Signoff = '"+date+"', Status = '"+state+"' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
@@ -653,7 +710,7 @@ def insert_approvedate(db, user, date, sampleid):
 	''' 
 	When hitting the approve-button in the browser - set approved date and approved user
 	'''
-	print("running approve-date")
+	logging.debug("running approve-date")
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "UPDATE Samples set User_Approval = '"+user+"', Date_Approval = '"+date+"' WHERE sampleid = '"+sampleid+"';"
 	with engine.connect() as conn:
@@ -664,8 +721,16 @@ def insert_failedsample(db, user, date, sampleid):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"""UPDATE Samples set 
 		User_Signoff = '{user}', Date_Signoff = '{date}', 
-		User_Approval = '{user}', Date_Approval = '{date}', 
 		Status = 'Failed' WHERE sampleid = '{sampleid}';"""
+	#(middle above)#User_Approval = '{user}', Date_Approval = '{date}', 
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
+def insert_comment(db, comment, sampleid):
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = f"""UPDATE Samples set 
+		CommentSamples = '{comment}' WHERE sampleid = '{sampleid}';"""
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
@@ -695,9 +760,11 @@ def insert_variants(db, variant_dict):
 								"class", \
 								"evidence_types", \
 								"changed", \
-								"visibility"]
+								"visibility",\
+								"User_Class"]
 	colVariantsPerSample = ["runid", "sampleid", "CHROM_POS_ALTEND_DATE",\
-								"DATE_CHANGED_VARIANT_BROWSER", "Reply", "CommentVPS"]
+								"DATE_CHANGED_VARIANT_BROWSER", "Reply", \
+								"CommentVPS", "TierVPS"]
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
@@ -709,8 +776,8 @@ def insert_variants(db, variant_dict):
 	dfVarVariantsPerSample = pd.DataFrame(dfVariant, columns = colVariantsPerSample)
 	dfVarVariantsPerSample = dfVarVariantsPerSample.fillna('')
 	# Dataframe to table Samples
-	dfVarSamples = pd.DataFrame(dfVariant, columns = colSamples)
-	dfVarSamples = dfVarSamples.fillna('')
+	#dfVarSamples = pd.DataFrame(dfVariant, columns = colSamples)
+	#dfVarSamples = dfVarSamples.fillna('')
 	# Dataframe to table Variants
 	dfVariants = pd.DataFrame(dfVariant, columns = colVariants)
 	dfVariants = dfVariants.fillna('')
@@ -728,15 +795,15 @@ def insert_variants(db, variant_dict):
 				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
-				AND Oncogenicity='"+				dfVarClassification['Oncogenicity'][0]					+"' \
+				AND Oncogenicity='"+				str(dfVarClassification['Oncogenicity'][0])				+"' \
 				AND evidence_types='"+				dfVarClassification['evidence_types'][0]				+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"
 	with engine.connect() as conn:
 		dfInDB = pd.read_sql_query(text(stmt), con=conn)
-	if dfInDB.empty:
-		# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date
-		print('new classifiction')
+	if dfInDB.empty or (dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] != "" and int(dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER']) > dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int)):
+	# If not in DB set DATE_CHANGED_VARIANT_BROWSER to present date. If already exists but with an earlier date than the most recent classification of the variant, also insert again.
+		logging.debug('new classifiction')
 		dateChangedVariantBrowser = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 		dfVarClassification.loc[0, 'DATE_CHANGED_VARIANT_BROWSER'] = \
 		dateChangedVariantBrowser
@@ -754,11 +821,10 @@ def insert_variants(db, variant_dict):
 			conn.commit()
 
 	else:
-		print('not new in classification')
+		logging.debug('not new in classification')
 		# If already in DB choose most recent entry DATE_CHANGED_VARIANT_BROWSER
 		dateChangedVariantBrowser = \
 			dfInDB['DATE_CHANGED_VARIANT_BROWSER'].astype(float).max().astype(int).astype(str)	
-	print(dateChangedVariantBrowser)
 	# Update table VariantsPerSample with DATE_CHANGED_VARIANT_BROWSER
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
@@ -767,7 +833,8 @@ def insert_variants(db, variant_dict):
 						'"+dateChangedVariantBrowser+"',\
 					Reply = \
 						'"+dfVarVariantsPerSample['Reply'][0]+"',\
-					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"' \
+					CommentVPS = '"+dfVarVariantsPerSample['CommentVPS'][0]+"', \
+					TierVPS = '"+dfVarVariantsPerSample['TierVPS'][0]+"' \
 				WHERE \
 					runid = \
 						'"+dfVarVariantsPerSample.runid[0]+"'\
@@ -777,26 +844,28 @@ def insert_variants(db, variant_dict):
 						'"+dfVarVariantsPerSample.CHROM_POS_ALTEND_DATE[0]+"';"
 		result = conn.execute(text(stmtVPS))
 		conn.commit()
+	# Necessary??
 	# Update table Samples with data for User and Date (Sign_off)
 	# and User and Date (Approval)
-	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	with engine.connect() as conn:
-		stmtS = "UPDATE Samples set \
-					User_Signoff = \
-						'"+dfVarSamples.User_Signoff[0]+"',\
-					Date_Signoff = \
-						'"+dfVarSamples.Date_Signoff[0]+"',\
-					User_Approval = \
-						'"+dfVarSamples.User_Approval[0]+"',\
-					Date_Approval = \
-						'"+dfVarSamples.Date_Approval[0]+"'\
-				WHERE \
-					runid = \
-						'"+dfVarSamples.runid[0]+"'\
-					AND sampleid = \
-						'"+dfVarSamples.sampleid[0]+"';"
-		result = conn.execute(text(stmtS))
-		conn.commit()
+	#engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	#dfVarSamples.to_csv("Test.tsv", sep='\t')
+	#with engine.connect() as conn:
+	#	stmtS = "UPDATE Samples set \
+	#				User_Signoff = \
+	#					'"+dfVarSamples.User_Signoff[0]+"',\
+	#				Date_Signoff = \
+	#					'"+dfVarSamples.Date_Signoff[0]+"',\
+	#				User_Approval = \
+	#					'"+dfVarSamples.User_Approval[0]+"',\
+	#				Date_Approval = \
+	#					'"+dfVarSamples.Date_Approval[0]+"'\
+	#			WHERE \
+	#				runid = \
+	#					'"+dfVarSamples.runid[0]+"'\
+	#				AND sampleid = \
+	#					'"+dfVarSamples.sampleid[0]+"';"
+	#	result = conn.execute(text(stmtS))
+	#	conn.commit()
 	# Update table Variants with annotation_variant2
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
@@ -820,7 +889,7 @@ def db_to_vcf(db,outvcf='exported.vcf'):
 	''' 
 	
 	'''
-	print("test")
+	logging.debug("test")
 	writer = csv.writer(open(outvcf,'w'), delimiter="\t", quoting=csv.QUOTE_NONE, quotechar="", escapechar=' ')
 	vcf_header = ['##fileformat=VCFv4.1',
 		'##fileDate=20170821',
@@ -1097,7 +1166,9 @@ def data_report(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, \
 		VariantsPerSample.sampleid, Samples.Genelist, \
-		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Variants.gene, Variants.exon,\
+		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, \
+		Samples.CommentSamples, \
+		Variants.gene, Variants.exon,\
 		Variants.annotation_variant, \
 		Samples.Date_Approval, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
@@ -1105,6 +1176,7 @@ def data_report(db):
 		VariantsPerSample.DP, \
 		VariantsPerSample.CNV_Confidence, \
 		VariantsPerSample.Valid_CNV_Amplicons, \
+		VariantsPerSample.TierVPS, \
 		VariantsPerSample.chrom_pos_altend_date, \
 		VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER \
 			from VariantsPerSample \

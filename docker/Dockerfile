@@ -1,7 +1,7 @@
 # Build like: docker build -t fullfres .
 FROM ubuntu:20.04
 
-LABEL maintainer="Maria.Fahlstrom@sthf.no & oyvindbusk@gmail.com"
+LABEL maintainer="Maria.Fahlstrom@sthf.no & Sigve.Strand.Landa@sthf.no"
 LABEL description="Image based on Ubuntu for running the cancer interpretation utility"
 
 ENV AM_I_IN_A_DOCKER_CONTAINER Yes
@@ -36,7 +36,9 @@ RUN cd /opt ; tar xvf Python-3.9.11.tgz
 RUN cd /opt/Python-3.9*/ && ./configure --enable-optimizations &&  make install
 
 # # Install node packages
-RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar
+RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
+RUN cd /fullFres/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
+RUN cd /fullFres/frontend/ && npx vue-cli-service build
 
 # Install python packages:
 RUN cd /fullFres && pip3 uninstall -y setuptools 

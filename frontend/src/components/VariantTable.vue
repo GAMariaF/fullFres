@@ -5,7 +5,7 @@
   
     <h1>Variants for sample: {{ sampleID }}</h1>
     <br>
-    <h5>Gene List: <b >{{ this.variants[0].Genelist }}</b> | Tumor %: <b>{{this.variants[0].Perc_Tumor}}</b></h5>
+    <h5>Gene List: <b >{{ this.variants[0].Genelist }}</b> | Tumor %: <b>{{ this.variants[0].Perc_Tumor }}</b></h5>
     <br>
     <b-table
       selectable
@@ -72,7 +72,8 @@
           </b-col>            
           <b-col cols="4">
             <label>Classification date:</label>
-            <td>{{ getDate() }}</td>
+            <p v-if="old" style="color:rgb(255, 0, 0)">{{ getDate() }}</p>
+            <p v-if="!old">{{ getDate() }}</p>
           </b-col> 
           <b-col cols="4">
             <b-button v-on:click="allowClassification(true)" class="btn mr-1 btn-info"> Edit Classification </b-button>
@@ -218,12 +219,11 @@
           </b-col>
           <b-col cols="6">
               <label>Tier</label>
-              <p v-if="!allowEdit">{{ variants[selectedRowIndex].Tier }}</p>
+              <p>{{ variants[selectedRowIndex].TierVPS }}</p>
               <b-form-select
                 :options="tierOptions"
                 class="py-sm-0 form-control"
-                v-if="allowEdit"
-                v-model="variants[selectedRowIndex].Tier"              
+                v-model="variants[selectedRowIndex].TierVPS"              
                 @change="updateVariants();setChanged()" 
               ></b-form-select>
             </b-col>
@@ -247,19 +247,6 @@
               ></b-form-textarea>
           </b-col>
         </b-row>
-        <b-row>
-          <b-col cols="12">
-              <label>Alt Annotation:</label>
-              <b-form-textarea
-                id="textarea"
-                
-                @click="changedatastate"
-                v-model="variants[selectedRowIndex].annotation_variant2"
-                @change="updateVariants();setChanged()" 
-              >
-              </b-form-textarea>
-              </b-col>
-        </b-row>
 
         <hr />
         <b-row>
@@ -276,17 +263,42 @@
           </span>
           <br>
           <br>
+        </b-col>
+        </b-row>
+        <b-row>
+            
             <label v-if="allowEdit" >Adjust Oncogenicity</label>
+            <b-col cols="2">
               <b-input v-if="allowEdit" v-model="oncoAdjust" placeholder="Adjust Oncogenicity"></b-input>
+            </b-col>
+            <b-col cols="10"></b-col>
             <br>
-        
+            </b-row>
+            <b-row>
+              <b-col cols="8">
             <div>
+              <br>
             <h5>Oncogenicity: {{ this.variants[this.selectedRowIndex].Oncogenicity }}</h5>
             <label>Chosen evidence types:</label>
             </div>
             {{this.variants[this.selectedRowIndex].evidence_types}}
 
-        </b-col>
+            </b-col>
+        </b-row>
+        <br>
+        <hr />
+        <b-row>
+          <b-col cols="12">
+              <label>Alt Annotation:</label>
+              <b-form-textarea
+                id="textarea"
+                
+                @click="changedatastate"
+                v-model="variants[selectedRowIndex].annotation_variant2"
+                @change="updateVariants();setChanged()" 
+              >
+              </b-form-textarea>
+              </b-col>
         </b-row>
         <br>
         <b-row class="mb-1">
@@ -328,26 +340,58 @@
         </b-row>
       </b-container>
     </b-modal>
+    <b-row class="mb-1">
+      
+          <b-col cols="12">
+            <div v-if="locked === false">
+            
+            <label>Sample Comment</label>
+             <b-form-textarea
+                id="textarea"
+                size="default"
+                
+                @click="changedatastate"
+                placeholder=""
+                rows=4
+                v-model="variants[0].CommentSamples"
+
+              ></b-form-textarea>
+              
+          <br>
+          <b-button v-on:click="updateComment" class="btn mr-1 btn-info"> Update Comment </b-button>
+          <br>
+        </div>
+        </b-col>
+      </b-row>
+     <br>
+      <h5><p v-if="locked === true" style="text-align: left">Sample Comment:</p></h5>
+      <p v-if="locked === true" style="text-align: left">{{ variants[0].CommentSamples }}</p>
       <br>
       <br>
       <div v-if="locked === false">
-      <h5>When interpretation is done, please sign off here</h5>
+      <b-row>
+        <b-col>
+            <b-button v-if="locked === false" v-on:click="fillReply" class="btn mr-1 btn-info btn-m"> Fill Reply </b-button>
+        </b-col>
+      </b-row>
+    <br><br>
+      
+      <h5>When interpretation is finished, please sign off here:</h5>
       <br>
-
-
-
-
+    
     <b-alert dismissible fade :show="showDismissibleAlert" @dismissed="showDismissibleAlert=false" variant="danger">All variants must have a reply!</b-alert>
       <b-row>
+        <b-col></b-col>
         <b-col>
           <b-button v-on:click="failedSample" class="btn mr-1 btn-danger btn-m"> Failed Sample </b-button>
           </b-col>
           <b-col>
-          <b-button v-on:click="fillReply" class="btn mr-1 btn-warning btn-m"> Fill Reply </b-button>
+          <b-button v-on:click="signOff(false)" class="btn mr-1 btn-warning btn-m"> Partial Success </b-button>
           </b-col>
           <b-col>
-          <b-button v-on:click="signOff" class="btn mr-1 btn-success btn-m"> Sign off </b-button>
+          <b-button v-on:click="signOff(true)" class="btn mr-1 btn-success btn-m"> Success </b-button>
         </b-col>
+        <b-col></b-col>
       </b-row>
       </div>
     <!--  -->
@@ -368,7 +412,7 @@ export default {
       showDismissibleAlert: false,
       loading: true,
       allowEdit: false,
-      sortedIndex: [ 'runid',
+      sortedIndex: ['runid',
                     'sampleid',
                     'Genelist',
                     'Perc_Tumor',
@@ -417,7 +461,7 @@ export default {
                     'Comment',
                     'evidence_types',
                     'Oncogenicity',
-                    'Tier'
+                    'TierVPS'
                   ],
       oncoScore: 0,
       oncoAdjust: 0,
@@ -451,7 +495,7 @@ export default {
         {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
-        {key: "annotation_variant", label: "Annotation Variant"},
+        {key: "annotation_variant2", label: "Annotation Variant"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "Specific", label: "Type Specific"},
@@ -461,7 +505,7 @@ export default {
         {key: "Reply", label: "Reply (Svares ut)"},
         {key: "Info"}
         ],
-        
+      old: false,
     };
   },
   methods: {
@@ -470,7 +514,6 @@ export default {
       //(I changed it to false and false to avoid the previous behaviour)
       if (this.datastate == true) {
         this.datastate = false
-        console.log('false')
       } else {
         this.datastate = false
         }
@@ -485,6 +528,7 @@ export default {
           if ((this.variants[index].class === null) || (this.variants[index].class.length === 0)) {
             this.variants[index].class = 'Not evaluated';
           }
+          this.variants[index].User_Class = this.$store.getters.username;
         }
       });
           
@@ -497,53 +541,58 @@ export default {
       },
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
-      console.log("updateVariants");
     },
-    oncoScoring(selectedoncogenicity_list) {
-    this.oncoScore = 0;
-    selectedoncogenicity_list.forEach(item => {
-    switch(item.default) {
-      case 'Very Strong':
-        this.oncoScore += 8
-        break;
-      case 'Strong':
-        this.oncoScore += 4
-        break;
-      case 'Moderate':
-        this.oncoScore += 2
-        break;
-      case 'Supporting':
-        this.oncoScore += 1
-        break;
-      case 'bVery Strong':
-        this.oncoScore += -8
-        break;
-      case 'bStrong':
-        this.oncoScore += -4
-        break;
-      case 'bModerate':
-        this.oncoScore += -2
-        break;
-      case 'bSupporting':
-        this.oncoScore += -1
-        break;
-      case 'adjust':
-        this.oncoScore += parseInt(this.oncoAdjust)
-        break;
-      }
-    })
 
-    if (this.oncoScore == 0){
-      this.oncoScore = "";
-    }
-    this.variants[this.selectedRowIndex].Oncogenicity = "" + this.oncoScore;
+    oncoScoring(selectedoncogenicity_list) {
+      if (selectedoncogenicity_list.length == 0) {
+        this.variants[this.selectedRowIndex].Oncogenicity = "";
+      } else {
+
+        this.oncoScore = 0;
+        selectedoncogenicity_list.forEach(item => {
+        switch(item.default) {
+          case 'Very Strong':
+            this.oncoScore += 8
+            break;
+          case 'Strong':
+            this.oncoScore += 4
+            break;
+          case 'Moderate':
+            this.oncoScore += 2
+            break;
+          case 'Supporting':
+            this.oncoScore += 1
+            break;
+          case 'bVery Strong':
+            this.oncoScore += -8
+            break;
+          case 'bStrong':
+            this.oncoScore += -4
+            break;
+          case 'bModerate':
+            this.oncoScore += -2
+            break;
+          case 'bSupporting':
+            this.oncoScore += -1
+            break;
+          case 'adjust':
+            this.oncoScore += parseInt(this.oncoAdjust)
+            break;
+          }
+        })
+
+        if (this.oncoScore == 0){
+          this.oncoScore = "0";
+        }
+        this.variants[this.selectedRowIndex].Oncogenicity = this.oncoScore;
+      }
     },
 
     setChanged() {
       this.variants[this.selectedRowIndex].visibility = true;
       this.variants[this.selectedRowIndex].changed = true;
+      this.variants[this.selectedRowIndex].User_Class = this.$store.getters.username;
       this.updateVariants();
-      console.log("setChanged");
     },
 
     allowClassification (state) {
@@ -554,20 +603,23 @@ export default {
       var date =
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
       this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
-      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2)
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yy = today.getFullYear()-2000;
+      today = Number(yy+mm+dd)
+      this.old = today-this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,6)>600;
       
       if (date === '..') {
-        return("Not previously classified")
+        return("Not previously classified");
       } else {
-        return(date)
+        return(date + " by " + this.variants[this.selectedRowIndex].User_Class);
       }
     },
 
     oncogenicitySelected(items) {
-      console.log("selected row");
-      console.log("--");
-      console.log(items);
-      console.log("--");
   
       // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
       // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
@@ -586,11 +638,9 @@ export default {
       // Regn ut oncoscore
       // Utfør kun om det faktisk er valgt en rad (length !== 0)
       if ((items.length !== 0) | (typeof items !== "undefined")) {
-        console.log(this.selectedoncogenicity_list)
         this.oncoScoring(this.selectedoncogenicity_list);
         // Apply evidence to table:
         
-        console.log(this.selectedoncogenicity_list);
         var tmplist = []
         this.selectedoncogenicity_list.forEach(function (arrayItem) {
           tmplist.push(arrayItem.tag)
@@ -611,13 +661,13 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+          return("RPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
             return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
-            return(data.item['Variant_ID']+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return("RPM: "+data.item['Read_Counts_Per_Million']);
           case 'COMPLEX':
             return("AF: "+data.item['AF'])
           default:
@@ -628,15 +678,12 @@ export default {
     rowSelected(items) {  
       if (items.length===1) {
         this.selectedVariant = items;
-        console.log(items)
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected");
       }
     },
 
     openInfoModal(item, index, button) {
-      console.log("openInfoModal");
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       // Convert Prediktive_data-feltet fra databasen til array for å sette inn i select-box
@@ -644,7 +691,9 @@ export default {
         this.predictive_data = this.variants[this.selectedRowIndex].Prediktive_data.split(",");
       }
       //this.infoModal.title = `Variant: ${index +1}`;
-      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
+
+      this.infoModal.title = `${item['gene']}, ${item['Type'].toUpperCase()}: ${item['annotation_variant2']}`;
+      
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.datastate = true;
     },
@@ -656,15 +705,26 @@ export default {
       // Get Prediktive_data-field into variants for this specific variant
       this.variants[this.selectedRowIndex].Prediktive_data = this.predictive_data.join().toString();
       this.predictive_data = [];
-      console.log("infomodal lukket");
     },
-
+    updateComment() {
+      var comment = this.variants[0].CommentSamples
+      const baseURI = config.$backend_url + "/api/commentsample";
+        this.$http.post(baseURI,
+          {
+            commentsamples: comment,
+            sampleid: this.$route.params.id,
+          },
+          {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+          }
+        ).then((response) => response.data);
+    },
 
     sendVariants() {
       // This is for updating variants in the db whenever there has been a change. Should be triggered by leaving the interp-modal but only send if anything has changed
       // If any changed:
       if (this.variants.filter(e => e.changed === true).length > 0) {
-        console.log("Something has changed - sending updated data to db")
         // Metode for  sende inn dato, og tolkede varianter til backend.
         const baseURI = config.$backend_url + "/api/updatevariants";
         this.$http
@@ -680,20 +740,14 @@ export default {
               headers: { "Content-Type": "application/json" },
             }
           )
-          .then((response) => response.data)
-          .then((data) => {
-            console.log(data);
-          });
+          .then((response) => response.data);
       } 
-      console.log("tester om sendvariants blir aktivert when leaving modal")
-      console.log(this.variants[0])
     },
 
     failedSample() {
 
       var all_reply = true
       this.variants.forEach(item => {
-        console.log(item.Reply)
         if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
@@ -713,24 +767,24 @@ export default {
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        .then((response) => response.data);
         this.$router.push({
         name: "Samples"
         });
       } else { this.showDismissibleAlert=true }
     },
 
-    signOff() {
-      // This if only for signing off the user when interpretation is done. 
-      console.log("Sign off method");
-      
+    signOff(status) {
+      // This if only for signing off the user when interpretation is done.
+      var state = ""; 
+      if (status) {
+        state = "Success";
+      } else {
+        state = "Partial";
+      }
       // Først - sjekk om alle rader har yes/no på reply
-      var all_reply = true
+      var all_reply = true;
       this.variants.forEach(item => {
-        console.log(item.Reply)
         if (item.Reply != "Yes" & item.Reply != "No" & item.Reply != 'Yes, VN') {
           all_reply = false
         }
@@ -745,16 +799,14 @@ export default {
             sampleid: this.$route.params.id,
             variants: this.variants,
             user: this.$store.getters.username,
+            state: state,
           },
           {
             withCredentials: true,
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-        });
+        .then((response) => response.data);
         this.$router.push({
         name: "Samples"
         });

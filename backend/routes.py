@@ -12,6 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import jwt
 import datetime
+import logging
 from functools import wraps
 from backend import app
 from backend.users_db import Users
@@ -36,12 +37,15 @@ from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
 from dbutils import insert_failedsample
+from dbutils import insert_comment
 from dbutils import statistics
 from dbutils import data_report
 from dbutils import list_search
+from dbutils import get_classifications
 
 from importutils import importVcfXls
 
+from vcfutils import CustomFileError
 # Imports som er brukt for aa teste db
 import sqlite3
 from sqlalchemy import create_engine, update
@@ -50,6 +54,10 @@ import pandas as pd
 import json
 
 db_path = config['Paths']['db_full_path']
+
+# For debug logging:
+logging.basicConfig(level=logging.DEBUG)
+
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
@@ -130,10 +138,10 @@ def login_user():
 @app.route('/api/<query>', methods=['GET', 'POST'])
 @token_required
 def api(current_user, query):
-    print(query)
+    #logging.debug(query)
     if request.method == 'GET':
         if query == 'import':
-            print("Running sample import function")
+            logging.debug("Running sample import function")
             args = request.args
             importfolder = args["0"]
             try:
@@ -141,44 +149,49 @@ def api(current_user, query):
                 response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)            
             except FileNotFoundError:
                 response = make_response(jsonify(isError=False, message="Missing file(s).", statusCode=204), 204)
+                logging.exception("Missing file(s).")
+            except CustomFileError:
+                response = make_response(jsonify(isError=False, message="Wrong types", statusCode=205), 205)
+                logging.exception("Wrong Type.")
             except ValueError:
-                response = make_response(jsonify(isError=False, message="Wrong Type.", statusCode=205), 205)
+                response = make_response(jsonify(isError=False, message="ValueError", statusCode=206), 206)
+                logging.exception("ValueError")
+            except TypeError:
+                response = make_response(jsonify(isError=False, message="TypeError", statusCode=207), 207)
+                logging.exception("TypeError")
+
             return response
         if query == "samples":
             samples = list_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success fetching samples. Import folder is: {}".format(config['Paths']['db_test_path']), statusCode=200, data=samples), 200)
             return response
         if query == "signoff_samples":
-            print("signoff_samples")
+            logging.debug("signoff_samples")
             samples = list_signoff_samples(db_path)
-            print("--")
-            print(samples)
-            print("--")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query.startswith("variants_"):
-            print("Sender varianter for sample id: " + query.split("ts_")[1])
+            logging.debug("Sender varianter for sample id: " + query.split("ts_")[1])
             variants = list_interpretation(db_path, query.split("ts_")[1])
-            print(variants)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
-            print("Sender alle varianter")
+            logging.debug("Sender alle varianter")
             allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
         elif query[:10] == "allsamples":
-            print("Sender alle prøver")
+            logging.debug("Sender alle prøver")
             allsamples = list_all_samples(db_path, query.split('|'), datetime.date.today().strftime('%Y%m%d'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
         elif query[:10] == "statistics":
-            print("Sending stats")
+            logging.debug("Sending stats")
             stats = statistics(db_path, start_date=query[10:18], end_date=query[18:26])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
             return response
         elif query[:6] == "report":
-            print("report")
+            logging.debug("report")
             samples = list_approved_samples(db_path, query.split('|'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
@@ -188,55 +201,64 @@ def api(current_user, query):
             for i in range(len(q)):
                 if len(q[i]) == 1 and q[i][0] == "":
                     q[i] = []
-           
             #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
             res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
+            return response
+        elif query[:9] == "get_class":
+            logging.debug("getting classifications")
+            samples = get_classifications(db_path, query.split('|'))
+            response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
             response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)
             return response
     elif request.method == 'POST':
         if query == "updatevariants":
-            print("--- update variants ---")          
+            logging.debug("--- update variants ---")          
             j = json.loads(json.dumps(request.json))
             for i in j["variants"]:
-                if i["changed"]==True:
+                if i["changed"]:
                     # Insert into db:
                     insert_variants(db_path,i)
-                    print("inserted")
+                    logging.debug("inserted")
 
-            print("Variants posted for update in database")
+            logging.debug("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response
         elif query == "signoff":
             j = json.loads(json.dumps(request.json))
-            #print(j)
-            insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"], j["state"],)
             response = jsonify({'message': 'Signed off sample!'})
             return response
         elif query == "unsignoff":
             j = json.loads(json.dumps(request.json))
-            insert_signoffdate(db_path, "", "", j["sampleid"])
+            insert_signoffdate(db_path, "", "", j["sampleid"], "")
             response = jsonify({'message': 'Unsigned off sample!'})
             return response
         elif query == "approve":
-            print("running approve")
+            logging.debug("running approve")
             j = json.loads(json.dumps(request.json))
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Approved sample!'})
             return response
         elif query == "failedsample":
-            print("Running failed sample")
+            logging.debug("Running failed sample")
             j = json.loads(json.dumps(request.json))
             insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Sample set to failed!'})
+            return response
+        elif query == "commentsample":
+            logging.debug("Running comment update for sample")
+            j = json.loads(json.dumps(request.json))
+            insert_comment(db_path, j["commentsamples"], j["sampleid"])
+            response = jsonify({'message': 'Comment updated for sample!'})
             return response
 
 @app.route('/chklogin')
 @token_required
 def chklogin(current_user):
-    print(current_user)
+    #logging.debug(current_user)
     name = request.cookies.get('sid')
     if name == None:
         response = make_response(jsonify(logstatus="false"))

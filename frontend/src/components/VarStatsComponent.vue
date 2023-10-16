@@ -61,10 +61,12 @@
     </template>
 
     <template #cell(Stats)="row">
-        <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+        <b-button size="sm" @click="row.toggleDetails();getClassifications(row.item)" class="mr-2">
            Details
         </b-button>
         <div v-if="row.detailsShowing">{{ plotPie(row.item) }}</div>
+
+
 
       <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @change -->
       <!-- <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails">
@@ -84,11 +86,40 @@
             </b-col>
               <br/>
               <b-col>
-              <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
-                <div class="sampleList">{{  makeSampleList(row.item) }} </div>
-              </VuePerfectScrollbar> 
-              <br/>
-              <div><p style="text-align:left;">Classification: {{ row.item.ClassesPerVariant }}</p></div>
+                <VuePerfectScrollbar class="scroll-area" :settings="settingsScrollBar">
+                <b-table
+                  selectable
+                  select-mode="single"
+                  @row-selected="rowSelected_class"
+                  striped
+                  hover
+                  outlined
+                  label-sort-asc=""
+                  label-sort-desc=""
+                  label-sort-clear=""
+                  :items="classifications"
+                  :fields="fieldsVariant"
+                  :small="small"
+                  :filter="filter"
+                >
+                <!-- Formatting Type column -->
+                <template #cell(Type)="data">
+                  <b class="text-info">{{ data.value.toUpperCase() }}</b>
+                </template>
+
+                  <template #cell(Classification)="row">
+                        <b-button
+                          size="sm"
+                          @click="openClassificationModal(row.item, row.index, $event.target)"
+                          class="mr-1"
+                        >
+                          Classification
+                        </b-button>
+                      </template>
+                  </b-table>
+                </VuePerfectScrollbar>
+                <br>
+              <div><p style="text-align:left;">Classification(s): {{ row.item.ClassesPerVariant }}</p></div>
             </b-col>           
           </b-row>
           <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
@@ -145,6 +176,47 @@
 
       </b-container>
     </b-modal>
+    <!--  -->
+    <b-modal
+      :id="classificationModal.id"
+      :title="classificationModal.title"
+      ok-only
+      size="lg"
+      @hide="
+        resetClassificationModal();
+
+      "
+    >
+      <b-container fluid>
+        <b-row class="mb-1">
+          <b-col cols="4">
+            <label>Classification date:</label>
+            <p>{{ classifications[selectedRowIndexClassification].date + " by: " + classifications[selectedRowIndexClassification].User_Class }}</p>
+            </b-col> 
+        </b-row>
+        <b-row>
+          <b-col>
+          <div class="table-responsive">
+            <table class="table-hover">
+              <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                      <tr v-for="name in sortedIndexClassification" :key="name">
+                        <td>{{ name }}</td>
+                        <td>{{ classifications[selectedRowIndexClassification][name] }}</td>
+                      </tr>
+              </tbody>
+            </table>
+          </div>
+          </b-col>
+        </b-row>
+
+      </b-container>
+    </b-modal>
 
     <!--  test -->
 <!-- <b-button v-on:click="sortTable(variants)" type="button">Testklikk sorter</b-button><span>&nbsp;</span> -->
@@ -160,7 +232,7 @@ import { config } from '../config.js';
 import util_funcs from "@/appUtils";
 import { Plotly } from 'vue-plotly';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+// must also add to components below
 export default {
   name: "allvarianttable",
   props: [ "loading" ],
@@ -177,6 +249,7 @@ export default {
 
       variantSampleList: "",
       variants: ['SamplesPerVariant'],
+      classifications: ["sampleid", "date"],
       oncoScore: 0,
       selectedoncogenicity_list: [],
       oncogenicitycriteria: config.oncogenicitycriteria,
@@ -193,20 +266,27 @@ export default {
       selectedReplyOption: "",
       small: true,
       selectedRowIndex: 0,
+      selectedRowIndexClassification: 0,
       infoModal: {
         id: "info-modal",
         title: "",
         content: "",
       },
+      classificationModal : {
+        id: "classification-modal",
+        title: "",
+        content: "",
+      },
       sampleID: this.$route.params.id,
       selectedVariant: "",
+      selectedClassification: "",
 
       settingsScrollBar: {
         maxScrollbarLength: 60},
       fields: [
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
-        {key: "annotation_variant", label: " Annotation Variant"},
+        {key: "annotation_variant2", label: " Annotation Variant (alt)"},
         {key: "CHROM", sortable: true},        
         {key: "POS", label: "Pos", sortable: true},
         {key: "REF", label: "Ref", sortable: true},
@@ -221,7 +301,7 @@ export default {
       sortedIndex: [ 'SamplesPerVariant',
                     'gene',
                     'transcript',
-                    'annotation_variant',
+                    'annotation_variant2',
                     'COSMIC',
                     'class',
                     'oncomineGeneClass',
@@ -246,7 +326,66 @@ export default {
                     'FreqSamples',
                     'FreqGenLis'
                   ],
+    sortedIndexClassification: ['runid',
+                    'sampleid',
+                    'Genelist',
+                    'Perc_Tumor',
+                    'gene',
+                    'exon',
+                    'transcript',
+                    'annotation_variant',
+                    'Reads',
+                    'FILTER',
+                    'AF',
+                    'COSMIC',
+                    'Reply',
+                    'User_Classification',
+                    'class',
+                    'Variant_ID',
+                    'Variant_Name',
+                    'Key_Variant',
+                    'Oncomine_Reporter_Evidence',
+                    'Type',
+                    'oncomineGeneClass',
+                    'oncomineVariantClass',
+                    'Locus',
+                    'protein',
+                    'REF',
+                    'ALTEND',
+                    'Call',
+                    'DP',
+                    'FDP',
+                    'FAO',
+                    'coding',
+                    'P_Value',
+                    'Read_Counts_Per_Million',
+                    'Oncomine_Driver_Gene',
+                    'Copy_Number',
+                    'CNV_Confidence',
+                    'Valid_CNV_Amplicons',
+                    'Populasjonsdata',
+                    'Funksjonsstudier',
+                    'Prediktive_data',
+                    'Cancer_hotspots',
+                    'Computational_evidens',
+                    'Konservering',
+                    'ClinVar',
+                    'CLSF',
+                    'Andre_DB',
+                    'Comment',
+                    'evidence_types',
+                    'Oncogenicity',
+                    'TierVPS',
+                    'User_Class'
+                  ],
       filter: '',
+      fieldsVariant: [
+        {key: 'sampleid', label: 'Sample'}, 
+        {key: 'Reply', label: 'Reply', sortable: true}, 
+        {key: 'Genelist', label: 'Gene List', sortable: true},
+        {key: 'date', label: 'Date Classified', sortable: true},
+        {key: 'Classification'},
+      ]
     };
   },
   methods: {
@@ -292,6 +431,19 @@ export default {
       this.gene_input = "";
       this.selectedGeneList = null;
       this.selectedReplyOption = "";
+    },
+
+    getClassifications(item){
+      var query = 'get_class|'+item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND
+
+      util_funcs.query_backend(config.$backend_url, query)
+        .then(result => {this.classifications = Object.values(result['data']);
+
+      for (let i = 0; i < this.classifications.length; i++) {
+        this.classifications[i].date = this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
+                                      this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
+                                      this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+      }})
     },
 
     addGeneList(item){
@@ -340,13 +492,13 @@ export default {
 
     makeSampleList(item) {
       var samples = item.SamplesPerVariant.split(', ');
-      var geneLists = item.GenelistsPerVariant.split(', ');
+      var geneList = item.GenelistsPerVariant.split(', ');
       var replyList = item.ReplyListPerVariant.split('|');
 
-      var res_string = "Sample:          Gene List          Reply\n";
+      var res_string = "Sample:          Reply          Gene List\n";
 
       for (var i=0; i<samples.length; i++){
-        res_string += samples[i] +': ' + geneLists[i] + '  ' + replyList[i] + '\n';
+        res_string += samples[i] +': ' + replyList[i] + '  ' + geneList[i] + '\n';
       }
       return(res_string);
     },
@@ -375,42 +527,26 @@ export default {
 
     },
 
-    setChanged() {
-      this.variants[this.selectedRowIndex].visibility = true;
-      //this.updateVariants();
-      console.log("setChanged")
-      },
-    oncogenicitySelected(items) {
-      console.log("selected row")
-      console.log("--")
-      console.log(items)
-      console.log("--")
-
-      // Utfør kun dersom en rad er valg - husk at på klikk to blir den deselektert
-      // Ved klikk: hvis ikke allerede valgt, velg, ellers fjern.
-      var index = this.selectedoncogenicity_list.indexOf(items);
-      if (index !== -1) {
-        // Fjern hvis tilstede
-        this.selectedoncogenicity_list.splice(index, 1);
-      } else {
-        // Legge til hvis ikke tilstede
-        this.selectedoncogenicity_list.push(items);
-      }
-      // Legg til en tabell hvor default styrke er valgt
-      // Tabellen vises kun hvis lengden av this.selectedACMG != 0
-      // Regn ut oncoscore
-      // Utfør kun om det faktisk er valgt en rad (length !== 0)
-      if(items.length !== 0 | typeof items !== 'undefined') {
-        this.oncoScoring(this.selectedoncogenicity_list);
-      }
-    },
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items;
         console.log("test")
+        //console.log(items)
 
       } else if (items.length===0) {
         this.selectedVariant = "";
+        console.log("unselected")
+      }
+    },
+
+    rowSelected_class(items) {
+      if (items.length===1) {
+        this.selectedClassification = items;
+        console.log("test")
+        console.log(items)
+
+      } else if (items.length===0) {
+        this.selectedClassification = "";
         console.log("unselected")
       }
     },
@@ -419,8 +555,18 @@ export default {
       console.log("openInfoModal")
       this.selectedRowIndex = index;
       //this.infoModal.title = `Variant: ${item.transcript}`;
-      this.infoModal.title = `${item['gene']}: ${item['annotation_variant']}`;
+      this.infoModal.title = `${item['gene']}: ${item['annotation_variant2']}`;
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
+      //this.variants = util_funcs.sort_table(this.variants);
+      //this.$store.commit("SET_STORE",this.variants)
+    },
+
+    openClassificationModal(item, index, button) {
+      console.log("openClassificationModal")
+      this.selectedRowIndexClassification = index;
+      //this.infoModal.title = `Variant: ${item.transcript}`;
+      this.classificationModal.title = `${item['sampleid']}: ${item['annotation_variant2']} Classification`;
+      this.$root.$emit("bv::show::modal", this.classificationModal.id, button);
       //this.variants = util_funcs.sort_table(this.variants);
       //this.$store.commit("SET_STORE",this.variants)
     },
@@ -429,6 +575,12 @@ export default {
       this.infoModal.title = "";
       this.infoModal.content = "";
       console.log("infomodal lukket")
+    },
+
+    resetClassificationModal() {
+      this.classificationModal.title = "";
+      this.classificationModal.content = "";
+      console.log("classificationModal lukket")
     },
 
     sortTable() {
@@ -463,8 +615,8 @@ div.sampleList {
 .scroll-area {
   position: relative;
   margin: auto;
-  width: 440px;
-  height: 360px;
+  width: 620px;
+  height: 420px;
   text-align: center;
 }
 .center {

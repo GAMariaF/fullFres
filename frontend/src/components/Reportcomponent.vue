@@ -29,6 +29,7 @@
           <b-table
             selectable
             select-mode="single"
+            selected-variant="warning"
             @row-selected="sampleRowSelected"
             striped
             hover
@@ -54,6 +55,10 @@
             Gene List: <b>{{ this.variants[0].Genelist }}</b> | Tumor %:
             <b>{{ this.variants[0].Perc_Tumor }}</b>
           </h5>
+          <br>
+          <br>
+          <h5><p style="text-align: left">Sample Comment:</p></h5>
+          <p style="text-align: left">{{ this.variants[0].CommentSamples }}</p>
           <br />
           <h2><p style="text-align: left">Classified variants:</p></h2>
           <br />
@@ -196,7 +201,7 @@
         <hr />
         <b-row>
           <b-col cols="10">
-            <p>Gene Info:</p>
+            <p>Variant Classified {{ getDate() }}</p>
           </b-col>
         </b-row>
 
@@ -254,7 +259,7 @@ export default {
         {key: "Locus"},
         {key: "REF", label: "Ref"},
         {key: "ALTEND", label: "Alt / End"},
-        {key: "annotation_variant", label: "Annotation Variant"},
+        {key: "annotation_variant2", label: "Annotation (Alt)"},
         {key: "oncomineGeneClass"},
         {key: "oncomineVariantClass"},
         {key: "Specific", label: "Type Specific"},
@@ -306,8 +311,6 @@ export default {
       return(row['runid']===filter);
     },
     getRuns() {
-      console.log("getRuns!!! Running!! ")
-      console.log(this.items)
 
       var runs = []
       var result = []
@@ -325,8 +328,6 @@ export default {
     },
 
     rowSelected(items) {
-      console.log("rowSelect items: ")
-      console.log(items)
       if (items.length===1) {
         // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
@@ -345,7 +346,6 @@ export default {
       if (items.length === 1) {
 
         this.selectedSample = items[0].sampleid;
-        console.log(this.selectedSample);
          //Get variants for that sample:
 
         //this.$store.dispatch("initVariantStore", {
@@ -356,7 +356,6 @@ export default {
         
         // Query and commit to store here instead of having the store do it.
         await util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
-          console.log(typeof result);
           var variants = Object.values(result['data']);
           this.variants = variants}) 
         
@@ -392,7 +391,7 @@ export default {
       index = this.variants.indexOf(item);
       this.selectedRowIndex = index;
       //this.reportModal.title = `Variant: ${index + 1}`;
-      this.reportModal.title = `${item['gene']}: ${item['annotation_variant']}`;
+      this.reportModal.title = `${item['gene']}: ${item['annotation_variant2']}`;
       this.$root.$emit("bv::show::modal", this.reportModal.id, button);  
     },
 
@@ -411,13 +410,13 @@ export default {
           case 'MNP':
             return("AF: "+data.item['AF']);
           case 'FUSION':
-            return(data.item['Variant_Name'].split(' ')[0]+"\nRPM: "+data.item['Read_Counts_Per_Million']);
+            return("RPM: "+data.item['Read_Counts_Per_Million']);
           case 'CNV':
             return("CN: "+data.item['Copy_Number']);
           case 'INS':
             return("AF: "+data.item['AF']);
           case 'RNAEXONVARIANT':
-            return("AF: "+data.item['AF']);
+            return("RPM: "+data.item['Read_Counts_Per_Million']);
           case 'COMPLEX':
             return("AF: "+data.item['AF'])
           default:
@@ -430,13 +429,13 @@ export default {
         console.log("No row selected")
         this.report = "No row selected";
       } else {
-        this.reportArray = [`${this.variants[0]['Genelist']} | XXbiopsi | Tumor %: ${this.variants[0]['Perc_Tumor']}\n\n`];
+        this.reportArray = [`Rapport prøve ${this.variants[0]['sampleid']}\n\n`];
         this.generateReport();
       }
     },
 
     generateVarRep(category) {
-
+      let aaDictionary = {"Ala": "A", "Arg": "R", "Asn": "N", "Asp": "D", "Cys": "C", "Glu": "E", "Gly": "G", "His": "H", "Ile": "I", "Leu": "L", "Lys": "K", "Met": "M", "Phe": "F", "Pro": "P", "Ser": "S", "Thr": "T", "Trp": "W", "Tyr": "Y", "Val": "V"};
       if (this.selectedVariant.length === 0) {
         console.log("No variant selected")
         this.warning = "No variant selected"
@@ -449,6 +448,10 @@ export default {
         switch (variant['Type'].toUpperCase()) {
           case 'SNP':
             type = 'sekvensvarianten';
+            var aa_1 = aaDictionary[variant['protein'].slice(2, 5)];
+            var aa_2 = aaDictionary[variant['protein'].slice(-3)];
+            var pos = variant['protein'].slice(5, -3);
+            name = variant['gene']+ " "+ aa_1+pos+aa_2;
             break;
           case 'DEL':
             type = 'delesjonen';
@@ -458,7 +461,8 @@ export default {
             break;
           case 'FUSION':
             type = 'fusjonen';
-            name = variant['Variant_Name'].split(' ')[0];
+            var genes = variant['Variant_ID'].split('.')[0].split('-');
+            name = genes[0]+'::'+genes[1];
             break;
           case 'CNV':
             type = 'kopitallsvarianten';
@@ -468,6 +472,7 @@ export default {
             break;
           case 'RNAEXONVARIANT':
             type = "exonvarianten";
+            name = variant['Variant_ID'];
             break;
           case 'COMPLEX':
             type = "kompleksvarianten"
@@ -475,12 +480,8 @@ export default {
         }
         type = type + " ";
 
-        var annoVar = "";
-        if (variant['annotation_variant2'] !== ": ()"){
-          annoVar = variant['annotation_variant2'] + " ";
-        }
+        var annoVar = variant['annotation_variant2'];
         
-
         // Trengs for å "lese" variabelene, kan nok gjøres på ein anna måte.
         console.log(variant)
         console.log(type)
@@ -500,6 +501,19 @@ export default {
 
     generateReport() {
       this.report = this.reportArray.join('')
+    },
+
+    getDate() {
+      var date =
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
+      this.variants[this.selectedRowIndex].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+      
+      if (date === '..') {
+        return("Not previously classified");
+      } else {
+        return(date + " by " + this.variants[this.selectedRowIndex].User_Class);
+      }
     },
 
     async copyToClipboard(text) { 

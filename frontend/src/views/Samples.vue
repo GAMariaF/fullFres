@@ -19,7 +19,7 @@
             </div>
         </template>
         <br>
-        <b-button v-on:click="loadData" class="btn mr-1 btn-info"> IMPORT SAMPLES </b-button>
+        <b-button v-on:click="loadData" class="btn mr-1 btn-info"> Import Samples </b-button>
       </b-col>
     </div>
     <div class="container" id="login" v-if="items.length!==0">
@@ -32,6 +32,7 @@
           <b-table
             selectable
             select-mode="single"
+            selected-variant="warning"
             @row-selected="rowSelected"
             striped
             hover
@@ -102,7 +103,6 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      console.log("metode testaxios");
       const baseURI = config.$backend_url + "/api/samples";
       axios
         .get(baseURI)
@@ -122,12 +122,9 @@ export default {
 
           if (response.status === 200){
             window.location.reload(true);
-        } else if (response.status === 204) {
+        } else if (response.status >= 204 & response.status <= 207) {
             this.showDismissibleAlert = true;
-            this.alertMessage = "Missing or too many file(s).";
-        } else if (response.status === 205) {
-            this.showDismissibleAlert = true;
-            this.alertMessage = "File(s) of wrong type.";
+            this.alertMessage = response.data.message;
         } else if (response.status === 500) {
             this.showDismissibleAlert = true;
             this.alertMessage = "Someting went wrong, check that the files are correct. If the error persists, contact support.";

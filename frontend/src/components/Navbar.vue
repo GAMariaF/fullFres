@@ -1,7 +1,8 @@
 <template>
 
 <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-navbar-brand to="/"> &nbsp; Variant browser</b-navbar-brand>
+    <!--<b-navbar-brand to="/" style="color:Red;">&nbsp;TEST SERVER Variant browser</b-navbar-brand>-->
+    <b-navbar-brand to="/">&nbsp;Variant Browser</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
      <b-navbar-nav>
         <b-nav-item to="/samples" v-show="state">Samples</b-nav-item>
@@ -17,7 +18,7 @@
           <b-nav-item-dropdown right v-show="state">
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em v-show="state">{{username}}</em>
+            <em v-show="state">{{ username }}</em>
             <em v-show="!state">User</em>
           </template>
           <b-dropdown-item to="/profile">Profile</b-dropdown-item>
