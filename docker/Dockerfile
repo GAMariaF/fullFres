@@ -9,9 +9,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN apt-get update && apt-get install -y software-properties-common gcc git curl make zlib1g-dev build-essential libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 
-# Install fullfres from git:
-RUN cd / && git clone --branch dev_docker https://github.com/GAMariaF/fullFres.git
-
 # # Install node
 # nvm environment variables
 RUN mkdir /usr/local/nvm
@@ -35,17 +32,24 @@ RUN curl https://www.python.org/ftp/python/3.9.11/Python-3.9.11.tgz --output /op
 RUN cd /opt ; tar xvf Python-3.9.11.tgz
 RUN cd /opt/Python-3.9*/ && ./configure --enable-optimizations &&  make install
 
+COPY requirements.txt /tmp/requirements.txt
+
+# Install python packages:
+RUN pip3 uninstall -y setuptools 
+RUN pip3 install setuptools 
+RUN python3 -m pip install -r /tmp/requirements.txt
+
+# Install fullfres from git:
+#RUN cd / && git clone --branch dev_docker https://github.com/GAMariaF/fullFres.git
+RUN cd / && mkdir -m 777 fullFres
+COPY . /fullFres/
+
 # # Install node packages
 RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
 RUN cd /fullFres/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
 RUN cd /fullFres/frontend/ && npx vue-cli-service build
 
-# Install python packages:
-RUN cd /fullFres && pip3 uninstall -y setuptools 
-RUN cd /fullFres && pip3 install setuptools 
-RUN cd /fullFres && python3 -m pip install -r requirements.txt
 # Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
-
 
 CMD ["sh", "fullFres/docker_startup_cmd.sh"]
 

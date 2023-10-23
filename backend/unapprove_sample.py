@@ -5,6 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import text
 import argparse
 import sys
+import configparser
+config = configparser.ConfigParser()
+config.read('backend/config.ini')
 
 try:
     from sys.stdin import buffer as std_in
@@ -16,21 +19,25 @@ except ImportError:
 
 
 def main():
+    # Beware that samples that get unapproved and unsigned will automatically get newer classifications.
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-S", metavar="sampleid", default=std_in, help="The ID of the sample which should be unapproved and unsigned.")
     args = parser.parse_args()
 
-    db = "/illumina/analysis/fullFres/db/variantdb.db"
+    db = config['Paths']['db_full_path']
 
     engine = create_engine("sqlite:///"+db, echo=False, future=True)
 
-    stmt = f"DELETE FROM Samples WHERE sampleid = '{args.S}';"
-    stmt2 = f"DELETE FROM VariantsPerSample WHERE sampleid = '{args.S}';"
+    stmt = f"""UPDATE Samples set 
+        User_Signoff = '', Date_Signoff = '',
+        User_Approval = '', Date_Approval = '',
+        Status = '' 
+        WHERE sampleid = '{args.S}';
+        """
 
     with engine.connect() as conn:
         result = conn.execute(text(stmt))
-        result2 = conn.execute(text(stmt2))
         conn.commit()
 
 if __name__ == "__main__":

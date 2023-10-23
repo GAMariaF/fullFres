@@ -1,4 +1,7 @@
 import sys, os
+import configparser
+config = configparser.ConfigParser()
+config.read('setup_config.ini')
 
 SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
 
@@ -23,10 +26,14 @@ if not in_virtualenv() and not in_docker():
 from backend import app
 
 if __name__ == '__main__':
-    from waitress import serve
-    print( "in_virtualenv()")
-    serve(app, host='0.0.0.0', port=5000)
-    # For running not in docker:
-    #app.run(host='172.16.0.3', port=5001, threaded=True, debug=True)
+    backendport = 5001
+    if in_docker():
+        from waitress import serve
+        # Keep 0.0.0.0 in docker.
+        serve(app, host='0.0.0.0', port=backendport)
+    else:
+        # For running not in docker:
+        # Change IP, remember to have the same IP and port in frontend/src/config.js
+        app.run(host='172.16.0.3', port=backendport, threaded=True, debug=True)
     
    
