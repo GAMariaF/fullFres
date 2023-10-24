@@ -34,7 +34,7 @@
             | Tumor %: <b>{{ this.variants[0].Perc_Tumor }}</b> 
             | Status: 
                 <b style="color:rgb(100, 207, 100);" v-show="this.variants[0].Status=='Success'">Success</b>
-                <b style="color:rgb(238, 158, 67);" v-show="this.variants[0].Status=='Partial Success'">Partial Success</b>
+                <b style="color:rgb(238, 158, 67);" v-show="this.variants[0].Status=='Partial'">Partial Success</b>
                 <b style="color:red;" v-show="this.variants[0].Status=='Failed'">Failed</b>
           </h5>
           <br>

@@ -157,7 +157,7 @@ def api(current_user, query):
                 response = make_response(jsonify(isError=False, message="ValueError", statusCode=206), 206)
                 logging.exception("ValueError")
             except TypeError:
-                response = make_response(jsonify(isError=False, message="TypeError", statusCode=207), 207)
+                response = make_response(jsonify(isError=False, message="TypeError, make sure correct filters have been used.", statusCode=207), 207)
                 logging.exception("TypeError")
 
             return response

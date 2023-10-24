@@ -9,18 +9,21 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 * Bootstrap som css
 
 ## Sett opp tom database
-Blir gjort automatisk viss angitt database ikkje eksisterer (??)
+Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet.)
 
 ## Sett opp VariantBrowser ved hjelp av docker image
 - Sett IP i frontend/src/config.js
 - Endre backend-port i run_backend.py og frontend/src/config.js
-- Bygg Image fra fullFres mappa: docker image build -t name -f docker/Dockerfile . 
+- Bygg Image fra fullFres mappa: 
+  ```sh
+  docker image build -t name -f docker/Dockerfile . 
+  ```
 - Sett frontendport i run_VB_docker.sh og kjør for å starte docker
 - Paths i backend/config.ini må kanskje endres på
 
 ## Sett opp dev utgave
 - Installer nvm som beskrevet nedenfor
-- Sett opp python virtual env og installer requirements.txt, mer infor nedenfor
+- Sett opp python virtual env og installer requirements.txt, mer info nedenfor
 - Sett korrekt ip og backendport i run_backend.py og frontend/src/config.js
 - Sett frontend port i frontend/start_frontend.sh
 - Paths i backend/config.ini må endres på
@@ -37,17 +40,22 @@ cd frontend; sh start_frontend.sh
 ```
 
 ## Bruker og passord
-Kjør db/users_db/add_user.py for å legge til brukere.
+Kjør db/users_db/add_user.py for å legge til brukere.\n
 (Gjør det fra docker ved å gå inn i docker med: docker exec -it {container.id} /bin/bash)
 
-Endre passord med db/users_db/change_pwd.py
+Endre passord med db/users_db/change_pwd.py\n
 OBS: man trenger ikke å kunne det gamle passordet for å gjøre dette, det er en simpel overskriving.
 
-## Unapprove og sletting av prøver
-En prøve som allerede har vært gjennom kontroll kan sendes tilbake til start ved hjelp av db/unapprove_sample.py {sample}
+## Laste inn prøver
+- I Genexus: gå til resultat -> prøve -> varianter. Klikk export for å få ett excel ark. I tillegg: Gå på download files og last ned "filtered variants" for å få ei zip fil. 
+- Legg filene i path som står i backend/config.ini "db_test_path"  (Burde få nytt navn)
+- OBS: pass på at det er filtrerte filer.
 
-En prøve kan bli sletted ved hjelp av db/remove_sample.py {sample}
-OBS: bare "Samples" og "VariantsPerSample" blir slettet, generell variantdata og evtuelle klassifiseringer forblir. 
+## Unapprove og sletting av prøver
+En prøve som allerede har vært gjennom kontroll kan sendes tilbake til start ved hjelp av db/unapprove_sample.py -S {sample.id}
+
+En prøve kan bli sletted ved hjelp av db/remove_sample.py -S {sample.id}
+OBS: bare "Samples" og "VariantsPerSample" blir slettet, generelle variantdata og evtuelle klassifiseringer forblir. 
 
 ### Info
 * Genexus VCF inneholder noen linjer med semikolon i protein feks sånn: p.[Gln61His;Glu62Lys]. Det skaper krøll i parsing. Ha noe konvertering i script som kopierer vcf fra server?

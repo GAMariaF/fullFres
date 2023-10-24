@@ -352,6 +352,8 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					'Perc_Tumor': [percent_tumor], 'Genelist': [sample_diseasetype],\
 					'Seq_Date': [sequencing_date]})
 		logging.debug(f"{run_id}, {sample_id}, {percent_tumor}, {sample_diseasetype}, {sequencing_date}")
+		#Add Standard Comment
+		dfSamples['CommentSamples']	= 'QC-parametere: \nAmplikon  dybde: \nEkspressjonskontroll: \nFilter: \nKommentar kontroll: '
 		# Transfer data to database
 		try:
 			dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
@@ -366,7 +368,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		if not dfvariant_copy.empty:
 			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
 			dfvariant_copy.to_sql('Variants', engine, if_exists='append', index=False)
-		try:			
+		try:
 			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)
 		except:
 			logging.error('There is an error trying to add '+run_id+','+sample_id+' \

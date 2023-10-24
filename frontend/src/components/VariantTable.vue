@@ -364,8 +364,12 @@
         </b-col>
       </b-row>
      <br>
-      <h5><p v-if="locked === true" style="text-align: left">Sample Comment:</p></h5>
-      <p v-if="locked === true" style="text-align: left">{{ variants[0].CommentSamples }}</p>
+     <b-row>
+        <b-col>
+          <h5><p v-if="locked === true" style="text-align: left">Sample Comment:</p></h5>
+          <p v-if="locked === true" style="text-align: left">{{ variants[0].CommentSamples }}</p>
+        </b-col>
+      </b-row>
       <br>
       <br>
       <div v-if="locked === false">

@@ -7,7 +7,7 @@ import argparse
 import sys
 import configparser
 config = configparser.ConfigParser()
-config.read('backend/config.ini')
+config.read('../backend/config.ini')
 
 try:
     from sys.stdin import buffer as std_in

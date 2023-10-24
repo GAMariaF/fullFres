@@ -149,8 +149,8 @@ config = {
     {value: "NGS-P3", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste sekvensvarianten ${name} (${annoVar}) med allelfraksjon ${Math.round(variant['AF'])}% kan være relevant for inkludering i kliniske studier (ClinicalTrials.gov)."},
     {value: "NGS-F", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste fusjonen ${name} med ${Math.round(variant['Read_Counts_Per_Million'])} reads/million er relevant for behandling (referanse)."},
     {value: "NGS-CNV", class: "btn mr-1 btn-warning btn-sm", text: "Den påviste kopitallsvarianten i ${variant['gene']}-genet (${Math.round(variant['Copy_Number'])-2}+2 kopier) er relevant for behandling (referanse). «Varianten bør verifiseres før den benyttes klinisk.»"},
-    {value: "NGS-MIS", class: "btn mr-1 btn-warning btn-sm", text: "Analysen kunne ikke fullføres pga. for lite/uegnet prøvemateriale eller tekniske problemer.\nDersom annet egnet prøvemateriale er tilgjengelig kan om ønskelig ny analyse rekvireres. (tumorandel > 20 % foretrekkes)."},
     {value: "NGS-VUS", class: "btn mr-1 btn-warning btn-sm", text: "Det ble påviste en ${type} av usikker betydning i ${variant['gene']}-genet. Det betyr at varianten ikke kan klassifiseres som sannsynlig benign eller sannsynlig onkogen med dagens kunnskap. Det er pr. i dag ikke indikasjon for behandling."}
+    //  {value: "NGS-MIS", class: "btn mr-1 btn-warning btn-sm", text: "Analysen kunne ikke fullføres pga. for lite/uegnet prøvemateriale eller tekniske problemer.\nDersom annet egnet prøvemateriale er tilgjengelig kan om ønskelig ny analyse rekvireres. (tumorandel > 20 % foretrekkes)."},
     ],
 
     geneListOptions: [
@@ -182,8 +182,6 @@ config = {
 };
 
 export { config };
-
-
 
 
 
