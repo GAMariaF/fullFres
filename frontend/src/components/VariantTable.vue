@@ -493,6 +493,7 @@ export default {
       sampleID: this.$route.params.id,
       selectedVariant: "",
       fields: [
+        {key: "Nr", label: "Nr", sortable: true},
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
         {key: "exon"},

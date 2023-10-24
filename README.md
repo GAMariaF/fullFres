@@ -1,5 +1,6 @@
 # fullFres
 Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fra tumorsekvensering
+OBS: Bare ment for å kjøre på lokalnett, ikke over internett.
 
 ## Oppsett:
 * Sqlite-db via Sqlalchemy
@@ -9,29 +10,33 @@ Database med import/eksportmuligheter og GUI for tolkning av sekvensvarianter fr
 * Bootstrap som css
 
 ## Sett opp tom database
-Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet.)
+Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet, er nok heller ikke oppdatert med nye felt.)
 
-## Sett opp VariantBrowser ved hjelp av docker image
+## Sett opp VariantBrowser som docker container
 - Sett IP i frontend/src/config.js
 - Endre backend-port i run_backend.py og frontend/src/config.js
 - Bygg Image fra fullFres mappa: 
   ```sh
   docker image build -t name -f docker/Dockerfile . 
   ```
+  Eller bruk fullFres/build_docker.sh.
+  Må bygges fra fullFres fordi heile repositoriet blir kopiert inn i dockerimaget. 
 - Sett frontendport i run_VB_docker.sh og kjør for å starte docker
-- Paths i backend/config.ini må kanskje endres på
+- Paths i backend/config.ini må kanskje endres på (man burde påse at databasen lagres utenfor docker containeren)
 
 ## Sett opp dev utgave
-- Installer nvm som beskrevet nedenfor
-- Sett opp python virtual env og installer requirements.txt, mer info nedenfor
+- Installer nvm som beskrevet lenger ned
+- Sett opp python virtual env og installer requirements.txt, mer info lenger ned
 - Sett korrekt ip og backendport i run_backend.py og frontend/src/config.js
 - Sett frontend port i frontend/start_frontend.sh
-- Paths i backend/config.ini må endres på
+- Paths i backend/config.ini må endres på 
   
 ```sh
 # Starte flask 
-# Fra /illumina/analysis/dev/2022/fullFres
-python run_backend_server.py # Sier i fra om du må aktivere virtualenv
+# I ./fullFres
+python run_backend_server.py 
+# Sier i fra om du må aktivere virtualenv
+
 # Starte javascript
 cd frontend; sh start_frontend.sh 
 
@@ -56,6 +61,11 @@ En prøve som allerede har vært gjennom kontroll kan sendes tilbake til start v
 
 En prøve kan bli sletted ved hjelp av db/remove_sample.py -S {sample.id}
 OBS: bare "Samples" og "VariantsPerSample" blir slettet, generelle variantdata og evtuelle klassifiseringer forblir. 
+
+## Backup
+For å kopiere databasen kan man bruke fullFres/backup_variantdb.sh.
+Den kan også koperest på vanlig måte, men viss den er i bruk/i en prosess kan den bli korrupt.
+Man kan f.eks. bruke en cronjob for å regelmessig ta backup.
 
 ### Info
 * Genexus VCF inneholder noen linjer med semikolon i protein feks sånn: p.[Gln61His;Glu62Lys]. Det skaper krøll i parsing. Ha noe konvertering i script som kopierer vcf fra server?

@@ -1,4 +1,3 @@
-# Build like: docker build -t fullfres .
 FROM ubuntu:20.04
 
 LABEL maintainer="Maria.Fahlstrom@sthf.no & Sigve.Strand.Landa@sthf.no"
