@@ -1,2 +1,2 @@
 #! /bin/bash
-docker build -t vbtest:test1 -f docker/Dockerfile .
+docker build -t variantbrowser:test4 -f docker/Dockerfile .

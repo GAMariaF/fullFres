@@ -45,10 +45,10 @@ cd frontend; sh start_frontend.sh
 ```
 
 ## Bruker og passord
-Kjør db/users_db/add_user.py for å legge til brukere.\n
-(Gjør det fra docker ved å gå inn i docker med: docker exec -it {container.id} /bin/bash)
+Kjør db/users_db/add_user.py for å legge til brukere.
+(Gjør det i docker container ved å gå inn i containeren med: docker exec -it {container.id} /bin/bash)
 
-Endre passord med db/users_db/change_pwd.py\n
+Endre passord med db/users_db/change_pwd.py
 OBS: man trenger ikke å kunne det gamle passordet for å gjøre dette, det er en simpel overskriving.
 
 ## Laste inn prøver
