@@ -5,6 +5,17 @@
     <h6 style="color: lightgray">(Accurate results not guaranteed)</h6>
     <br>
 
+    <b-row>
+        <b-col></b-col>
+        <b-col>
+          <b-input-group>
+            <b-input v-model="startDate" placeholder="Start date: yyyymmdd"></b-input>
+              <b-input v-model="endDate" placeholder="End date: yyyymmdd"></b-input>
+           </b-input-group>
+        </b-col>
+        <b-col></b-col>
+      </b-row>
+      <br>
         <b-col  class="my-1">
            <b-input-group size="sm">
               <b-input v-model="run_input" placeholder="Enter Run(s)"></b-input> 
@@ -31,12 +42,22 @@
                 >
     
               </b-form-select>
+              <b-form-select
+                :options="geneClassOptions"
+                class="py-sm-0 form-control"
+                v-model="selectedClass"
+                @change="addClassList" 
+                >
+                <template #first>
+                  <b-form-select-option :value="null" disabled>Any Class</b-form-select-option>
+                </template> 
+              </b-form-select>
 
            </b-input-group>
         </b-col>
         <div class="mt-3"><strong>Current gene lists search: {{ this.geneListSearch }}</strong></div>
         <br>
-        <b-button v-on:click="query(run_input, sample_input, var_input, gene_input)" type="button">Search</b-button><span>&nbsp;</span>
+        <b-button v-on:click="query(run_input, sample_input, var_input, gene_input, startDate, endDate)" type="button">Search</b-button><span>&nbsp;</span>
         <b-button v-on:click="resetSearch()" type="button">Reset</b-button><span>&nbsp;</span>
         <br>
         <br>
@@ -245,6 +266,9 @@ export default {
       sample_input: "",
       var_input: "",
       gene_input: "",
+      classSearch: "",
+      startDate: null,
+      endDate: null,
 
 
       variantSampleList: "",
@@ -262,8 +286,10 @@ export default {
       options: config.classOptions,
       geneListOptions: config.geneListOptions,
       replySearchOptions: config.replySearchOptions,
+      geneClassOptions: config.classOptions,
       selectedGeneList: null,
       selectedReplyOption: "",
+      selectedClass: null,
       small: true,
       selectedRowIndex: 0,
       selectedRowIndexClassification: 0,
@@ -383,13 +409,13 @@ export default {
         {key: 'sampleid', label: 'Sample'}, 
         {key: 'Reply', label: 'Reply', sortable: true}, 
         {key: 'Genelist', label: 'Gene List', sortable: true},
-        {key: 'date', label: 'Date Classified', sortable: true},
+        {key: 'date', label: 'Date of Classification', sortable: true},
         {key: 'Classification'},
       ]
     };
   },
   methods: {
-    query(run_input, sample_input, var_input, gene_input) {
+    query(run_input, sample_input, var_input, gene_input, start_date, end_date) {
 
         const run_input_array = run_input.split(' AND ')
         const sample_input_array = sample_input.split(' AND ')
@@ -397,17 +423,19 @@ export default {
         const var_input_array = var_input.split(' AND ')
         const gene_input_array = [gene_input]
         const reply_input_array = [this.selectedReplyOption]
+        const class_array = this.classSearch.split(' AND ')
+        const dates = [String(start_date), String(end_date)]
         console.log(gene_input)
-        console.log(this.run_input_array)
+        console.log(run_input_array)
+        console.log(class_array)
 
-
-        const array_1 = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array, reply_input_array]);
-        console.log(array_1)
-        if (array_1 === '[[""],[""],[""],[""],[""],[""]]'){
+        const search_array = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array, reply_input_array, class_array, dates]);
+        console.log(search_array)
+        if (search_array === '[[""],[""],[""],[""],[""],[""],[""],["null", "null"]]'){
           console.log('Empty Search')
           this.displayWarning("No search parameters provided!")
         } else {
-          util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
+          util_funcs.query_backend(config.$backend_url, "stat_search" + search_array).then(result => {
             var variants = Object.values(result['data']);
             if (variants.length) {
               this.variants = variants;
@@ -431,14 +459,19 @@ export default {
       this.gene_input = "";
       this.selectedGeneList = null;
       this.selectedReplyOption = "";
+      this.classSearch = "";
+      this.startDate = null;
+      this.endDate = null;
     },
 
     getClassifications(item){
       var query = 'get_class|'+item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND
 
       util_funcs.query_backend(config.$backend_url, query)
-        .then(result => {this.classifications = Object.values(result['data']);
-
+        .then(result => {console.log(result);
+          eval(result)
+          this.classifications = Object.values(result['data']);
+      
       for (let i = 0; i < this.classifications.length; i++) {
         this.classifications[i].date = this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
                                       this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
@@ -454,6 +487,15 @@ export default {
       }
       console.log(this.geneListSearch)
     },
+
+    addClassList(item){
+      if (this.classSearch === "") {
+        this.classSearch += item;
+      } else {
+      this.classSearch += " AND " + item;
+      }
+    },
+
     oncoScoring(selectedoncogenicity_list) {
     this.oncoScore = 0;
     selectedoncogenicity_list.forEach(item => {
@@ -523,8 +565,6 @@ export default {
         labels,
         type: 'pie'
       }];
-      
-
     },
 
     rowSelected(items) {
@@ -593,7 +633,7 @@ export default {
     }
   },
   created: function() {
-    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""], [""]]);
+    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""], [""], [""], ["null", "null"]]);
     util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
       this.variants = Object.values(result['data']);     
     }) 

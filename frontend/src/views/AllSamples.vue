@@ -34,6 +34,8 @@
             :items="items"
             :fields="fields"
             :small="small"
+            sort-by="Seq_Date"
+            :sort-desc="true"
             
           >
           <!-- Formatting Type column -->
@@ -62,9 +64,9 @@ export default {
       selectedSample: "",
       items: [],
       fields: [{key: "runid", label: "Run id", sortable: true}, 
-              {key: "sampleid", label: "Sample id", sortable: true},
-              {key: "Seq_Date", label: "Sequencing Date", sortable: false},
-              {key: "Status", label: "Status", sortable: false},
+              {key: "sampleid", label: "Sample id", sortable: false},
+              {key: "Seq_Date", label: "Sequencing Date", sortable: true},
+              {key: "Status", label: "Status", sortable: true},
               {key: "Date_Signoff", label: "Date Sign off", sortable: true},
               {key: "User_Signoff", label: "User Sign off", sortable: false},
               {key: "Date_Approval", label: "Date Approval", sortable: true},

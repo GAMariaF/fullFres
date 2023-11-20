@@ -49,7 +49,7 @@ Kjør db/users_db/add_user.py for å legge til brukere.
 (Gjør det i docker container ved å gå inn i containeren med: docker exec -it {container.id} /bin/bash)
 
 Endre passord med db/users_db/change_pwd.py
-OBS: man trenger ikke å kunne det gamle passordet for å gjøre dette, det er en simpel overskriving.
+Man trenger ikke å kunne det gamle passordet for å gjøre dette, det er en simpel overskriving.
 
 ## Laste inn prøver
 - I Genexus: gå til resultat -> prøve -> varianter. Klikk export for å få ett excel ark. I tillegg: Gå på download files og last ned "filtered variants" for å få ei zip fil. 

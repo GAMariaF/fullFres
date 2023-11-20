@@ -353,7 +353,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					'Seq_Date': [sequencing_date]})
 		logging.debug(f"{run_id}, {sample_id}, {percent_tumor}, {sample_diseasetype}, {sequencing_date}")
 		#Add Standard Comment
-		dfSamples['CommentSamples']	= 'QC-parametere: \nAmplikon  dybde: \nEkspressjonskontroll: \nFilter: \nKommentar kontroll: '
+		dfSamples['CommentSamples']	= 'QC-parametere: \nAmplikon dybde: \nEkspressjonskontroll: \nFilter: \nKommentar kontroll: '
 		# Transfer data to database
 		try:
 			dfvcf_copy.AF = dfvcf_copy.AF.astype(float)
@@ -362,7 +362,7 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 		except AttributeError:
 			# Satser på at det går greit å hoppe over dette på denne måten.
 			# Når en prøve kun har f.eks. strukturelle variantar er ikkje AF feltet inkludert.
-			logging.debug(f"{run_id}, {sample_id}, (Likely:) AttributeError: 'DataFrame' object has no attribute 'AF'")
+			logging.debug(f"{run_id}, {sample_id}, Skipped AttributeError: (Likely to be:) 'DataFrame' object has no attribute 'AF'")
 		
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
 		if not dfvariant_copy.empty:
@@ -438,7 +438,7 @@ def list_approved_samples(db, args):
 		cond = f" AND Samples.{args[1]} = '{args[2]}'"
 
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-	stmt = f"SELECT sampleid, runid, Date_Approval \
+	stmt = f"SELECT sampleid, runid, User_Signoff, Date_Signoff, User_Approval, Date_Approval, User_Lock, Date_Lock \
 				FROM Samples \
 				WHERE Samples.Date_Approval IS NOT NULL \
 				AND Samples.Date_Approval != '' \
@@ -553,17 +553,25 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list):
+def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list, classes: list, dates: list):
+	""" This function consturcts a complex SQL-query based on the conditions it recieves from the frontend. 
+	The data is not treated before it is sent to the frontend, but it probably should be."""
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
-
-	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Samples.Genelist": diag, "Variants.annotation_variant": variants, "v.gene": gene}
+	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Variants.annotation_variant": variants, "v.gene": gene}
 	conds = ""
 	
 	for k, v in cond_dict.items():
 		if v:
 			conds += " AND " + k + " IN (" + str(v)[1:-1] +")" 
-
+	
+	if dates[0] != "null":
+		conds += " AND  Samples.Seq_Date > " + dates[0]
+	if dates[1] != "null":
+		conds += " AND  Samples.Seq_Date < " + dates[1]
+	
+	# Move gelist to be added after regular conditions to ensure only likness and not exact matching is used.
+	cond_dict["Samples.Genelist"] = diag
 	add_cond = ""
 	if cond_dict["Samples.Genelist"]:
 		add_cond += ("").join([f" AND GenelistsPerVariant LIKE '%{gl}%'" for gl in cond_dict["Samples.Genelist"]])
@@ -579,20 +587,27 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	
 	if reply:
 		if reply[0] == "Yes_A":
-			add_cond += " AND ReplyListPerVariant NOT LIKE '%No%'"
+			add_cond += " AND ReplyListPerVariant LIKE '%Yes%'"
 		elif reply[0] == "Yes_No":
 			add_cond += " AND ReplyListPerVariant LIKE '%Yes%' AND ReplyListPerVariant LIKE '%No%'"
-		elif reply[0] == "Yes":
-			add_cond += " AND ReplyListPerVariant NOT LIKE '%N%'"
+		elif reply[0] == "Yes_O":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%No%'"
 		elif reply[0] == "Yes, VN":
-			add_cond += " AND ReplyListPerVariant NOT LIKE '%No%' AND ReplyListPerVariant NOT LIKE '%Yes|%' AND ReplyListPerVariant LIKE '%Yes, VN'"
+			add_cond += " AND ReplyListPerVariant LIKE '%Yes, VN%'"
 		elif reply[0] == "No":
-			add_cond += " AND ReplyListPerVariant NOT LIKE '%Yes%'"
-		
+			add_cond += " AND ReplyListPerVariant LIKE '%No%'"
+		elif reply[0] == "No_O":
+			add_cond += " AND ReplyListPerVariant NOT LIKE '%Y%'"
+
+	if classes:
+		for c in classes:
+			add_cond += f" AND ClassesPerVariant LIKE '%{c}%'"	
 
 	stmt = f"""
-	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant2, 
+	-- Which terms to extract, only put Variant terms at the top untreated.
+	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant2,
 
+	-- Other terms must be combined in such a way that there is only one result per variant.
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
 	group_concat(s.Genelist, ', ') GenelistsPerVariant,
 	group_concat(vs.Reply, '|') ReplyListPerVariant,
@@ -605,6 +620,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	group_concat(DISTINCT v.CHROM_POS_ALTEND_DATE) CPADListPerVariant,
 	group_concat(DISTINCT c.DATE_CHANGED_VARIANT_BROWSER) DCVBListPerVariant
 
+	-- Combining all the tables.
 	FROM Variants v
 	LEFT JOIN VariantsPerSample vs
 	ON v.CHROM_POS_ALTEND_DATE = 
@@ -617,7 +633,13 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	LEFT JOIN Samples s 
 	ON vs.sampleid =  
 		s.sampleid 
- 
+	
+		
+	-- The WHERE clause has another query embedded in it. 
+	-- This is done because the tables need to be combined differently to get the correct results,
+	-- and we want to use v.annotation_variant
+	-- This acutually finds more variants than what we are after. Additional variants are filtered out further below.
+
 	WHERE v.annotation_variant in 
 		(SELECT Variants.annotation_variant
 		FROM Variants
@@ -630,7 +652,11 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 		WHERE
 			Samples.Status != 'Failed'
 			{conds}
-		) 
+		) AND s.Status != 'Failed'
+
+		
+	-- There must be minimum as many genelists in the results as requested in the query.
+	-- The conditions here essentially filter out unwanted variants based on the query conditions.
 
 	GROUP BY v.CHROM, v.POS, v.annotation_variant 
 	HAVING FreqGenLis >= {len(diag)}{add_cond}
@@ -685,15 +711,18 @@ def get_classifications(db, data):
 			AND VariantsPerSample.DATE_CHANGED_VARIANT_BROWSER = \
 											Classification.DATE_CHANGED_VARIANT_BROWSER \
 			LEFT JOIN Samples \
-			on VariantsPerSample.runid = Samples.runid \
-			and VariantsPerSample.sampleid = Samples.sampleid \
-			WHERE Samples.Status != 'Failed' and \
-				Variants.CHROM = '{data[1]}' and \
-				Variants.POS = '{data[2]}' and \
-				Variants.REF = '{data[3]}' and \
+			ON VariantsPerSample.runid = Samples.runid \
+			AND VariantsPerSample.sampleid = Samples.sampleid \
+			WHERE Samples.Status != 'Failed' AND \
+				Variants.CHROM = '{data[1]}' AND \
+				Variants.POS = '{data[2]}' AND \
+				Variants.REF = '{data[3]}' AND \
 				Variants.ALTEND = '{data[4]}';"
+	
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
+	# Due to not all imports having AF it can sometimes be NaN, this causes issues in frontend.
+	interpretationlist['AF'] = interpretationlist['AF'].apply(str)
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
@@ -719,12 +748,22 @@ def insert_approvedate(db, user, date, sampleid):
 		result = conn.execute(text(stmt))
 		conn.commit()
 
+def insert_lockdate(db, user, date, sampleid):
+	''' 
+	When hitting the lock-button in the browser - set lock date and lock user
+	'''
+	logging.debug("running lock-date")
+	engine = create_engine("sqlite:///"+db, echo=False, future=True)
+	stmt = "UPDATE Samples set User_Lock = '"+user+"', Date_Lock = '"+date+"' WHERE sampleid = '"+sampleid+"';"
+	with engine.connect() as conn:
+		result = conn.execute(text(stmt))
+		conn.commit()
+
 def insert_failedsample(db, user, date, sampleid):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"""UPDATE Samples set 
 		User_Signoff = '{user}', Date_Signoff = '{date}', 
 		Status = 'Failed' WHERE sampleid = '{sampleid}';"""
-	#(middle above)#User_Approval = '{user}', Date_Approval = '{date}', 
 	with engine.connect() as conn:
 		result = conn.execute(text(stmt))
 		conn.commit()
@@ -980,21 +1019,23 @@ def statistics(db, start_date: str, end_date: str):
 					{first_condition})")).fetchone()[0]
 
 		# Number of samples waiting for interpretation
-		n_samples_waiting = conn.execute(text("SELECT COUNT(*) FROM(SELECT DISTINCT sampleid, runid \
-												FROM Samples \
+		n_samples_waiting = conn.execute(text(f"SELECT COUNT(*) FROM(SELECT DISTINCT sampleid, runid \
+												FROM Samples s \
 												WHERE (Date_Signoff IS NULL \
 												OR Date_Signoff IS '') \
-												AND (Date_Approval IS Null \
-												OR Date_Approval is ''))")).fetchone()[0]
+												AND (Date_Approval IS NULL \
+												OR Date_Approval is '') \
+												{date_condition})")).fetchone()[0]
 
 		# Number of samples waiting for control
-		n_samples_signedoff = conn.execute(text("SELECT COUNT(*) FROM(SELECT DISTINCT \
+		n_samples_signedoff = conn.execute(text(f"SELECT COUNT(*) FROM(SELECT DISTINCT \
 													sampleid, runid, Date_Signoff \
-													FROM Samples \
+													FROM Samples s \
 													WHERE (Date_Signoff IS NOT NULL \
 													AND Date_Signoff IS NOT '') \
 													AND (Date_Approval IS NULL \
-													OR Date_Approval IS ''))")).fetchone()[0]
+													OR Date_Approval IS '') \
+										  			{date_condition})")).fetchone()[0]
 
 		# Number of samples per genelist
 		n_samples_genelist = conn.execute(text(f"SELECT Genelist, COUNT(*) as Freq \
@@ -1126,6 +1167,25 @@ def statistics(db, start_date: str, end_date: str):
 		n_variants_class5pd = pd.DataFrame(n_variants_class5list)
 		n_variants_class5 = n_variants_class5pd.to_dict('list')
 
+		vus_stmt = f"""SELECT Reply, Genelist, COUNT(*) AS Freq 
+				FROM ( 
+				SELECT DISTINCT chrom, pos, altend, 
+				Genelist, class, Reply FROM Samples s 
+				LEFT JOIN VariantsPerSample vps 
+				ON s.runid = vps.runid 
+				AND s.sampleid = vps.sampleid 
+				LEFT JOIN Variants v 
+				ON vps.CHROM_POS_ALTEND_DATE = 
+					v.CHROM_POS_ALTEND_DATE 
+				LEFT JOIN Classification c 
+				ON vps.CHROM_POS_ALTEND_DATE = 
+					c.CHROM_POS_ALTEND_DATE 
+				AND vps.DATE_CHANGED_VARIANT_BROWSER = 
+					c.DATE_CHANGED_VARIANT_BROWSER 
+				WHERE c.class='3 - VUS' {date_condition}) 
+				GROUP BY Genelist, Reply"""
+		vus_statistics = pd.read_sql_query(text(vus_stmt), con = conn).to_dict('records')
+
 		# Number of users
 		n_users = conn.execute(text(f"SELECT COUNT(DISTINCT(User_Signoff)) \
 			FROM Samples s {first_condition}")).fetchone()[0]
@@ -1160,7 +1220,8 @@ def statistics(db, start_date: str, end_date: str):
 				"variants_class2": n_variants_class2,
 				"variants_class3": n_variants_class3,
 				"variants_class4": n_variants_class4,
-				"variants_class5": n_variants_class5 }
+				"variants_class5": n_variants_class5,
+				"vus_statistics": vus_statistics }
 	return results
 
 def data_report(db):
@@ -1172,7 +1233,12 @@ def data_report(db):
 		Samples.CommentSamples, \
 		Variants.gene, Variants.exon,\
 		Variants.annotation_variant, \
+		Samples.User_Signoff, \
+		Samples.Date_Signoff, \
+		Samples.User_Approval, \
 		Samples.Date_Approval, \
+		Samples.User_Lock, \
+		Samples.Date_Lock, \
 		VariantsPerSample.FAO || ' / ' || VariantsPerSample.FDP as Reads, \
 		VariantsPerSample.Copy_Number, VariantsPerSample.AF, \
 		VariantsPerSample.DP, \

@@ -32,6 +32,7 @@ def main():
     stmt = f"""UPDATE Samples set 
         User_Signoff = '', Date_Signoff = '',
         User_Approval = '', Date_Approval = '',
+        User_Lock = '', Date_Lock = '',
         Status = '' 
         WHERE sampleid = '{args.S}';
         """

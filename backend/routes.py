@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import uuid
 import jwt
+import ast
 import datetime
 import logging
 from functools import wraps
@@ -36,6 +37,7 @@ from dbutils import list_interpretation
 from dbutils import insert_variants
 from dbutils import insert_signoffdate
 from dbutils import insert_approvedate
+from dbutils import insert_lockdate
 from dbutils import insert_failedsample
 from dbutils import insert_comment
 from dbutils import statistics
@@ -196,13 +198,12 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query[:11] == 'stat_search':
-            import ast
             q = ast.literal_eval(query[11:])
             for i in range(len(q)):
                 if len(q[i]) == 1 and q[i][0] == "":
                     q[i] = []
             #return make_response(jsonify(isError=False, message="None", statusCode=205, data={0: 0}), 205)
-            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5])
+            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
         elif query[:9] == "get_class":
@@ -214,6 +215,7 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="None", statusCode=204, data={0: 0}), 204)
             return response
     elif request.method == 'POST':
+        # Should probably be a switch
         if query == "updatevariants":
             logging.debug("--- update variants ---")          
             j = json.loads(json.dumps(request.json))
@@ -241,6 +243,20 @@ def api(current_user, query):
             j = json.loads(json.dumps(request.json))
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Approved sample!'})
+            return response
+        elif query == "unapprove":
+            logging.debug("running approve")
+            j = json.loads(json.dumps(request.json))
+            insert_signoffdate(db_path, "", "", j["sampleid"], "")
+            insert_approvedate(db_path, "", "", j["sampleid"])
+            insert_comment(db_path, j["commentsamples"], j["sampleid"])
+            response = jsonify({'message': 'Unapproved sample!'})
+            return response
+        elif query == "lock":
+            logging.debug("running sample lock")
+            j = json.loads(json.dumps(request.json))
+            insert_lockdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
+            response = jsonify({'message': 'Locked sample!'})
             return response
         elif query == "failedsample":
             logging.debug("Running failed sample")

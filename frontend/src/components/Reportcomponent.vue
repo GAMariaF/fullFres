@@ -130,6 +130,21 @@
         </div>
       </b-col>
     </b-row>
+
+      <div v-if="selectedSample !== '' && selectedSampleLock.length < 5">
+        <b-row>
+        <b-col>
+          <b-button v-on:click="sendBack()" class="btn mr-1 btn-danger btn-lg"> Send Back </b-button>
+        </b-col>
+        <b-col>
+          <b-button v-on:click="lock()" class="btn mr-1 btn-success btn-lg"> Lock </b-button>
+        </b-col>
+      </b-row>
+      </div>
+      <div v-if="selectedSampleLock.length > 5">
+        <h2> Locked {{ selectedSampleLock }}</h2>
+      </div>
+    
 <!-- -->
 
 <!-- -->
@@ -250,6 +265,7 @@ export default {
     return {
       selectedRowIndex: 0,
       sortedIndex: config.sortedIndex,
+      selectedSampleIndex: 0,
       reportModal: {
         id: "report-modal",
         title: "",
@@ -284,6 +300,7 @@ export default {
       loggedInStatus: false,
       selectedSample: "",
       selectedVariant: "",
+      selectedSampleLock: "",
       small: true,
       items: [],
       // 'Variants' is a placeholder to prevent errors until the data is fetched from backend.
@@ -349,6 +366,9 @@ export default {
       if (items.length === 1) {
 
         this.selectedSample = items[0].sampleid;
+        this.selectedSampleLock = String(items[0].Date_Lock) + " by " + items[0].User_Lock;
+        this.selectedSampleIndex = this.items.indexOf(items[0])
+
          //Get variants for that sample:
 
         //this.$store.dispatch("initVariantStore", {
@@ -368,6 +388,7 @@ export default {
       } else if (items.length === 0) {
         this.selectedSample = "";
         this.generalReport = "";
+        this.selectedSampleLock = "";
       }
     },
 
@@ -518,6 +539,54 @@ export default {
         return(date + " by " + this.variants[this.selectedRowIndex].User_Class);
       }
     },
+
+    lock() {
+      // Sending approval date to database
+      // This if only for signing off the user when interpretation is done. 
+      
+      // Metode for  sende inn dato, og tolkede varianter til backend.
+      
+      // Må sjekke om noko har blitt endra.
+      const baseURI = config.$backend_url + "/api/lock";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.selectedSample,
+            user: this.$store.getters.username,
+          },
+        {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+      location.reload();
+    },
+
+    sendBack() {
+      // If the sample is not ready and needs to be sent back to the interpretation-list this button is used.
+      // The button does the opposite of the sign-off 
+      const sel_sample = this.items[this.selectedSampleIndex]
+      const baseURI = config.$backend_url + "/api/unapprove";
+      this.$http
+        .post(
+          baseURI,
+          {
+            sampleid: this.selectedSample,
+            user: this.$store.getters.username,
+            commentsamples: this.variants[0].CommentSamples + "\nOriginally signed off by " + sel_sample.User_Signoff + " " + sel_sample.Date_Signoff + " and controlled by " + sel_sample.User_Approval + " " + sel_sample.Date_Approval
+          },
+          {
+            withCredentials: true,
+            // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => response.data);
+        location.reload();
+    },
+  
+
 
     async copyToClipboard(text) { 
       // Needs https to work, not currently active.

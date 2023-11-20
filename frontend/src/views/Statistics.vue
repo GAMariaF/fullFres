@@ -159,6 +159,35 @@
 
         </b-col>
       </b-row>
+      <b-row><br><br></b-row>
+      <h5> VUS Reply Statistics </h5>
+      <b-row>
+
+        <b-col>
+          <h5> Total </h5>
+          <Plotly v-if="loaded" 
+            :data="vusPieData[0]"
+            :layout="vusPieLayout" 
+            :display-mode-bar="false" />
+        </b-col>
+
+        <b-col>
+          <h5> Yes </h5>
+          <Plotly v-if="loaded" 
+            :data="vusPieData[1]"
+            :layout="vusPieLayout" 
+            :display-mode-bar="false" />
+        </b-col>
+
+        <b-col>
+          <h5> No </h5>
+          <Plotly v-if="loaded" 
+            :data="vusPieData[2]"
+            :layout="vusPieLayout" 
+            :display-mode-bar="false" />
+        </b-col>
+        <b-col></b-col>
+      </b-row>
 
         <!--  -->
         <b-col>
@@ -213,7 +242,7 @@ export default {
       sampleText: "Total number of samples in database",
       stats: {},
       items: [],
-      loaded: true, 
+      loaded: false, 
       dataSamples:[{
                 x: [],
                 y: [],
@@ -298,6 +327,7 @@ export default {
                 name: 'class5',
                 type: "bar"}, 
                 ];
+            this.plotVusPie(this.stats.vus_statistics)
 
         });
     },
@@ -318,6 +348,60 @@ export default {
     changeText() {
       this.runText = "Number of runs in search"
       this.sampleText = "Number of samples in search"
+    },
+
+    calcVusListInfo(items) {
+      
+      var total = {"Yes": 0, "No": 0};
+      var yesList = {};
+      var noList = {};
+
+      items.forEach((item) => {
+        if(item.Reply.includes("Yes")) {
+          total.Yes = total.Yes + item.Freq;
+          if (yesList[item.Genelist]){
+            yesList[item.Genelist] += item.Freq
+          } else {
+          yesList[item.Genelist] = item.Freq;
+          }
+        } 
+        else if (item.Reply.includes("No")) {
+          total.No = total.No + item.Freq;
+          noList[item.Genelist] = item.Freq
+        }
+      }) 
+
+      return {"total": total, "yes": yesList, "no": noList}
+    },
+
+    plotVusPie(item) {
+      var vusData = this.calcVusListInfo(item);
+
+      this.vusPieData = []
+      for (const [k, v] of Object.entries(vusData)){
+
+        console.log(k)
+        var values = [];
+        var labels = [];
+
+        for (const  [key, value] of Object.entries(v)) {
+            values.push(value);
+            labels.push(key);
+          }
+
+        this.vusPieData.push([{
+          values,
+          labels,
+          type: 'pie'
+        }]);
+      }
+
+      this.vusPieLayout = {
+        height: 480,
+        width: 340,
+        legend: {x: -0.7, y: -0.7},
+      };
+      this.loaded = true
     }
   },
   created: function () {

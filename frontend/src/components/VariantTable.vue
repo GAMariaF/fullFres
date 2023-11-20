@@ -352,7 +352,7 @@
                 
                 @click="changedatastate"
                 placeholder=""
-                rows=4
+                rows=5
                 v-model="variants[0].CommentSamples"
 
               ></b-form-textarea>
