@@ -366,7 +366,11 @@ export default {
       if (items.length === 1) {
 
         this.selectedSample = items[0].sampleid;
+        if (items[0].Date_Lock === null && items[0].User_Lock === null){
+          this.selectedSampleLock = '';
+        } else {
         this.selectedSampleLock = String(items[0].Date_Lock) + " by " + items[0].User_Lock;
+        }
         this.selectedSampleIndex = this.items.indexOf(items[0])
 
          //Get variants for that sample:
@@ -586,17 +590,6 @@ export default {
         location.reload();
     },
   
-
-
-    async copyToClipboard(text) { 
-      // Needs https to work, not currently active.
-      try {
-        await navigator.clipboard.writeText(text);
-        console.log('Text copied to clipboard');
-      } catch (err) {
-        console.error('Error in copying text: ', err);
-      }
-    },
   },
 
   created: function () {
