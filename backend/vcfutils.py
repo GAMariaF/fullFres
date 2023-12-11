@@ -176,12 +176,15 @@ def get_sample_id(vcf):
 #IonReporterAnalysisName=22SKH02673_LibPrep87
 
 def get_run_id(vcf):
-    run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2}/Auto',line) 
+    # This find functionality should probably be changed
+    run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,3}/Auto',line) 
             for line in open(vcf)]
+
     run_string=[string for string in run_list if len(string) > 0][0][0]
-    # A bit weird maybe, but 'GX' has been hardcoded in above anyway.
-    run_string='GX' + run_string[:-8].split('GX')[1]
-    print(run_string)
+    
+    run_string_split = run_string.split("-")[-1].split("_")
+    run_string = run_string_split[0] + "_" + run_string_split[1]
+    print("Run string: " + run_string)
     return run_string
 #GNXS-0297-18-GX_0016_22/Auto
 
