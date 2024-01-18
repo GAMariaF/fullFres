@@ -177,7 +177,7 @@ def get_sample_id(vcf):
 
 def get_run_id(vcf):
     # This find functionality should probably be changed
-    run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,3}/Auto',line) 
+    run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,4}/Auto',line) 
             for line in open(vcf)]
 
     run_string=[string for string in run_list if len(string) > 0][0][0]

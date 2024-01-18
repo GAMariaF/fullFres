@@ -312,7 +312,7 @@ export default {
       fields: [
         {key: "Type", label: "Type", sortable: true},
         {key: "gene", sortable: true},
-        {key: "annotation_variant2", label: " Annotation Variant (alt)"},
+        {key: "annotation_variant", label: " Annotation Variant"},
         {key: "CHROM", sortable: true},        
         {key: "POS", label: "Pos", sortable: true},
         {key: "REF", label: "Ref", sortable: true},
@@ -406,10 +406,11 @@ export default {
                   ],
       filter: '',
       fieldsVariant: [
-        {key: 'sampleid', label: 'Sample'}, 
+        {key: 'sampleid', label: 'Sample', sortable: true},
+        {key: 'Seq_Date_2', label: 'Sequencing Date'},
         {key: 'Reply', label: 'Reply', sortable: true}, 
         {key: 'Genelist', label: 'Gene List', sortable: true},
-        {key: 'date', label: 'Date of Classification', sortable: true},
+        {key: 'date', label: 'Classification Date'},
         {key: 'Classification'},
       ]
     };
@@ -465,17 +466,29 @@ export default {
     },
 
     getClassifications(item){
-      var query = 'get_class|'+item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND
+      var query = 'get_class|'+item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND+'|'
 
+      if (this.startDate !== "" || this.startDate !== null) {
+        query = query + this.startDate
+      } 
+      if (this.endDate !== "" || this.endDate !== null) {
+        query = query + '|' + this.endDate
+      } 
       util_funcs.query_backend(config.$backend_url, query)
-        .then(result => {console.log(result);
-          eval(result)
+        .then(result => {
+          eval(result);
           this.classifications = Object.values(result['data']);
-      
+        
       for (let i = 0; i < this.classifications.length; i++) {
         this.classifications[i].date = this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(4,6) + '.' + 
                                       this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(2,4) + '.' +
                                       this.classifications[i].DATE_CHANGED_VARIANT_BROWSER.substring(0,2);
+
+        this.classifications[i].Seq_Date_2 = this.classifications[i].Seq_Date.substring(6,8) + '.' + 
+                                      this.classifications[i].Seq_Date.substring(4,6) + '.' +
+                                      this.classifications[i].Seq_Date.substring(2,4);
+        
+        
       }})
     },
 
@@ -485,7 +498,6 @@ export default {
       } else {
       this.geneListSearch += " AND " + item;
       }
-      console.log(this.geneListSearch)
     },
 
     addClassList(item){
@@ -517,7 +529,6 @@ export default {
     },
 
     calcGeneListInfo(item) {
-      console.log(item)
       const geneList = item.GenelistsPerVariant.split(', ')
       var uniqueGeneList = geneList.filter((v, i, a) => a.indexOf(v) === i);
       let geneListDict = new Object();
@@ -570,29 +581,23 @@ export default {
     rowSelected(items) {
       if (items.length===1) {
         this.selectedVariant = items;
-        console.log("test")
-        //console.log(items)
 
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected")
       }
     },
 
     rowSelected_class(items) {
       if (items.length===1) {
         this.selectedClassification = items;
-        console.log("test")
         console.log(items)
 
       } else if (items.length===0) {
         this.selectedClassification = "";
-        console.log("unselected")
       }
     },
 
     openInfoModal(item, index, button) {
-      console.log("openInfoModal")
       this.selectedRowIndex = index;
       //this.infoModal.title = `Variant: ${item.transcript}`;
       this.infoModal.title = `${item['gene']}: ${item['annotation_variant2']}`;
@@ -602,7 +607,6 @@ export default {
     },
 
     openClassificationModal(item, index, button) {
-      console.log("openClassificationModal")
       this.selectedRowIndexClassification = index;
       //this.infoModal.title = `Variant: ${item.transcript}`;
       this.classificationModal.title = `${item['sampleid']}: ${item['annotation_variant2']} Classification`;
@@ -614,13 +618,11 @@ export default {
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
-      console.log("infomodal lukket")
     },
 
     resetClassificationModal() {
       this.classificationModal.title = "";
       this.classificationModal.content = "";
-      console.log("classificationModal lukket")
     },
 
     sortTable() {

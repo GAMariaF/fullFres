@@ -97,7 +97,7 @@
         <b-col>
           <b-input-group>
             <b-input v-model="startDate" placeholder="Start date: yyyymmdd"></b-input>
-              <b-input v-model="endDate" placeholder="End date: yyyymmdd"></b-input>
+            <b-input v-model="endDate" placeholder="End date: yyyymmdd"></b-input>
            </b-input-group>
           <br>
           <b-button v-on:click="getstats();changeText()" type="button">Search date</b-button><span>&nbsp;</span>

@@ -401,12 +401,25 @@ def list_samples(db):
 def list_all_samples(db, args, date):
 
 	cond = "WHERE"
-	if args[1] == 'date':
+
+	if args[1] != "":
+		cond += " s.runid == " + args[1] + " AND"
+	if args[2] != "":
+		cond += " s.sampleid == " + args[2] + " AND"
+	if args[3] != "":
+		cond += " s.Genelist LIKE '%" + args[3] + "%' AND"
+	if args[4] != "":
+		cond += " s.Seq_Date >= " + args[4] + " AND"
+	if args[5] != "":
+		cond += " s.Seq_Date <= " + args[5] + " AND"
+
+	if len(cond) > 5:
+		cond = cond[:-4]
+	else:
 		cond += " s.Seq_Date <= " + date
 		cond += " AND s.Seq_Date >= " + str(int(date)-10000)
-	else:
-		cond += f" s.{args[1]} = '{args[2]}'"
-	
+
+	print(cond)
 	#list all samples
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"SELECT * FROM Samples s {cond};"
@@ -564,11 +577,15 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	for k, v in cond_dict.items():
 		if v:
 			conds += " AND " + k + " IN (" + str(v)[1:-1] +")" 
-	
+
+	conds_date = ""
 	if dates[0] != "null":
 		conds += " AND  Samples.Seq_Date > " + dates[0]
+		conds_date += " AND s.Seq_Date > " + dates[0]
+		
 	if dates[1] != "null":
 		conds += " AND  Samples.Seq_Date < " + dates[1]
+		conds_date += " AND s.Seq_Date < " + dates[1]
 	
 	# Move gelist to be added after regular conditions to ensure only likness and not exact matching is used.
 	cond_dict["Samples.Genelist"] = diag
@@ -605,7 +622,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 
 	stmt = f"""
 	-- Which terms to extract, only put Variant terms at the top untreated.
-	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant2,
+	SELECT v.Type, v.CHROM, v.POS, v.REF, v.ALTEND, v.gene, v.oncomineGeneClass, v.oncomineVariantClass, v.annotation_variant,
 
 	-- Other terms must be combined in such a way that there is only one result per variant.
 	group_concat(vs.sampleid,', ') SamplesPerVariant,
@@ -653,6 +670,7 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 			Samples.Status != 'Failed'
 			{conds}
 		) AND s.Status != 'Failed'
+		{conds_date}
 
 		
 	-- There must be minimum as many genelists in the results as requested in the query.
@@ -669,6 +687,15 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	return list_json
 
 def get_classifications(db, data):
+
+	# Add date search for Variants Statistics Tab:
+	date_cond = ""
+	if len(data) > 5:
+		if data[5] != "" and data[5] != "null":
+			date_cond += " AND Samples.Seq_date > " + data[5]
+		if data[6] != "" and data[6] != "null":
+			date_cond += " AND Samples.Seq_date < " + data[6]
+	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
 		Samples.Perc_Tumor, Samples.Seq_Date, Samples.Status, Samples.CommentSamples, \
@@ -717,7 +744,8 @@ def get_classifications(db, data):
 				Variants.CHROM = '{data[1]}' AND \
 				Variants.POS = '{data[2]}' AND \
 				Variants.REF = '{data[3]}' AND \
-				Variants.ALTEND = '{data[4]}';"
+				Variants.ALTEND = '{data[4]}' \
+				{date_cond};"
 	
 	with engine.connect() as conn:
 		interpretationlist = pd.read_sql_query(text(stmt), con = conn)

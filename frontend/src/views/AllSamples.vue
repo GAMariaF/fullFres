@@ -4,14 +4,25 @@
     <h1>All samples</h1>
     <br/>
     <b-row>
-      <b-col></b-col>
+      
         <b-col>
           <b-input-group>
             <b-input v-model="runid" placeholder="Run ID"></b-input>
             <b-input v-model="sampleid" placeholder="Sample ID"></b-input>
+            <b-form-select
+                :options="geneListOptions"
+                class="py-sm-0 form-control"
+                v-model="selectedGeneList"
+                >
+                <template #first>
+                  <b-form-select-option :value="null" disabled>Gene Lists</b-form-select-option>
+              </template> 
+              </b-form-select>
+            <b-input v-model="startDate" placeholder="Start date: yyyymmdd"></b-input>
+            <b-input v-model="endDate" placeholder="End date: yyyymmdd"></b-input>
            </b-input-group>
           </b-col>
-          <b-col></b-col>
+          
         </b-row>
         <br/>
         <b-button v-on:click="getsamples()" type="button">Search</b-button><span>&nbsp;</span>
@@ -39,6 +50,9 @@
             
           >
           <!-- Formatting Type column -->
+          <template #cell(Nr)="data">
+            {{ data.index + 1 }}
+          </template>
           <template #cell(runid)="data">
             <b class="text-info">{{ data.value.toUpperCase() }}</b>
           </template>
@@ -63,8 +77,10 @@ export default {
       sampleID: "",
       selectedSample: "",
       items: [],
-      fields: [{key: "runid", label: "Run id", sortable: true}, 
+      fields: [{key: "Nr", label: "Nr", sortable: false},
+              {key: "runid", label: "Run id", sortable: true}, 
               {key: "sampleid", label: "Sample id", sortable: false},
+              {key: "Genelist", label: "Gene List", sortable: true},
               {key: "Seq_Date", label: "Sequencing Date", sortable: true},
               {key: "Status", label: "Status", sortable: true},
               {key: "Date_Signoff", label: "Date Sign off", sortable: true},
@@ -75,6 +91,10 @@ export default {
       filter: '',
       runid: "",
       sampleid: "",
+      selectedGeneList: null,
+      startDate: "",
+      endDate: "",
+      geneListOptions: config.geneListOptions,
     };
   },
   methods: {
@@ -88,13 +108,14 @@ export default {
     getsamples() {
       // Funksjon for å få samples fra backenc
       // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
-      var search = "|date"
-      if (this.runid !== ""){
-        search = "|runid|"+this.runid;
-      } else if(this.sampleid !== "") {
-        search = "|sampleid|"+this.sampleid;
+      var geneList = ""
+      if (this.selectedGeneList === null) {
+        geneList = "";
+      } else {
+        geneList = this.selectedGeneList;
       }
-      console.log("metode testaxios");
+      var search = "|" + this.runid + "|" + this.sampleid + "|" + geneList + "|" + this.startDate + "|" + this.endDate
+      console.log(search)
       const baseURI = config.$backend_url + "/api/allsamples";
       axios
         .get(baseURI+search)
@@ -103,6 +124,7 @@ export default {
       this.runid = "";
       this.sampleid = "";
     },
+
   },
   created: function () {
     // initstore sjekk innlogging
