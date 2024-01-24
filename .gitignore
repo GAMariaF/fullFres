@@ -1,6 +1,11 @@
-# Added by Oyvind:
+# Manually added:
 */package-lock.json
 frontend/package-lock.json
+frontend/package.json
+backend/user_db/users.db
+db/*.db
+*.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
