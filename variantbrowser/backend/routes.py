@@ -11,39 +11,23 @@ import ast
 import datetime
 import logging
 from functools import wraps
-from backend import app
-from backend.users_db import Users
+from variantbrowser.backend import app
+from variantbrowser.backend.user import Users
 from flask_cors import cross_origin
 import sys
 import configparser
 config = configparser.ConfigParser()
-config.read('backend/config.ini')
+config.read('variantbrowser/backend/config.ini')
 
 sys.path.insert(0, config['Paths']['backend_path'])
 sys.path.insert(0, config['Paths']['db_path'])
 
 ### settings.json gir path til dbutils og vcfutils
-from dbutils import list_samples
-from dbutils import list_all_samples
-from dbutils import list_signoff_samples
-from dbutils import list_approved_samples
-from dbutils import list_all_variants
-#from dbutils import list_sample_variants
-from dbutils import list_interpretation
-from dbutils import insert_variants
-from dbutils import insert_signoffdate
-from dbutils import insert_approvedate
-from dbutils import insert_lockdate
-from dbutils import insert_failedsample
-from dbutils import insert_comment
-from dbutils import statistics
-from dbutils import data_report
-from dbutils import list_search
-from dbutils import get_classifications
+from variantbrowser.db.dbutils import *
 
-from importutils import importVcfXls
+from variantbrowser.backend.importutils import importVcfXls
+from variantbrowser.backend.vcfutils import CustomFileError
 
-from vcfutils import CustomFileError
 # Imports som er brukt for aa teste db
 import sqlite3
 from sqlalchemy import create_engine, update
@@ -55,7 +39,6 @@ db_path = config['Paths']['db_full_path']
 
 # For debug logging:
 logging.basicConfig(level=logging.DEBUG)
-
 
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:

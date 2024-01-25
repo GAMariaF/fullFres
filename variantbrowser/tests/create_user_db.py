@@ -1,5 +1,5 @@
 from backend import db_user as db
-from backend.users_db import Users
+from variantbrowser.backend.user import Users
 import uuid
 from werkzeug.security import generate_password_hash
 

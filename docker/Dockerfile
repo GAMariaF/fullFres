@@ -42,18 +42,19 @@ RUN python3 -m pip install -r /tmp/requirements.txt
 
 # Install fullfres from git (changed to folders):
 #RUN cd / && git clone --branch dev_docker https://github.com/GAMariaF/fullFres.git
-RUN cd / && mkdir -m 777 fullFres
-COPY . /fullFres/
+RUN cd / && mkdir -m 777 vb
+COPY . /vb/
+RUN cd /vb; pip3 install .
 
 ENV NODE_OPTIONS --openssl-legacy-provider
 
 # # Install node packages
-RUN cd /fullFres/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
-RUN cd /fullFres/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
-RUN cd /fullFres/frontend/ && npx vue-cli-service build
-RUN cd /fullFres/frontend/ && npm run lint
+RUN cd /vb/variantbrowser/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
+RUN cd /vb/variantbrowser/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
+RUN cd /vb/variantbrowser/frontend/ && npx vue-cli-service build
+RUN cd /vb/variantbrowser/frontend/ && npm run lint
 
 # Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
 
-CMD ["sh", "fullFres/docker_startup_cmd.sh"]
+CMD ["sh", "variantbrowser/docker_startup_cmd.sh"]
 

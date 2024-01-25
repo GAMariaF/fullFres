@@ -22,14 +22,14 @@ Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet, er
   Eller bruk VaraintBrowser/build_docker.sh.
   Må bygges fra overordna mappe fordi hele repositoriet blir kopiert inn i dockerimaget. 
 - Sett frontendport i run_VB_docker.sh og kjør for å starte docker
-- Paths i backend/config.ini må kanskje endres på (man burde påse at databasen lagres utenfor docker containeren)
+- Paths i variantbrowser/backend/config.ini må kanskje endres på (man burde påse at databasen lagres utenfor docker containeren)
 
 ## Sett opp dev utgave (ikke i docker)
 - Installer nvm som beskrevet lenger ned
 - Sett opp python virtual env og installer requirements.txt, mer info lenger ned
 - Sett korrekt ip og backendport i run_backend.py og frontend/src/config.js
 - Sett frontend port i frontend/start_frontend.sh
-- Paths i backend/config.ini må endres på 
+- Paths i variantbrowser/backend/config.ini må endres på 
   
 ```sh
 # Starte flask 
@@ -51,7 +51,7 @@ Man trenger ikke å kunne det gamle passordet for å gjøre dette, da det er en 
 
 ## Laste inn prøver
 - I Genexus: gå til resultat -> prøve -> varianter. Klikk export for å få ett excel ark. I tillegg: Gå på download files og last ned "filtered variants" for å få ei zip fil. 
-- Legg filene i path som står i backend/config.ini "db_test_path"  (Burde få nytt navn)
+- Legg filene i path som står i cariantbrowser/backend/config.ini "db_test_path"  (Burde få nytt navn)
 - OBS: pass på at det er filtrerte filer.
 
 ## Unapprove og sletting av prøver

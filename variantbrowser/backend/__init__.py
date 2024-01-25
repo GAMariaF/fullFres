@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+
 import configparser
 config = configparser.ConfigParser()
 config.read('variantbrowser/backend/config.ini')
@@ -22,4 +23,5 @@ db_user = SQLAlchemy(app)
 #app.config['CORS_HEADERS'] = 'Content-Type'
 app.config.from_object(__name__)
 
+__all__ = ["importutils", "routes", "user", "vcfutils"]
 from variantbrowser.backend import *

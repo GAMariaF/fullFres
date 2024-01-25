@@ -1,7 +1,3 @@
-
-from flask_sqlalchemy import SQLAlchemy
-# Import ikkje brukt?
-
 from variantbrowser.backend import db_user as db
 
 class Users(db.Model):

@@ -3,51 +3,28 @@ import logging
 from . import db
 
 
-def get_options():
 
-    parser = argparse.ArgumentParser(description='Version: 0.0.1')
-    parser.add_argument('program', nargs=1,
-                        help='Select a program to run')
-
-    args = parser.parse_args()
-
-    return args
 
 
 def main():
 
-#    args = get_options()
-#    
-#    match args.program[0]:
-#        case 'removesample':
-#            db.remove_sample
-#        case 'unlocksample':
-#            db.unlock_sample
-#        case 'adduser':
-#            db.add_user
-#        case 'changepwd':
-#            db.change_pwd
-#        case 'generatedbs':
-#            db.generate_dbs
-#        case _:
-#            print("Not found")
 
-    #if None in [args.adduser]:
-    #    logging.error('ERROR in arguments')
-    #    exit()
-    
     print("""
-    Uses:
+    Variantbrowser Version: 0.0.1
           
-    removesample: Delete a sample from the variant database.
+    Commandline tools:
           
-    unlocksample: Unlock a locked sample. It is sent back to the initial interpretation stage.
+    vb-removesample: Delete a sample from the variant database.
           
-    adduser: Add new user to user database.
+    vb-unlocksample: Unlock a locked sample. It is sent back to the initial interpretation stage.
           
-    changepwd: Change password for user. Existing password not needed.
+    vb-adduser: Add new user to user database.
           
-    generatedbs: Generate empty variant and user databases.
+    vb-changepwd: Change password for user. Existing password not needed.
+          
+    vb-generatedbs: Generate empty variant and user databases.
+          
+    vb-runbackend: To run backend for development
     
     """)
     exit()
