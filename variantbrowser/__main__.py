@@ -18,13 +18,13 @@ def main():
           
     vb-unlocksample: Unlock a locked sample. It is sent back to the initial interpretation stage.
           
-    vb-adduser: Add new user to user database.
+    vb-adduser: Add a new user to user database.
           
-    vb-changepwd: Change password for user. Existing password not needed.
+    vb-changepwd: Change password for a user. Existing password not needed.
           
-    vb-generatedbs: Generate empty variant and user databases.
+    vb-generatedbs: Generate empty variant and user databases. Does not overwrite existing dbs.
           
-    vb-runbackend: To run backend for development
+    vb-runbackend: Run backend for development
     
     """)
     exit()

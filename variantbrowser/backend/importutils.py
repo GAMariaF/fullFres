@@ -1,18 +1,15 @@
 import os
-import configparser
 import sys
 import zipfile
 import shutil
 import re
 import pandas as pd
-config = configparser.ConfigParser()
-config.read('variantbrowser/backend/config.ini')
-sys.path.insert(0, config['Paths']['backend_path'])
-sys.path.insert(0, config['Paths']['db_path'])
+
 from variantbrowser.backend.vcfutils import *
-from variantbrowser.db.dbutils import populate_thermo_variantdb
+from variantbrowser.db.dbutils import populate_thermo_variantdb, get_config
 
 # list files and directories in import directory
+config = get_config()
 folder = config['Paths']['db_test_path']
 
 def importVcfXls(folder):

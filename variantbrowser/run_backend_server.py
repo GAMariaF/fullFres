@@ -1,8 +1,5 @@
 import sys, os
 from variantbrowser.backend import app
-import configparser
-config = configparser.ConfigParser()
-config.read('setup_config.ini')
 
 SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
 

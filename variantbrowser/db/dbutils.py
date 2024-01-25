@@ -34,21 +34,26 @@
 
 # def db_to_vcf(db,outvcf='exported.vcf'):
 # create vcf from db data to upload to Genexus software
-
-import xxlimited
 import pandas as pd
-import sqlite3
-import sqlalchemy
-from sqlalchemy import update
+from sqlalchemy import create_engine, text
 import datetime
-from sqlalchemy import create_engine
-from sqlalchemy import text
 import csv
-import os
 import logging
+import configparser
+#import sqlite3
+#import sqlalchemy
+#import sys
+
+#sys.path.insert(0, config['Paths']['backend_path'])
+#sys.path.insert(0, config['Paths']['db_path'])
 
 # For debug logging
 logging.basicConfig(level=logging.DEBUG)
+
+def get_config():
+	config = configparser.ConfigParser()
+	config.read('variantbrowser/backend/config.ini')
+	return config
 
 #sqlite syntax...
 def generate_db(db):

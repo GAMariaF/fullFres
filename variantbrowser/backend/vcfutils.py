@@ -20,7 +20,6 @@ def parse_thermo_vcf(vcf,excel):
     # With fusion 
     df_excel_w = df_excel.loc[df_excel['Type'] == 'Fusion']
     if not df_excel_w.empty:
-        #df_excel_w.loc[:,'ID'] = df_excel_w.loc[:,'Variant ID'] + "_1"
         df_excel_w = df_excel_w.assign(ID = df_excel_w.loc[:,'Variant ID'] + "_1")
         df1 = pd.merge(df_excel_w,df_vcf,on='ID',how='left')
         df1.loc[:,'ID']=df1.loc[:,'Variant ID']
@@ -38,8 +37,6 @@ def parse_thermo_vcf(vcf,excel):
         df_excel_wo = df_excel_wo.reset_index(drop='True')
         df_vcf["Locus_vcf"] = df_vcf.CHROM.astype(str)+":" \
                     +df_vcf.POS.astype(str)
-        #df_vcf.Locus = df_vcf.Locus.astype(str)
-        #df_excel_wo.Locus.astype(str)
         df2 = pd.merge(df_excel_wo,df_vcf,\
                     left_on=['Locus','Variant ID'],right_on=['Locus_vcf','ID'],how='left')
         df2 = df2.drop(columns=['Locus_vcf'])
@@ -58,7 +55,7 @@ def parse_thermo_vcf(vcf,excel):
    
 def filter_nocalls(df):
     ''' Fjern varianter som begynner med 0/0 eller ./.'''
-    dfOut = df[   (~(df['GT'].str.startswith('./.')))   & (~(df['GT'].str.startswith('0/0')))   ]
+    dfOut = df[(~(df['GT'].str.startswith('./.'))) & (~(df['GT'].str.startswith('0/0')))]
     return dfOut
 
 def explode_format_gt(df):

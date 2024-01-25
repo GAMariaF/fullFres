@@ -2,10 +2,9 @@ from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
-import configparser
-config = configparser.ConfigParser()
-config.read('variantbrowser/backend/config.ini')
+from variantbrowser.db.dbutils import get_config
 
+config = get_config()
 
 app = Flask(__name__)
 #CORS(app, resources={ r'/api/*': {'origins': "*"}})

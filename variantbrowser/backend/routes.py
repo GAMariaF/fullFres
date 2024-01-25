@@ -15,12 +15,6 @@ from variantbrowser.backend import app
 from variantbrowser.backend.user import Users
 from flask_cors import cross_origin
 import sys
-import configparser
-config = configparser.ConfigParser()
-config.read('variantbrowser/backend/config.ini')
-
-sys.path.insert(0, config['Paths']['backend_path'])
-sys.path.insert(0, config['Paths']['db_path'])
 
 ### settings.json gir path til dbutils og vcfutils
 from variantbrowser.db.dbutils import *
@@ -30,11 +24,11 @@ from variantbrowser.backend.vcfutils import CustomFileError
 
 # Imports som er brukt for aa teste db
 import sqlite3
-from sqlalchemy import create_engine, update
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 import pandas as pd
 import json
 
+config = get_config()
 db_path = config['Paths']['db_full_path']
 
 # For debug logging:

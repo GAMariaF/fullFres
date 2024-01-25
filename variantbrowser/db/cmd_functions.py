@@ -1,16 +1,16 @@
 from sqlalchemy import create_engine, text
 import argparse
 import uuid
-import configparser
 import maskpass
 from werkzeug.security import generate_password_hash
+import os.path
 
 from variantbrowser.backend import app, db_user
 from variantbrowser.backend.user import Users
 
-config = configparser.ConfigParser()
-config.read('variantbrowser/backend/config.ini')
+from variantbrowser.db.dbutils import get_config, generate_db,  generate_user_db
 
+config = get_config()
 
 def remove_sample():
 
@@ -81,7 +81,7 @@ def add_user():
 
         hashed_password = generate_password_hash(new_password, method='scrypt')
 
-        admin = bool(input("\nShould the user be an admin? (True or False) "))
+        admin = bool(input("\nShould the user be an admin? (True or False) (Also, does not actually make a difference.) "))
 
         db.session.add(Users(public_id=str(uuid.uuid4()), name=name, password=hashed_password, admin=admin))
 
@@ -133,15 +133,23 @@ def change_pwd():
             pass
 
 def generate_dbs():
-
-    from variantbrowser.db.dbutils import generate_db,  generate_user_db
     
     # If exists, do not create.
+    
     db_path = config['Paths']['db_full_path']
     user_db_path = config['Paths']['db_users'][4:]
 
-    generate_db(db_path)
-    generate_user_db(user_db_path)
+    if not os.path.isfile(db_path):
+        generate_db(db_path)
+        print("Variant DB created at: " + db_path)
+    else:
+        print("The variant db already exists. Delete or rename then run again.")
+
+    if not os.path.isfile(user_db_path):
+        generate_user_db(user_db_path)
+        print("User DB created at: " + user_db_path)
+    else:
+        print("The user db already exists. Delete or rename then run again.")
 
     
 
