@@ -56,5 +56,5 @@ RUN cd /vb/variantbrowser/frontend/ && npm run lint
 
 # Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
 
-CMD ["sh", "variantbrowser/docker_startup_cmd.sh"]
+CMD ["sh", "variantbrowser/startup_cmd.sh"]
 

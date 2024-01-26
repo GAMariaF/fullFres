@@ -10,7 +10,9 @@ OBS: Bare ment for å kjøre på lokalnett eller på en enkelt PC, ikke over int
 * Bootstrap som css
 
 ## Sett opp tom database
-Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet, er nok heller ikke oppdatert med nye felt.)
+- Kjør kommandoen: vb-generatedbs 
+- Databasene vil bli laget i henhold til path i varaintbrowser/backend/config.ini
+- Eksisterende databaser blir ikke overskrive.
 
 ## Sett opp VariantBrowser som docker container
 - Sett IP i frontend/src/config.js
@@ -24,20 +26,26 @@ Blir gjort automatisk viss angitt database ikkje eksisterer (??, ikke testet, er
 - Sett frontendport i run_VB_docker.sh og kjør for å starte docker
 - Paths i variantbrowser/backend/config.ini må kanskje endres på (man burde påse at databasen lagres utenfor docker containeren)
 
+## Sett opp dev utgave (i docker)
+--- # Lag meir detaljert: #
+- Kjør python variantbrowser/run_backend_server.py
+- Kjør i frontend folder: sh start_frontend.sh
+
+
 ## Sett opp dev utgave (ikke i docker)
 - Installer nvm som beskrevet lenger ned
-- Sett opp python virtual env og installer requirements.txt, mer info lenger ned
+- Sett opp python virtual env, viss ønskelig med separat environment, og innstaller requirements.txt.
 - Sett korrekt ip og backendport i run_backend.py og frontend/src/config.js
 - Sett frontend port i frontend/start_frontend.sh
 - Paths i variantbrowser/backend/config.ini må endres på 
   
 ```sh
 # Starte flask 
-# I ./VariantBrowser
-python run_backend_server.py 
+# I VaraintBrowser
+python variantbrowser/run_backend_server.py
 # Sier i fra om du må aktivere virtualenv
 
-# Starte javascript
+# I egen terminal: start frontend
 cd frontend; sh start_frontend.sh 
 
 ```

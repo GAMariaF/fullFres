@@ -1,12 +1,14 @@
 #!/bin/bash
-
+# Script for starting the variantbrowser docker.
 docker run \
-	-it \
-	-v "/illumina/analysis/dev/2023/sigvla/fullFres_dev/db:/db" \
-	-v "/illumina/analysis/dev/2023/sigvla/fullFres_dev/variantbrowser:/illumina/analysis/dev/2023/sigvla/fullFres_dev/variantbrowser" \
+	-d \
+	-v "./db:/vb/db" \
+	-v "./import:/vb/import" \
 	--network host \
-    --rm \
     -e PORTFRONTEND=8082 \
-	vbtest:test1 \
-    /bin/bash
+	variantbrowser:test-version-upgrade 
+    #/bin/bash
  
+ # To enter docker:
+ # docker container ls -> get id
+ # Run: docker exec -it [id] bash
