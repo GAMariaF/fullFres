@@ -1,13 +1,7 @@
-import argparse
-import logging
-from .. import db
-
-
-
 
 
 def main():
-
+    # Only prints some info
 
     print("""
     Variantbrowser Version: 0.0.1
@@ -28,8 +22,6 @@ def main():
     
     """)
     exit()
-
-    
 
 
 if __name__ == '__main__':

@@ -55,7 +55,6 @@ def get_config():
 	config.read('variantbrowser/backend/config.ini')
 	return config
 
-#sqlite syntax...
 def generate_db(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:

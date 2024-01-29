@@ -137,7 +137,7 @@ def generate_dbs():
     # If exists, do not create.
     
     db_path = config['Paths']['db_full_path']
-    user_db_path = config['Paths']['db_users'][4:]
+    user_db_path = config['Paths']['db_users']
 
     if not os.path.isfile(db_path):
         generate_db(db_path)

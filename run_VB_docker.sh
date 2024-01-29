@@ -1,13 +1,13 @@
 #!/bin/bash
 # Script for starting the variantbrowser docker.
 docker run \
-	-d \
+	-it \
 	-v "./db:/vb/db" \
 	-v "./import:/vb/import" \
 	--network host \
     -e PORTFRONTEND=8082 \
-	variantbrowser:test-version-upgrade 
-    #/bin/bash
+	variantbrowser:test-version-upgrade \
+    /bin/bash
  
  # To enter docker:
  # docker container ls -> get id

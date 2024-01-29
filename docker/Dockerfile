@@ -49,10 +49,8 @@ RUN cd /vb; pip3 install .
 ENV NODE_OPTIONS --openssl-legacy-provider
 
 # # Install node packages
-RUN cd /vb/variantbrowser/frontend/ && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
-RUN cd /vb/variantbrowser/frontend/ && npm install browserslist@latest && npx browserslist@latest --update-db 
-RUN cd /vb/variantbrowser/frontend/ && npx vue-cli-service build
-RUN cd /vb/variantbrowser/frontend/ && npm run lint
+RUN cd /vb/frontend/ && npm install @achrinza/node-ipc@9.2.5 && npm install browserslist@latest && npx browserslist@latest --update-db && npm install && npm install pm2 -g && npm install vue-perfect-scrollbar && npm install http-server
+RUN cd /vb/frontend/ && npx vue-cli-service build && npm run lint
 
 # Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
 

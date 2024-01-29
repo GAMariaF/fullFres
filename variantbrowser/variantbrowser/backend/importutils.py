@@ -24,21 +24,21 @@ def importVcfXls(folder):
             # Get excel file immediately to uncover potential error
             for fileexcel in dir_list:
                 if fileexcel.startswith(re.split("_GX", file)[0].lower()):
-                    excelfile = folder + '/' + fileexcel   
+                    excelfile = folder + '/' + fileexcel
                     break
             else:
                 raise CustomFileError 
 
             # unzip vcf-file
-            with zipfile.ZipFile(folder +'/'+ file, 'r') as zip_ref:
-                zip_ref.extractall(folder +'/'+ file[:-4] + 'TEMP')
+            with zipfile.ZipFile(folder + '/' + file, 'r') as zip_ref:
+                zip_ref.extractall(folder + '/' + file[:-4] + 'TEMP')
             # copy file from unzip-folder to folder
-            filezip = os.listdir(folder +'/'+ file[:-4] + 'TEMP')
-            shutil.copyfile(folder +'/'+ file[:-4] + 'TEMP/' + filezip[0], \
+            filezip = os.listdir(folder + '/' + file[:-4] + 'TEMP')
+            shutil.copyfile(folder + '/' + file[:-4] + 'TEMP/' + filezip[0], \
                 folder + '/' + file[:-4] + '.vcf')
             # remove extra files and folders
-            os.remove(folder +'/'+ file)
-            shutil.rmtree(folder +'/'+ file[:-4] + 'TEMP/')
+            os.remove(folder + '/' + file)
+            shutil.rmtree(folder + '/' + file[:-4] + 'TEMP/')
             vcffile = folder + '/' + file[:-4] + '.vcf'
             # set up path to DB and get run_id, sample_id etc from vcffile
             db = config['Paths']['db_full_path']
@@ -49,13 +49,13 @@ def importVcfXls(folder):
             sample_diseasetype = get_sample_diseasetype(vcffile)
             sequencing_date = get_sequencing_date(vcffile)
             # TRANSFER VCF TO DATAFRAME
-            df = parse_thermo_vcf(vcffile,excelfile)
+            df = parse_thermo_vcf(vcffile, excelfile)
             if df.shape[0] != 0:
                 df = explode_format_gt(df)
                 df = explode_info(df)
                 if not 'FUNC' in df.columns:
                     df['FUNC'] = "[{}]"
-                dfvariant = df[["CHROM","POS","ID","REF","ALTEND","Type","FUNC"]]
+                dfvariant = df[["CHROM", "POS", "ID", "REF", "ALTEND", "Type", "FUNC"]]
                 dfvariant = explode_func(dfvariant)
             # Adding column for assigning possible correction of annotation
                 #dfvariant['annotation_variant2']=dfvariant['annotation_variant']
@@ -81,7 +81,9 @@ def importVcfXls(folder):
 
     rm_dir_list = os.listdir(folder)
     for rm_file in rm_dir_list:
-        os.remove(folder +'/'+ rm_file)
+        os.remove(folder + '/' + rm_file)
+    
+    # Add a return for vertification/testing purposes?
 
 
 
