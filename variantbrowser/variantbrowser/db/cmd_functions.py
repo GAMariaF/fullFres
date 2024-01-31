@@ -15,7 +15,7 @@ config = get_config()
 def remove_sample():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-S", metavar="Sample ID", required=True, nargs=1,  help="The ID of the sample which should be unapproved and unsigned.")
+    parser.add_argument("-S", metavar="Sample ID", required=True,  help="The ID of the sample which should be removed.")
     args = parser.parse_args()
 
     db = config['Paths']['db_full_path']
@@ -35,7 +35,7 @@ def unapprove_sample():
     # Beware that samples that get unapproved and unsigned will automatically get newer classifications.
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-S", metavar="Sample ID", required=True, nargs=1, help="The ID of the sample which should be unapproved and unsigned.")
+    parser.add_argument("-S", metavar="Sample ID", required=True, help="The ID of the sample which should be unapproved and unsigned.")
     args = parser.parse_args()
 
     db = config['Paths']['db_full_path']

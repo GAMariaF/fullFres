@@ -52,7 +52,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 def get_config():
 	config = configparser.ConfigParser()
-	config.read('variantbrowser/backend/config.ini')
+	config.read('/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/backend/config_test.ini')
+	#config.read('variantbrowser/backend/config.ini')
 	return config
 
 def generate_db(db):
@@ -196,10 +197,13 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 			# Satser på at det går greit å hoppe over dette på denne måten.
 			# Når en prøve kun har f.eks. strukturelle variantar er ikkje AF feltet inkludert.
 			logging.debug(f"{run_id}, {sample_id}, Skipped AttributeError: (Likely to be:) 'DataFrame' object has no attribute 'AF'")
-		
 		dfvcf_copy.to_sql('VariantsPerSample', engine, if_exists='append', index=False)
+
 		if not dfvariant_copy.empty:
-			dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
+			# Some fields can sometimes be lists, which for some reason only sometimes gives an error. Particularily if the database is empty
+			#dfvariant_copy["POS"] = dfvariant_copy["POS"].astype(str)
+			# Unsure if simply converting everythint to string will break something down the line.
+			dfvariant_copy = dfvariant_copy.astype(str)
 			dfvariant_copy.to_sql('Variants', engine, if_exists='append', index=False)
 		try:
 			dfSamples.to_sql('Samples', engine, if_exists='append', index=False)

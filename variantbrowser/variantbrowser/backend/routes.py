@@ -248,15 +248,16 @@ def api(current_user, query):
 def chklogin(current_user):
     #logging.debug(current_user)
     name = request.cookies.get('sid')
-    if name == None:
+    if name == None or current_user == None:
         response = make_response(jsonify(logstatus="false"))
     else:
         # Sjekk om bruker i database og ikke utløpt
         # returner enten "logstatus": true, "username": c.username}
         response = make_response(jsonify(logstatus="true", username=current_user.name), 200)
+
     return response
 
 
-
+# Remove?
 if __name__ == '__main__':
     app.run(debug=True)

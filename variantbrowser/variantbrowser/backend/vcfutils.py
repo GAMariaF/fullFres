@@ -165,8 +165,10 @@ def explode_func(df):
     return dfOut       
 
 def get_sample_id(vcf):
-    sample_list=[re.findall(r'IonReporterAnalysisName=.+_Lib',line) 
-            for line in open(vcf)]
+
+    with open(vcf) as v:
+        sample_list=[re.findall(r'IonReporterAnalysisName=.+_Lib', line) for line in v]
+        
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string[24:-4]
     return sample_string
@@ -174,11 +176,10 @@ def get_sample_id(vcf):
 
 def get_run_id(vcf):
     # This find functionality should probably be changed
-    run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,4}/Auto',line) 
-            for line in open(vcf)]
+    with open(vcf) as v:
+        run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,4}/Auto', line) for line in v]
 
     run_string=[string for string in run_list if len(string) > 0][0][0]
-    
     run_string_split = run_string.split("-")[-1].split("_")
     run_string = run_string_split[0] + "_" + run_string_split[1]
     print("Run string: " + run_string)
@@ -186,24 +187,24 @@ def get_run_id(vcf):
 #GNXS-0297-18-GX_0016_22/Auto
 
 def get_percent_tumor(vcf):
-    sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{2}',line) 
-            for line in open(vcf)]
+    with open(vcf) as v:
+        sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{2}', line) for line in v]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string[-2:]
     return sample_string
 # ##manually_input_percent_tumor_cellularity=85
 
 def get_sample_diseasetype(vcf):
-    sample_list=[re.findall(r'##sampleDiseaseType=.*',line) 
-            for line in open(vcf)]
+    with open(vcf) as v:
+        sample_list=[re.findall(r'##sampleDiseaseType=.*', line) for line in v]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string[20:]
     return sample_string
 # ##sampleDiseaseType=Prostate Cancer
 
 def get_sequencing_date(vcf):
-    sample_list=[re.findall(r'##fileDate=.*',line) 
-            for line in open(vcf)]
+    with open(vcf) as v:
+        sample_list=[re.findall(r'##fileDate=.*', line) for line in v]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string[11:]
     return sample_string
