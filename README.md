@@ -11,8 +11,8 @@ OBS: Bare ment for å kjøre på lokalnett eller på en enkelt PC, ikke over int
 
 ## Sett opp tom database
 - Kjør kommandoen: vb-generatedbs 
-- Databasene vil bli laget i henhold til path i varaintbrowser/backend/config.ini
-- Eksisterende databaser blir ikke overskrive.
+- Databasene vil bli laget i henhold til path i variantbrowser/backend/config.ini
+- Eksisterende databaser blir ikke overskrevet.
 
 ## Sett opp VariantBrowser som docker container
 - Sett IP i frontend/src/config.js
@@ -22,9 +22,9 @@ OBS: Bare ment for å kjøre på lokalnett eller på en enkelt PC, ikke over int
   docker image build -t name -f docker/Dockerfile . 
   ```
   Eller bruk VaraintBrowser/build_docker.sh.
-  Må bygges fra overordna mappe fordi hele repositoriet blir kopiert inn i dockerimaget. 
+  Kjør fra mappen filen ligger i. 
 - Sett frontendport i run_VB_docker.sh og kjør for å starte docker
-- Paths i variantbrowser/backend/config.ini må kanskje endres på (man burde påse at databasen lagres utenfor docker containeren)
+- Paths i variantbrowser/backend/config.ini må kanskje endres på (man må påse at databasen lagres utenfor docker containeren).
 
 ## Sett opp dev utgave (i docker)
 --- # Lag meir detaljert: #
@@ -59,7 +59,7 @@ Man trenger ikke å kunne det gamle passordet for å gjøre dette, da det er en 
 
 ## Laste inn prøver
 - I Genexus: gå til resultat -> prøve -> varianter. Klikk export for å få ett excel ark. I tillegg: Gå på download files og last ned "filtered variants" for å få ei zip fil. 
-- Legg filene i path som står i cariantbrowser/backend/config.ini "db_test_path"  (Burde få nytt navn)
+- Legg filene i path som står i variantbrowser/backend/config.ini "db_test_path"  (Burde få nytt navn)
 - OBS: pass på at det er filtrerte filer.
 
 ## Unapprove og sletting av prøver

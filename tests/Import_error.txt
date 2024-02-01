@@ -1,0 +1,95 @@
+DEBUG:root:Running sample import function
+Run string: GX_0092
+AOHC_PP-test
+DEBUG:root:GX_0092, AOHC_PP-test, 10, Other Solid Tumor:ktrl, 20230629
+INFO:werkzeug:172.16.0.16 - - [30/Jan/2024 09:14:18] "GET /api/import?0=/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/tests/import HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1938, in _exec_single_context
+    self.dialect.do_executemany(
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 919, in do_executemany
+    cursor.executemany(statement, parameters)
+sqlite3.ProgrammingError: Error binding parameter 22: type 'list' is not supported
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 1488, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 1466, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 1463, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 872, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 870, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/flask/app.py", line 855, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/variantbrowser/backend/routes.py", line 91, in decorator
+    return f(current_user, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/variantbrowser/backend/routes.py", line 123, in api
+    importVcfXls(importfolder)
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/variantbrowser/backend/importutils.py", line 70, in importVcfXls
+    populate_thermo_variantdb(db, df, dfvariant, \
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/variantbrowser/db/dbutils.py", line 204, in populate_thermo_variantdb
+    dfvariant_copy.to_sql('Variants', engine, if_exists='append', index=False)
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/util/_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/core/generic.py", line 3081, in to_sql
+    return sql.to_sql(
+           ^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 842, in to_sql
+    return pandas_sql.to_sql(
+           ^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 2021, in to_sql
+    total_inserted = sql_engine.insert_records(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 1570, in insert_records
+    raise err
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 1561, in insert_records
+    return table.insert(chunksize=chunksize, method=method)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 1122, in insert
+    num_inserted = exec_insert(conn, keys, chunk_iter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/pandas/io/sql.py", line 1010, in _execute_insert
+    result = conn.execute(self.table.insert(), data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1938, in _exec_single_context
+    self.dialect.do_executemany(
+  File "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/env/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 919, in do_executemany
+    cursor.executemany(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (sqlite3.ProgrammingError) Error binding parameter 22: type 'list' is not supported
+[SQL: INSERT INTO "Variants" ("CHROM_POS_ALTEND_DATE", "CHROM", "POS", "ID", "REF", "ALTEND", "DATE", "Type", "origPos", "origRef", "normalizedRef", gene, "normalizedPos", "normalizedAlt", polyphen, gt, codon, coding, sift, grantham, transcript, function, protein, location, "origAlt", exon, "oncomineGeneClass", "oncomineVariantClass", "CLNACC1", "CLNSIG1", "CLNREVSTAT1", "CLNID1", annotation_variant, annotation_variant2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: [('chr7148508727A240130091416', 'chr7', '148508727', 'COSM37028', 'T', 'A', '240130091416', 'snp', '148508727', 'T', 'T', 'EZH2', '148508727', 'A', '0.817', 'pos', 'TTC', 'c.1937A>T', '0.0', '22.0', 'NM_004456.5', 'missense', 'p.Tyr646Phe', 'exonic', 'A', '16', 'Gain-of-Function', 'Hotspot', '76768', 'Likely_pathogenic', 'no_assertion_criteria_provided', 'rs267601394', 'NM_004456.5:c.1937A>T p.(Tyr646Phe)', 'NM_004456.5:c.1937A>T p.(Tyr646Phe)'), ('chr3138665163C240130091416', 'chr3', '138665163', 'COSM33661', 'G', 'C', '240130091416', 'snp', '138665163', 'G', 'G', 'FOXL2', '138665163', 'C', '', 'pos', 'TGG', 'c.402C>G', '', '215.0', 'NM_023067.4', 'missense', 'p.Cys134Trp', 'exonic', 'C', '1', 'Gain-of-Function', 'Hotspot', '376348', 'not_provided', 'no_assertion_provided', 'rs1057519865', 'NM_023067.4:c.402C>G p.(Cys134Trp)', 'NM_023067.4:c.402C>G p.(Cys134Trp)'), ('chr12121431506G240130091416', 'chr12', '121431506', 'COSM21474', 'A', 'G', '240130091416', 'snp', '121431506', 'A', 'A', 'HNF1A', '121431506', 'G', '0.358', 'pos', 'AGT', 'c.710A>G', '0.0', '46.0', 'NM_000545.8', 'missense', 'p.Asn237Ser', 'exonic', 'G', '3', 'Loss-of-Function', 'Hotspot', '', '', '', '', 'NM_000545.8:c.710A>G p.(Asn237Ser)', 'NM_000545.8:c.710A>G p.(Asn237Ser)'), ('chr12121431481T240130091416', 'chr12', '121431481', '.', 'C', 'T', '240130091416', 'snp', '121431481', 'C', 'C', 'HNF1A', '121431481', 'T', '', 'pos', 'TGA', 'c.685C>T', '', '', 'NM_000545.8', 'nonsense', 'p.Arg229Ter', 'exonic', 'T', '3', 'Loss-of-Function', 'Truncating', '420064', 'Pathogenic', 'criteria_provided,_single_submitter', 'rs769086289', 'NM_000545.8:c.685C>T p.(Arg229Ter)', 'NM_000545.8:c.685C>T p.(Arg229Ter)'), ('chr95073770T240130091416', 'chr9', '5073770', 'COSM12600', 'G', 'T', '240130091416', 'snp', '5073770', 'G', 'G', 'JAK2', '5073770', 'T', '0.996', 'pos', 'TTC', 'c.1849G>T', '0.0', '50.0', 'NM_004972.4', 'missense', 'p.Val617Phe', 'exonic', 'T', '14', 'Gain-of-Function', 'Hotspot', '14662', 'Pathogenic', 'criteria_provided,_multiple_submitters,_no_conflicts', 'rs77375493', 'NM_004972.4:c.1849G>T p.(Val617Phe)', 'NM_004972.4:c.1849G>T p.(Val617Phe)'), ('chr9139399422G240130091416', 'chr9', '139399422', 'COSM12772', 'A', 'G', '240130091416', 'snp', '139399422', 'A', 'A', 'NOTCH1', '139399422', 'G', '1.0', 'pos', 'CCG', 'c.4721T>C', '0.0', '98.0', 'NM_017617.5', 'missense', 'p.Leu1574Pro', 'exonic', 'G', '26', 'Loss-of-Function', 'Hotspot', '', '', '', '', 'NM_017617.5:c.4721T>C p.(Leu1574Pro)', 'NM_017617.5:c.4721T>C p.(Leu1574Pro)'), ('chr9139399365G240130091416', 'chr9', '139399365', 'COSM13042', 'A', 'G', '240130091416', 'snp', '139399365', 'A', 'A', 'NOTCH1', '139399365', 'G', '1.0', 'pos', 'CCG', 'c.4778T>C', '0.0', '98.0', 'NM_017617.5', 'missense', 'p.Leu1593Pro', 'exonic', 'G', '26', 'Loss-of-Function', 'Hotspot', '', '', '', '', 'NM_017617.5:c.4778T>C p.(Leu1593Pro)', 'NM_017617.5:c.4778T>C p.(Leu1593Pro)'), ('chr9139397768G240130091416', 'chr9', '139397768', 'COSM13048', 'A', 'G', '240130091416', 'snp', '139397768', 'A', 'A', 'NOTCH1', '139397768', 'G', '1.0', 'pos', 'CCG', 'c.5033T>C', '0.0', '98.0', 'NM_017617.5', 'missense', 'p.Leu1678Pro', 'exonic', 'G', '27', 'Loss-of-Function', 'Hotspot', '', '', '', '', 'NM_017617.5:c.5033T>C p.(Leu1678Pro)', 'NM_017617.5:c.5033T>C p.(Leu1678Pro)')  ... displaying 10 of 192 total bound parameter sets ...  ('chr177577580C240130091416', 'chr17', '7577580', 'COSM10725', 'T', 'C', '240130091416', 'snp', '7577580', 'T', 'T', 'TP53', '7577580', 'C', '0.999', 'pos', 'TGC', 'c.701A>G', '0.0', '194.0', 'NM_000546.5', 'missense', 'p.Tyr234Cys', 'exonic', 'C', '7', 'Loss-of-Function', 'Hotspot', '127820', 'Pathogenic/Likely_pathogenic', 'criteria_provided,_multiple_submitters,_no_conflicts', 'rs587780073', 'NM_000546.5:c.701A>G p.(Tyr234Cys)', 'NM_000546.5:c.701A>G p.(Tyr234Cys)'), ('chr177576865C240130091416', 'chr17', '7576865', '.', 'A', 'C', '240130091416', 'snp', '7576865', 'A', 'A', 'TP53', '7576865', 'C', '', 'pos', 'TAG', 'c.981T>G', '', '', 'NM_000546.5', 'nonsense', 'p.Tyr327Ter', 'exonic', 'C', '9', 'Loss-of-Function', 'Truncating', '246069', 'Likely_pathogenic', 'criteria_provided,_single_submitter', 'rs879254077', 'NM_000546.5:c.981T>G p.(Tyr327Ter)', 'NM_000546.5:c.981T>G p.(Tyr327Ter)')]]
+(Background on this error at: https://sqlalche.me/e/20/f405)
