@@ -5,8 +5,9 @@ import shutil
 import re
 import pandas as pd
 
-from variantbrowser.backend.vcfutils import *
-from variantbrowser.db.dbutils import populate_thermo_variantdb, get_config
+from variantbrowser.vcfutils import *
+from variantbrowser.dbutils import populate_thermo_variantdb
+from variantbrowser.vb_app import get_config
 
 # list files and directories in import directory
 config = get_config()

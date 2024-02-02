@@ -39,7 +39,6 @@ from sqlalchemy import create_engine, text
 import datetime
 import csv
 import logging
-import configparser
 #import sqlite3
 #import sqlalchemy
 #import sys
@@ -50,11 +49,6 @@ import configparser
 # For debug logging
 logging.basicConfig(level=logging.DEBUG)
 
-def get_config():
-	config = configparser.ConfigParser()
-	config.read('/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/backend/config_test.ini')
-	#config.read('variantbrowser/backend/config.ini')
-	return config
 
 def generate_db(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
@@ -67,7 +61,7 @@ def generate_db(db):
 def generate_user_db(user_db):
 	engine = create_engine("sqlite:///"+user_db, echo=False, future=True)
 	with engine.connect() as conn:
-		result_user_db = conn.execute(text("CREATE TABLE users ( id INTEGER NOT NULL, public_id INTEGER, name VARCHAR(50), password VARCHAR(50), admin BOOLEAN, PRIMARY KEY (id) )"))
+		result_user_db = conn.execute(text("CREATE TABLE user ( id INTEGER NOT NULL, public_id INTEGER, name VARCHAR(50), password VARCHAR(50), admin BOOLEAN, PRIMARY KEY (id) )"))
 
 def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 					run_id, sample_id, percent_tumor, sample_diseasetype, sequencing_date):

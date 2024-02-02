@@ -2,8 +2,9 @@ import os
 import unittest
 import shutil
 import sqlite3
-from variantbrowser.db.dbutils import generate_db,  generate_user_db, get_config
-from variantbrowser.backend.importutils import importVcfXls
+from variantbrowser.dbutils import generate_db,  generate_user_db
+from variantbrowser.importutils import importVcfXls
+from variantbrowser.vb_app import get_config
 
 
 class TestImport(unittest.TestCase):

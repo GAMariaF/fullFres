@@ -1,9 +1,8 @@
 from ast import stmt
 from random import sample
 from signal import valid_signals
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
-
 
 import uuid
 import jwt
@@ -11,16 +10,16 @@ import ast
 import datetime
 import logging
 from functools import wraps
-from variantbrowser.backend import app
-from variantbrowser.backend.user import Users
 from flask_cors import cross_origin
 import sys
 
 ### settings.json gir path til dbutils og vcfutils
-from variantbrowser.db.dbutils import *
+from variantbrowser.dbutils import *
 
-from variantbrowser.backend.importutils import importVcfXls
-from variantbrowser.backend.vcfutils import CustomFileError
+from variantbrowser.importutils import importVcfXls
+from variantbrowser.vcfutils import CustomFileError
+from variantbrowser.vb_app import get_config
+from variantbrowser.user import User
 
 # Imports som er brukt for aa teste db
 import sqlite3
@@ -31,12 +30,14 @@ import json
 config = get_config()
 db_path = config['Paths']['db_full_path']
 
+routes = Blueprint('routes', __name__, static_folder='static', template_folder='templates')
+secret_key = '004f2af45d3a4e161a7dd2d17fdae47f'
 # For debug logging:
 logging.basicConfig(level=logging.DEBUG)
 
+
 # Testfunksjoner for query som skal byttes ut med metoder fra db_utils:
 # Hent ut unike samples:
-
 
 def run_q(db, query):
     #list all variants including frequency
@@ -81,8 +82,8 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'a valid token is missing'})
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Users.query.filter_by(
+            data = jwt.decode(token, secret_key, algorithms=["HS256"])
+            current_user = User.query.filter_by(
                 public_id=data['public_id']).first()
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Signature expired. Please log in again.'})
@@ -91,26 +92,28 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorator
 
-@app.route('/login', methods=['POST'])
+@routes.route('/login', methods=['POST'])
 def login_user():
     auth = request.get_json()
     if not auth or not auth['username'] or not auth['password']:
         return make_response('could not verify', 401, {'Authentication': 'login required"'})
-    user = Users.query.filter_by(name=auth['username']).first()
+    user = User.query.filter_by(name=auth['username']).first()
     if user is None:
         return make_response('could not verify',  401, {'Authentication': '"login required"'})
     if check_password_hash(user.password, auth['password']):
         token = jwt.encode({'public_id': user.public_id, 'exp': datetime.datetime.utcnow(
-        ) + datetime.timedelta(hours=45), 'iat': datetime.datetime.utcnow()}, app.config['SECRET_KEY'], "HS256")
+        ) + datetime.timedelta(hours=45), 'iat': datetime.datetime.utcnow()}, secret_key, "HS256")
         resp = make_response(f"The Cookie has been Set")
         resp.set_cookie('sid', token, expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
         return resp
     return make_response('could not verify',  401, {'Authentication': '"login required"'})
 
 
+@routes.route('/')
+def home():
+    return "Hello World!"
 
-
-@app.route('/api/<query>', methods=['GET', 'POST'])
+@routes.route('/api/<query>', methods=['GET', 'POST'])
 @token_required
 def api(current_user, query):
     #logging.debug(query)
@@ -243,7 +246,7 @@ def api(current_user, query):
             response = jsonify({'message': 'Comment updated for sample!'})
             return response
 
-@app.route('/chklogin')
+@routes.route('/chklogin')
 @token_required
 def chklogin(current_user):
     #logging.debug(current_user)
@@ -257,7 +260,3 @@ def chklogin(current_user):
 
     return response
 
-
-# Remove?
-if __name__ == '__main__':
-    app.run(debug=True)

@@ -1,5 +1,5 @@
 import sys, os
-from variantbrowser.backend import app
+from variantbrowser import app
 
 SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
 

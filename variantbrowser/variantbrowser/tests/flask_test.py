@@ -1,7 +1,6 @@
 #import flask
 #import unittest
 #import flask_test
-from variantbrowser.backend.__init__ import create_app
 import pytest
 
 #class TestApp(unittest.TestCase):
@@ -35,32 +34,15 @@ import pytest
 #
     #    print(res1)
 
-@pytest.fixture()
-def app():
-    app = create_app()
-    app.config.update({
-        "TESTING": True,
-    })
 
-    # other setup can go here
-
-    yield app
-
-    # clean up / reset resources here
-
-
-@pytest.fixture()
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture()
-def runner(app):
-    return app.test_cli_runner()
 
 def test_request_example(client):
-    response = client.get("/api/samples")
-    assert b"<h2>Hello, World!</h2>" in response.data
+    
+    response = client.get("/")
+    print(dir(client.application.url_map))
+    for f in client.application.url_map.iter_rules():
+        print(f)
+    assert response.status_code == 200
 
 
 #if __name__ == '__main__':

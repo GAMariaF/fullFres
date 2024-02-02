@@ -5,10 +5,11 @@ import maskpass
 from werkzeug.security import generate_password_hash
 import os.path
 
-from variantbrowser.backend import app, db_user
-from variantbrowser.backend.user import Users
+from variantbrowser.__init__ import app, db_user
+from variantbrowser.user import User
 
-from variantbrowser.db.dbutils import get_config, generate_db,  generate_user_db
+from variantbrowser.dbutils import  generate_db,  generate_user_db
+from variantbrowser.vb_app import get_config
 
 config = get_config()
 
@@ -60,7 +61,7 @@ def add_user():
 
         name = input("\nEnter a new user name: ")
         
-        user = Users.query.filter_by(name=name).first()
+        user = User.query.filter_by(name=name).first()
 
         if user is not None:
             print("User name already taken!")
@@ -83,7 +84,7 @@ def add_user():
 
         admin = bool(input("\nShould the user be an admin? (True or False) (Also, does not actually make a difference.) "))
 
-        db.session.add(Users(public_id=str(uuid.uuid4()), name=name, password=hashed_password, admin=admin))
+        db.session.add(User(public_id=str(uuid.uuid4()), name=name, password=hashed_password, admin=admin))
 
         db.session.commit()
         print("\n-----User added successfully!-----\n")
@@ -100,7 +101,7 @@ def change_pwd():
 
     def change_pwd_internal(db):
 
-        user = Users.query.filter_by(name=input("\nEnter username: ")).first()
+        user = User.query.filter_by(name=input("\nEnter username: ")).first()
 
         if user is None:
             print("User not found!")
