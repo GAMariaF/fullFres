@@ -89,8 +89,7 @@ def add_user():
         db.session.commit()
         print("\n-----User added successfully!-----\n")
         return True
-
- 
+    
     print("\n-----------Add New User------------")
     with app.app_context():
         while(not add_user_internal(db_user)):

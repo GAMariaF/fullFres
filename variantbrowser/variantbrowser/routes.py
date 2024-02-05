@@ -80,7 +80,7 @@ def token_required(f):
         if request.cookies.get('sid') != None:
             token = request.cookies.get('sid')
         if not token:
-            return jsonify({'message': 'a valid token is missing'})
+            return jsonify({'message': 'A valid token is missing'})
         try:
             data = jwt.decode(token, secret_key, algorithms=["HS256"])
             current_user = User.query.filter_by(
@@ -101,10 +101,10 @@ def login_user():
     if user is None:
         return make_response('could not verify',  401, {'Authentication': '"login required"'})
     if check_password_hash(user.password, auth['password']):
-        token = jwt.encode({'public_id': user.public_id, 'exp': datetime.datetime.utcnow(
-        ) + datetime.timedelta(hours=45), 'iat': datetime.datetime.utcnow()}, secret_key, "HS256")
+        token = jwt.encode({'public_id': user.public_id, 'exp': datetime.datetime.now(datetime.UTC)
+            + datetime.timedelta(hours=45), 'iat': datetime.datetime.now(datetime.UTC)}, secret_key, "HS256")
         resp = make_response(f"The Cookie has been Set")
-        resp.set_cookie('sid', token, expires=datetime.datetime.utcnow() + datetime.timedelta(hours=45))
+        resp.set_cookie('sid', token, expires=datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=45))
         return resp
     return make_response('could not verify',  401, {'Authentication': '"login required"'})
 

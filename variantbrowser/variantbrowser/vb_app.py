@@ -11,7 +11,7 @@ def get_config():
 	return config
 
 
-def create_app():
+def create_app(db):
     from .routes import routes, secret_key
     config = get_config()
 
@@ -25,6 +25,8 @@ def create_app():
 
     app.config.from_object(__name__)
     app.register_blueprint(routes)
+
+    db.init_app(app)
 
     return app
 

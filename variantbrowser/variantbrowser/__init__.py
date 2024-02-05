@@ -1,10 +1,12 @@
 from variantbrowser.vb_app import *
-from variantbrowser.userdb import db as db_user
+from variantbrowser.userdb import db
 
-app = create_app()
+
+db_user = db
+app = create_app(db_user)
 
 #db_user.app = app
-db_user.init_app(app)
+
 
 #db_user = SQLAlchemy(app)
 
