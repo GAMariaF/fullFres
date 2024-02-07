@@ -5,6 +5,7 @@ import shutil
 import sqlite3
 import unittest
 import flask_test
+import pandas as pd
 from flask import Flask, url_for, request, jsonify, make_response
 
 from variantbrowser.vb_app import *
@@ -55,24 +56,24 @@ class TestSetUpDBs(unittest.TestCase):
         shutil.copyfile("AOHC_PP-test_GX_0092_Result_300.zip", "import/AOHC_PP-test_GX_0092_Result_300.zip")
         shutil.copyfile("aohc_pp-test_variants.xlsx", "import/aohc_pp-test_variants.xlsx")
 
-        import_test = self.app.get("/api/import", json={ "0": "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/tests/import"})
+        import_test = self.app.get("/api/import", json={ "0": "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/import"})
         print(import_test)
         #return None
 
         test_db = "test_db/test_db.db"
         comp_db = "comp.db"
 
-        conn = sqlite3.connect(test_db)
-        conn.execute("ATTACH ? AS db2", [comp_db])
+        with sqlite3.connect(test_db) as conn:
+            conn.execute("ATTACH ? AS db2", [comp_db])
 
-        res1 = conn.execute("""SELECT * FROM main.variants
-                            WHERE annotation_variant NOT IN
-                                (SELECT annotation_variant FROM db2.variants)
-                            """).fetchall()
-        res2 = conn.execute("""SELECT * FROM db2.variants
-                            WHERE annotation_variant NOT IN
-                                (SELECT annotation_variant FROM main.variants)
-                            """).fetchall()
+            res1 = conn.execute("""SELECT * FROM main.variants
+                                WHERE annotation_variant NOT IN
+                                    (SELECT annotation_variant FROM db2.variants)
+                                """).fetchall()
+            res2 = conn.execute("""SELECT * FROM db2.variants
+                                WHERE annotation_variant NOT IN
+                                    (SELECT annotation_variant FROM main.variants)
+                                """).fetchall()
 
         # They should both be empty if no difference is found.
         self.assertEqual(res1, [])
@@ -98,8 +99,39 @@ class TestApp(unittest.TestCase):
         self.assertEqual(login.status_code, 200)
         #print(chklogin)
 
-        result = self.app.get('/api/variants_AOHC_PP-test')
-        self.assertEqual(login.status_code, 200)
+        variants = self.app.get('/api/variants_AOHC_PP-test')
+        self.assertEqual(variants.status_code, 200)
+
+        test = pd.DataFrame(variants.get_json()["data"])
+        test.to_csv("test.csv", index = False)
+
+        signoff_samples = self.app.get("/api/signoff_samples")
+        allvariants = self.app.get("/api/allvariants")
+        allsamples = self.app.get(f"/api/allsamples{'dates++?'}")
+        statistics = self.app.get(f"/api/statistics{'dates++?'}")
+        report = self.app.get(f"/api/report{'dates++?'}")
+        stat_search = self.app.get(f"/api/stat_search{'dates++?'}")
+        get_class = self.app.get(f"/api/get_class{'dates++?'}")
+
+
+    def test_post(self):
+
+        updatevariants = self.app.post("/api/updatevariants")
+        # setta alle variantar til 
+        signoff = self.app.post("/api/signoff", json={"user": "testuser", "sampleid": "AOHC_PP-test", "status": "success"})
+        unsignoff = self.app.post("/api/unsignoff", json={"sampleid": "AOHC_PP-test"})
+        # signoff again
+
+        approve = self.app.post("/api/approve")
+        unapprove = self.app.post("/api/unapprove")
+        lock = self.app.post("/api/lock")
+        failedsample = self.app.post("/api/failedsample")
+        commentsample = self.app.post("/api/commentsample")
+
+        #print(dir(result))
+        #print(type(result.get_json()["data"]))
+        #print(result.get_json()["data"])
+
 
 
         #print(result)

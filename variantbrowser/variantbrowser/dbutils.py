@@ -397,10 +397,28 @@ def list_interpretation(db,sampleid):
 	list_json = interpretationlist.to_dict('records')
 	return list_json
 
-def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list, classes: list, dates: list):
+def list_search(db, args):
 	""" This function consturcts a complex SQL-query based on the conditions it recieves from the frontend. 
 	The data is not treated before it is sent to the frontend, but it probably should be."""
-	
+	# runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list, classes: list, dates: list 
+
+	split_input = {}
+	for term in args:
+		input = args[term].split(" AND ")
+		if len(input) == 1 and input[0] == "":
+			split_input[term] = []
+		else:
+			split_input[term] = input
+
+	runid = split_input["run_search"]
+	sampleid = split_input["sample_search"]
+	diag = split_input["diag_search"]
+	variants = split_input["var_search"]
+	gene = split_input["gene_search"]
+	reply = split_input["reply_search"]
+	classes = split_input["class_search"]
+	dates = [split_input["start_date"][0], split_input["end_date"][0]]
+
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	cond_dict = {"VariantsPerSample.runid": runid, "VariantsPerSample.sampleid": sampleid, "Variants.annotation_variant": variants, "v.gene": gene}
 	conds = ""
@@ -511,21 +529,24 @@ def list_search(db, runid: list, sampleid: list, diag: list, variants: list, gen
 	HAVING FreqGenLis >= {len(diag)}{add_cond}
 	ORDER BY FreqSamples DESC;
 	"""
-
+	print(stmt)
 	with engine.connect() as conn:
-		interpretationlist = pd.read_sql_query(text(stmt), con = conn)
-	list_json = interpretationlist.to_dict('records')
+		results = pd.read_sql_query(text(stmt), con = conn)	
+		print("##########RESULTS###################")
+		print(results)
+		print("#############END_RESULTS#############")
+	list_json = results.to_dict('records')
 	return list_json
 
 def get_classifications(db, data):
 
 	# Add date search for Variants Statistics Tab:
 	date_cond = ""
-	if len(data) > 5:
+	if len(data) > 4:
+		if data[4] != "" and data[4] != "null":
+			date_cond += " AND Samples.Seq_date > " + data[4]
 		if data[5] != "" and data[5] != "null":
-			date_cond += " AND Samples.Seq_date > " + data[5]
-		if data[6] != "" and data[6] != "null":
-			date_cond += " AND Samples.Seq_date < " + data[6]
+			date_cond += " AND Samples.Seq_date < " + data[5]
 	
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = f"select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \

@@ -102,7 +102,6 @@ export default {
     },
     getsamples() {
       // Funksjon for å få samples fra backenc
-      // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
       const baseURI = config.$backend_url + "/api/samples";
       axios
         .get(baseURI)
@@ -117,7 +116,7 @@ export default {
       console.log("Load new data")
       const baseURI = config.$backend_url + "/api/import";
       axios
-        .get(baseURI, { params: [this.importFolder] })
+        .get(baseURI, { params: {importfolder: this.importFolder} })
         .then((response) => {
 
           if (response.status === 200){

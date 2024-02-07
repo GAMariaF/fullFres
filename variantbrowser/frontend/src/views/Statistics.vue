@@ -277,7 +277,7 @@ export default {
       // Funksjon for å få data og tall fra backend
       const baseURI = config.$backend_url + "/api/statistics";
       axios
-        .get(baseURI+this.generate_search())
+        .get(baseURI, {params:  this.generate_search()})
         .then((response) => response.data)
         .then((data) => {
           this.stats = JSON.parse(data.data);
@@ -327,18 +327,19 @@ export default {
         });
     },
     generate_search () {
-      var search = "";
+      var localStartDate = ""
+      var localEndDate = ""
       if (this.startDate === null || this.startDate === ""){
-        search = "00000000";
+        localStartDate = "00000000";
       } else {
-        search = this.startDate;
+        localStartDate = this.startDate;
       }
       if (this.endDate === null || this.endDate === ""){
-        search += "00000000";
+        localEndDate = "00000000";
       } else {
-        search += this.endDate;
+        localEndDate = this.endDate;
       }
-      return(search)
+      return({startdate: localStartDate, enddate: localEndDate})
     },
     changeText() {
       this.runText = "Number of runs in search"

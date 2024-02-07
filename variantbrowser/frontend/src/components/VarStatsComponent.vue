@@ -405,34 +405,28 @@ export default {
   methods: {
     query(run_input, sample_input, var_input, gene_input, start_date, end_date) {
 
-        const run_input_array = run_input.split(' AND ')
-        const sample_input_array = sample_input.split(' AND ')
-        const diag_input_array = this.geneListSearch.split(' AND ')
-        const var_input_array = var_input.split(' AND ')
-        const gene_input_array = [gene_input]
-        const reply_input_array = [this.selectedReplyOption]
-        const class_array = this.classSearch.split(' AND ')
-        const dates = [String(start_date), String(end_date)]
-        console.log(gene_input)
-        console.log(run_input_array)
-        console.log(class_array)
-
-        const search_array = JSON.stringify([run_input_array, sample_input_array, diag_input_array, var_input_array, gene_input_array, reply_input_array, class_array, dates]);
-        console.log(search_array)
-        if (search_array === '[[""],[""],[""],[""],[""],[""],[""],["null", "null"]]'){
-          console.log('Empty Search')
-          this.displayWarning("No search parameters provided!")
-        } else {
-          util_funcs.query_backend(config.$backend_url, "stat_search" + search_array).then(result => {
-            var variants = Object.values(result['data']);
-            if (variants.length) {
-              this.variants = variants;
-            } else {
-              this.variants = ['SamplesPerVariant'];
-            }
-            console.log(this.variants);
-          })
+        util_funcs.query_backend(config.$backend_url, "stat_search", { 
+            params: { 
+                run_search: run_input, 
+                sample_search: sample_input,
+                diag_search: this.geneListSearch, 
+                var_search: var_input,
+                gene_search: gene_input,
+                reply_search: this.selectedReplyOption,
+                class_search: this.classSearch,
+                start_date: String(start_date),
+                end_date: String(end_date)
+                }
+              }).then(result => {
+          var variants = Object.values(result['data']);
+          console.log(result['data'])
+          if (variants.length) {
+            this.variants = variants;
+          } else {
+            this.variants = ['SamplesPerVariant'];
+          }
         }
+      )   
     },
     updateVariants(){
       
@@ -451,7 +445,7 @@ export default {
     },
 
     getClassifications(item){
-      var query = 'get_class|'+item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND+'|'
+      var query = item.CHROM+'|'+item.POS+'|'+item.REF+'|'+item.ALTEND+'|'
 
       if (this.startDate !== "" || this.startDate !== null) {
         query = query + this.startDate
@@ -459,7 +453,7 @@ export default {
       if (this.endDate !== "" || this.endDate !== null) {
         query = query + '|' + this.endDate
       } 
-      util_funcs.query_backend(config.$backend_url, query)
+      util_funcs.query_backend(config.$backend_url, 'get_class', {params: {search: query}})
         .then(result => {
           eval(result);
           this.classifications = Object.values(result['data']);
@@ -608,13 +602,11 @@ export default {
     },
 
     displayWarning(message) {
-      alert(message);
-      
+      alert(message);  
     }
   },
   created: function() {
-    const array_1 = JSON.stringify([[""], ["22SKH02673"], [""], [""], [""], [""], [""], ["null", "null"]]);
-    util_funcs.query_backend(config.$backend_url, "stat_search" + array_1).then(result => {
+    util_funcs.query_backend(config.$backend_url, "stat_search").then(result => {
       this.variants = Object.values(result['data']);     
     }) 
   },

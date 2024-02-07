@@ -15,7 +15,7 @@ const getters = {
 const actions = {
 	initVariantStore: ({ commit }, payload) => {
 		if(payload.allVariants == false) {
-			util_funcs.query_backend(config.$backend_url,'variants_' + payload.sample_id).then(result => {
+			util_funcs.query_backend(config.$backend_url,'variants', {params:  {sampleid: payload.sample_id}}).then(result => {
 				var variants = result['data'];
 				console.log(variants)
 				commit('SET_STORE', Object.values(variants));

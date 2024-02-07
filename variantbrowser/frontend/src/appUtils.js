@@ -9,10 +9,10 @@ var util_funcs = {
         objects.sort((a, b) => orderIndex[a.CHROM] - orderIndex[b.CHROM]);
         return objects
     },
-    query_backend(url, query) {
+    query_backend(url, query, terms = {}) {
         // Funksjon som sender query til backend
         const baseURI = url + '/api/' + query
-        return axios.get(baseURI)
+        return axios.get(baseURI, terms)
         .then((response) => {return response.data});      
     },
     delete_cookie(name) {

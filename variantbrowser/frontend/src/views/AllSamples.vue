@@ -115,7 +115,7 @@ export default {
       console.log(search)
       const baseURI = config.$backend_url + "/api/allsamples";
       axios
-        .get(baseURI+search)
+        .get(baseURI, { params: {search: search} })
         .then((response) => response.data)
         .then((data) => (this.items = data.data));
       this.runid = "";

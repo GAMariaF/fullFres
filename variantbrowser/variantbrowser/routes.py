@@ -26,6 +26,8 @@ import sqlite3
 from sqlalchemy import create_engine, text
 import pandas as pd
 import json
+import time
+from datetime import timedelta
 
 config = get_config()
 db_path = config['Paths']['db_full_path']
@@ -71,6 +73,9 @@ def insert_interp(db, id, vclass, vcomment, ):
     with engine.connect() as conn:
         conn.execute(text(stmt))
         conn.commit()
+
+def get_json(request):
+    return json.loads(json.dumps(request.json))
 
 def token_required(f):
     ''' Decorator that checks if user is logged in '''
@@ -120,8 +125,7 @@ def api(current_user, query):
     if request.method == 'GET':
         if query == 'import':
             logging.debug("Running sample import function")
-            args = request.args
-            importfolder = args["0"]
+            importfolder = request.args["importfolder"]
             try:
                 importVcfXls(importfolder)
                 response = make_response(jsonify(isError=False, message="Running sample import function", statusCode=200), 200)            
@@ -129,8 +133,8 @@ def api(current_user, query):
                 response = make_response(jsonify(isError=False, message="Missing file(s).", statusCode=204), 204)
                 logging.exception("Missing file(s).")
             except CustomFileError:
-                response = make_response(jsonify(isError=False, message="Wrong types", statusCode=205), 205)
-                logging.exception("Wrong Type.")
+                response = make_response(jsonify(isError=False, message="Wrong file types", statusCode=205), 205)
+                logging.exception("Wrong File Type.")
             except ValueError:
                 response = make_response(jsonify(isError=False, message="ValueError", statusCode=206), 206)
                 logging.exception("ValueError")
@@ -139,18 +143,18 @@ def api(current_user, query):
                 logging.exception("TypeError")
 
             return response
-        if query == "samples":
+        elif query == "samples":
             samples = list_samples(db_path)
-            response = make_response(jsonify(isError=False, message="Success fetching samples. Import folder is: {}".format(config['Paths']['db_test_path']), statusCode=200, data=samples), 200)
+            response = make_response(jsonify(isError=False, message=f"Success fetching samples. Import folder is: {config['Paths']['db_test_path']}", statusCode=200, data=samples), 200)
             return response
-        if query == "signoff_samples":
+        elif query == "signoff_samples":
             logging.debug("signoff_samples")
             samples = list_signoff_samples(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
-        elif query.startswith("variants_"):
-            logging.debug("Sender varianter for sample id: " + query.split("ts_")[1])
-            variants = list_interpretation(db_path, query.split("ts_")[1])
+        elif query == ("variants"):
+            logging.debug("Sender varianter for sample id: " + request.args["sampleid"])
+            variants = list_interpretation(db_path, request.args["sampleid"])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=variants), 200)
             return response
         elif query == "allvariants":
@@ -158,32 +162,29 @@ def api(current_user, query):
             allvariants = list_all_variants(db_path)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allvariants), 200)
             return response
-        elif query[:10] == "allsamples":
-            logging.debug("Sender alle prøver")
-            allsamples = list_all_samples(db_path, query.split('|'), datetime.date.today().strftime('%Y%m%d'))
+        elif query == "allsamples":
+            logging.debug("Sender alle prøver")     
+            allsamples = list_all_samples(db_path, request.args["search"].split('|'), datetime.date.today().strftime('%Y%m%d'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=allsamples), 200)
             return response
-        elif query[:10] == "statistics":
+        elif query == "statistics":
             logging.debug("Sending stats")
-            stats = statistics(db_path, start_date=query[10:18], end_date=query[18:26])
+            stats = statistics(db_path, start_date=request.args["startdate"], end_date=request.args["enddate"])
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=json.dumps(stats)), 200)
             return response
-        elif query[:6] == "report":
+        elif query == "report":
             logging.debug("report")
-            samples = list_approved_samples(db_path, query.split('|'))
+            samples = list_approved_samples(db_path, request.args["search"].split('|'))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
-        elif query[:11] == 'stat_search':
-            q = ast.literal_eval(query[11:])
-            for i in range(len(q)):
-                if len(q[i]) == 1 and q[i][0] == "":
-                    q[i] = []
-            res = list_search(db_path, q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7])
+        elif query == 'stat_search':
+            res = list_search(db_path, request.args)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
-        elif query[:9] == "get_class":
+            #return make_response(jsonify(isError=False, message="Empty Search", statusCode=204, data={0: 0}), 204)
+        elif query == "get_class":
             logging.debug("getting classifications")
-            samples = get_classifications(db_path, query.split('|'))
+            samples = get_classifications(db_path, request.args["search"].split("|"))
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         else:
@@ -193,7 +194,7 @@ def api(current_user, query):
         # Should probably be a switch
         if query == "updatevariants":
             logging.debug("--- update variants ---")          
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             for i in j["variants"]:
                 if i["changed"]:
                     # Insert into db:
@@ -204,24 +205,24 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
             return response
         elif query == "signoff":
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"], j["state"],)
-            response = jsonify({'message': 'Signed off sample!'})
+            response = jsonify({'message': 'Sample Signed!'})
             return response
         elif query == "unsignoff":
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_signoffdate(db_path, "", "", j["sampleid"], "")
-            response = jsonify({'message': 'Unsigned off sample!'})
+            response = jsonify({'message': 'Sample Unsigned!'})
             return response
         elif query == "approve":
             logging.debug("running approve")
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Approved sample!'})
             return response
         elif query == "unapprove":
             logging.debug("running approve")
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_signoffdate(db_path, "", "", j["sampleid"], "")
             insert_approvedate(db_path, "", "", j["sampleid"])
             insert_comment(db_path, j["commentsamples"], j["sampleid"])
@@ -229,19 +230,19 @@ def api(current_user, query):
             return response
         elif query == "lock":
             logging.debug("running sample lock")
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_lockdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Locked sample!'})
             return response
         elif query == "failedsample":
             logging.debug("Running failed sample")
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
             response = jsonify({'message': 'Sample set to failed!'})
             return response
         elif query == "commentsample":
             logging.debug("Running comment update for sample")
-            j = json.loads(json.dumps(request.json))
+            j = get_json(request)
             insert_comment(db_path, j["commentsamples"], j["sampleid"])
             response = jsonify({'message': 'Comment updated for sample!'})
             return response

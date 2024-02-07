@@ -764,8 +764,7 @@ export default {
       this.predictive_data = [];
     },
     getsamples() {
-      // Funksjon for å få samples fra backenc
-      // util_funcs.query_backend(config.$backend_url,'samples').then(result => this.items = JSON.parse(result['data']))
+      // Funksjon for å få samples fra backend
       const baseURI = config.$backend_url + "/api/signoff_samples";
       this.$http
         .get(baseURI)

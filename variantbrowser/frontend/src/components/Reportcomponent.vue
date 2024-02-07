@@ -380,7 +380,7 @@ export default {
         //});
         
         // Query and commit to store here instead of having the store do it.
-        await util_funcs.query_backend(config.$backend_url,'variants_' + this.selectedSample).then(result => {
+        await util_funcs.query_backend(config.$backend_url,'variants', {params: {sampleid: this.selectedSample}}).then(result => {
           var variants = Object.values(result['data']);
           this.variants = variants}) 
         
@@ -402,7 +402,7 @@ export default {
         search = "|sampleid|"+this.sampleid;
       }
 
-      util_funcs.query_backend(config.$backend_url, "report"+search).then(data => {
+      util_funcs.query_backend(config.$backend_url, "report", {params: {search: search}}).then(data => {
         this.items = data.data
         this.getRuns()
       });
