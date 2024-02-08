@@ -1,7 +1,7 @@
 import sys, os
 from variantbrowser import app
 
-SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
+DOCKER_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
 
 
 # To funksjoner for aa sjekke om virtualenv er aktivert:
@@ -15,7 +15,7 @@ def in_virtualenv():
 
 
 def in_docker():
-    if SECRET_KEY:
+    if DOCKER_KEY:
         return True
     else:
         return False

@@ -125,6 +125,7 @@ def api(current_user, query):
     if request.method == 'GET':
         if query == 'import':
             logging.debug("Running sample import function")
+            logging.debug(request.args)
             importfolder = request.args["importfolder"]
             try:
                 importVcfXls(importfolder)
@@ -178,10 +179,11 @@ def api(current_user, query):
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=samples), 200)
             return response
         elif query == 'stat_search':
+            if not request.args:
+                return make_response(jsonify(isError=False, message="Empty Search", statusCode=204, data={0: 0}), 204)
             res = list_search(db_path, request.args)
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data=res), 200)
             return response
-            #return make_response(jsonify(isError=False, message="Empty Search", statusCode=204, data={0: 0}), 204)
         elif query == "get_class":
             logging.debug("getting classifications")
             samples = get_classifications(db_path, request.args["search"].split("|"))
@@ -195,11 +197,15 @@ def api(current_user, query):
         if query == "updatevariants":
             logging.debug("--- update variants ---")          
             j = get_json(request)
-            for i in j["variants"]:
-                if i["changed"]:
-                    # Insert into db:
-                    insert_variants(db_path,i)
-                    logging.debug("inserted")
+
+
+            with open("/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/variants_inserted.tsv", "w") as file:
+                for i in j["variants"]:
+                    file.write(str(i)+"\n")
+                    if i["changed"]:
+                        # Insert into db:
+                        insert_variants(db_path,i)
+                        logging.debug("inserted")
 
             logging.debug("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)
@@ -207,18 +213,18 @@ def api(current_user, query):
         elif query == "signoff":
             j = get_json(request)
             insert_signoffdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"], j["state"],)
-            response = jsonify({'message': 'Sample Signed!'})
+            response = make_response(jsonify(isError=False, message='Sample Signed!', statusCode=200, data=""), 200)
             return response
         elif query == "unsignoff":
             j = get_json(request)
             insert_signoffdate(db_path, "", "", j["sampleid"], "")
-            response = jsonify({'message': 'Sample Unsigned!'})
+            response = make_response(jsonify(isError=False, message='Sample Unsigned!', statusCode=200, data=""), 200)
             return response
         elif query == "approve":
             logging.debug("running approve")
             j = get_json(request)
             insert_approvedate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            response = jsonify({'message': 'Approved sample!'})
+            response = make_response(jsonify(isError=False, message='Approved sample!', statusCode=200, data=""), 200)
             return response
         elif query == "unapprove":
             logging.debug("running approve")
@@ -226,25 +232,25 @@ def api(current_user, query):
             insert_signoffdate(db_path, "", "", j["sampleid"], "")
             insert_approvedate(db_path, "", "", j["sampleid"])
             insert_comment(db_path, j["commentsamples"], j["sampleid"])
-            response = jsonify({'message': 'Unapproved sample!'})
+            response = make_response(jsonify(isError=False, message='Unapproved sample!', statusCode=200, data=""), 200)
             return response
         elif query == "lock":
             logging.debug("running sample lock")
             j = get_json(request)
             insert_lockdate(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            response = jsonify({'message': 'Locked sample!'})
+            response = make_response(jsonify(isError=False, message='Locked sample!', statusCode=200, data=""), 200)
             return response
         elif query == "failedsample":
             logging.debug("Running failed sample")
             j = get_json(request)
             insert_failedsample(db_path, j["user"], datetime.date.today().strftime('%Y%m%d'), j["sampleid"])
-            response = jsonify({'message': 'Sample set to failed!'})
+            response = make_response(jsonify(isError=False, message='Sample set to failed!', statusCode=200, data=""), 200)
             return response
         elif query == "commentsample":
             logging.debug("Running comment update for sample")
             j = get_json(request)
             insert_comment(db_path, j["commentsamples"], j["sampleid"])
-            response = jsonify({'message': 'Comment updated for sample!'})
+            response = make_response(jsonify(isError=False, message='Comment updated for sample!', statusCode=200, data=""), 200)
             return response
 
 @routes.route('/chklogin')

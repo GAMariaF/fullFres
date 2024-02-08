@@ -398,7 +398,7 @@ def list_interpretation(db,sampleid):
 	return list_json
 
 def list_search(db, args):
-	""" This function consturcts a complex SQL-query based on the conditions it recieves from the frontend. 
+	""" This function consturcts a complex SQL-query based on the terms it receives from the frontend. 
 	The data is not treated before it is sent to the frontend, but it probably should be."""
 	# runid: list, sampleid: list, diag: list, variants: list, gene: list, reply: list, classes: list, dates: list 
 
@@ -532,9 +532,6 @@ def list_search(db, args):
 	print(stmt)
 	with engine.connect() as conn:
 		results = pd.read_sql_query(text(stmt), con = conn)	
-		print("##########RESULTS###################")
-		print(results)
-		print("#############END_RESULTS#############")
 	list_json = results.to_dict('records')
 	return list_json
 

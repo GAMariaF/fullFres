@@ -17,7 +17,6 @@ const actions = {
 		if(payload.allVariants == false) {
 			util_funcs.query_backend(config.$backend_url,'variants', {params:  {sampleid: payload.sample_id}}).then(result => {
 				var variants = result['data'];
-				console.log(variants)
 				commit('SET_STORE', Object.values(variants));
 			})
 		} else {
@@ -37,9 +36,7 @@ const actions = {
 
 const mutations = {
 	SET_STORE(state, variants) {
-		console.log("updated variants")		
 		state.variants = variants;
-		console.log(state.variants)
 	}
 };
 

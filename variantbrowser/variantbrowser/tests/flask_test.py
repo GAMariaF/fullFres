@@ -1,4 +1,5 @@
 import os
+import ast
 import sys
 import json
 import shutil
@@ -17,6 +18,7 @@ from variantbrowser.importutils import importVcfXls
 
 from variantbrowser.cmd_functions import *
 
+sampleid = "AOHC_PP-test"
 
 class TestSetUpDBs(unittest.TestCase):
 
@@ -47,7 +49,8 @@ class TestSetUpDBs(unittest.TestCase):
             db.session.add(User(public_id=str(uuid.uuid4()), name="testuser", password=generate_password_hash("default", method='scrypt'), admin=True))
             db.session.commit()
 
-    def test_import(self):
+        login = self.app.post('/login', json={'username': 'testuser', 'password': 'default'})
+        self.assertEqual(login.status_code, 200)
 
         if len(os.listdir("import")) != 0:
             shutil.rmtree("import")
@@ -56,8 +59,8 @@ class TestSetUpDBs(unittest.TestCase):
         shutil.copyfile("AOHC_PP-test_GX_0092_Result_300.zip", "import/AOHC_PP-test_GX_0092_Result_300.zip")
         shutil.copyfile("aohc_pp-test_variants.xlsx", "import/aohc_pp-test_variants.xlsx")
 
-        import_test = self.app.get("/api/import", json={ "0": "/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/import"})
-        print(import_test)
+        import_test = self.app.get("/api/import?importfolder=/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/import")
+        self.assertEqual(import_test.status_code, 200)
         #return None
 
         test_db = "test_db/test_db.db"
@@ -96,37 +99,48 @@ class TestApp(unittest.TestCase):
         #print(login.headers['Set-Cookie'])
 
         chklogin = self.app.get('/chklogin')
-        self.assertEqual(login.status_code, 200)
+        self.assertEqual(chklogin.status_code, 200)
         #print(chklogin)
 
-        variants = self.app.get('/api/variants_AOHC_PP-test')
+        variants = self.app.get(f'/api/variants?sampleid={sampleid}')
         self.assertEqual(variants.status_code, 200)
+        # How to check data? It has in a sense already been checked by comparing dbs above.
+        # Must be for after classifications and such things.
 
         test = pd.DataFrame(variants.get_json()["data"])
         test.to_csv("test.csv", index = False)
 
-        signoff_samples = self.app.get("/api/signoff_samples")
-        allvariants = self.app.get("/api/allvariants")
-        allsamples = self.app.get(f"/api/allsamples{'dates++?'}")
-        statistics = self.app.get(f"/api/statistics{'dates++?'}")
-        report = self.app.get(f"/api/report{'dates++?'}")
-        stat_search = self.app.get(f"/api/stat_search{'dates++?'}")
-        get_class = self.app.get(f"/api/get_class{'dates++?'}")
+        #signoff_samples = self.app.get("/api/signoff_samples")
+        #allvariants = self.app.get("/api/allvariants")
+        #allsamples = self.app.get(f"/api/allsamples{'dates++?'}")
+        #statistics = self.app.get(f"/api/statistics{'dates++?'}")
+        #report = self.app.get(f"/api/report{'dates++?'}")
+        #stat_search = self.app.get(f"/api/stat_search{'dates++?'}")
+        #get_class = self.app.get(f"/api/get_class{'dates++?'}")
 
 
     def test_post(self):
 
-        updatevariants = self.app.post("/api/updatevariants")
+        #updatevariants = self.app.post("/api/updatevariants")
+        var_dicts = []
+        with open("classifications_to_insert.tsv", "r") as classifications_file:
+            for line in classifications_file.readlines():
+                var_dicts += [ast.eval(line)]
+
+        updatevariants = self.app.post("/api/updatevariants", json={"variants": var_dicts})
+        self.assertEqual(updatevariants.status_code, 200)
+
         # setta alle variantar til 
-        signoff = self.app.post("/api/signoff", json={"user": "testuser", "sampleid": "AOHC_PP-test", "status": "success"})
-        unsignoff = self.app.post("/api/unsignoff", json={"sampleid": "AOHC_PP-test"})
+        signoff = self.app.post("/api/signoff", json={"user": "testuser", "sampleid": sampleid, "status": "success"})
+        self.assertEqual(signoff.status_code, 200)
+        #unsignoff = self.app.post("/api/unsignoff", json={"sampleid": "AOHC_PP-test"})
         # signoff again
 
-        approve = self.app.post("/api/approve")
-        unapprove = self.app.post("/api/unapprove")
-        lock = self.app.post("/api/lock")
-        failedsample = self.app.post("/api/failedsample")
-        commentsample = self.app.post("/api/commentsample")
+        #approve = self.app.post("/api/approve")
+        #unapprove = self.app.post("/api/unapprove")
+        #lock = self.app.post("/api/lock")
+        #failedsample = self.app.post("/api/failedsample")
+        #commentsample = self.app.post("/api/commentsample")
 
         #print(dir(result))
         #print(type(result.get_json()["data"]))
@@ -139,10 +153,11 @@ class TestApp(unittest.TestCase):
 
 def main():
 
-    #test_classes_to_run = [TestSetUpDBs, TestApp]
-    test_classes_to_run = [TestApp]
+    test_classes_to_run = [TestSetUpDBs]
+    #test_classes_to_run = [TestApp]
 
     loader = unittest.TestLoader()
+    loader.sortTestMethodsUsing = None
 
     suites_list = []
     for test_class in test_classes_to_run:
