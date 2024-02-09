@@ -54,5 +54,5 @@ RUN cd /vb/frontend/ && npx vue-cli-service build && npm run lint
 
 # Run like: docker run -p 8080:8080 -it --rm fullfres /bin/bash
 
-CMD ["sh", "variantbrowser/startup_cmd.sh"]
+CMD ["sh", "/vb/startup.sh"]
 

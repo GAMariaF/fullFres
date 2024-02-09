@@ -176,6 +176,23 @@ config = {
         {value: "No_O", text: "No Only"},
     ],
 
+    genesToBeColored: [
+        "BAP1",
+        "BRCA1",
+        "BRCA2",
+        "MLH1",
+        "MSH2",
+        "MSH6",
+        "PALB2",
+        "POLE",
+        "PMS2",
+        "RAD51C",
+        "RAD51D",
+        "RB1",
+        "RET",
+        "TSC2"
+    ]
+
     
 };
 
