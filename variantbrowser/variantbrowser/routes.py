@@ -125,7 +125,7 @@ def api(current_user, query):
     if request.method == 'GET':
         if query == 'import':
             logging.debug("Running sample import function")
-            logging.debug(request.args)
+            #logging.debug(request.args)
             importfolder = request.args["importfolder"]
             try:
                 importVcfXls(importfolder)
@@ -199,13 +199,13 @@ def api(current_user, query):
             j = get_json(request)
 
 
-            with open("/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/variants_inserted.tsv", "w") as file:
-                for i in j["variants"]:
-                    file.write(str(i)+"\n")
-                    if i["changed"]:
+            #with open("/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/tests/variants_inserted.tsv", "w") as file:
+            for i in j["variants"]:
+                    #file.write(str(i)+"\n")
+                if i["changed"]:
                         # Insert into db:
-                        insert_variants(db_path,i)
-                        logging.debug("inserted")
+                    insert_variants(db_path,i)
+            logging.debug("Variants inserted")
 
             logging.debug("Variants posted for update in database")
             response = make_response(jsonify(isError=False, message="Success", statusCode=200, data="allvariants"), 200)

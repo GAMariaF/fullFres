@@ -1,14 +1,19 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 
-
 def get_config():
-	config = configparser.ConfigParser()
-	config.read('/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/config_test.ini')
+
+    config = configparser.ConfigParser()
+
+    if os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False):
+        config.read('/vb/variantbrowser/config.ini')
+    else:
+        config.read('/illumina/analysis/dev/2024/sigvla/fullFres_dev_2024/fullFres/variantbrowser/variantbrowser/config_test.ini')
 	#config.read('variantbrowser/backend/config.ini')
-	return config
+    return config
 
 
 def create_app(db):
@@ -29,5 +34,3 @@ def create_app(db):
     db.init_app(app)
 
     return app
-
-   

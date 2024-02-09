@@ -111,8 +111,9 @@ export default {
       } else {
         geneList = this.selectedGeneList;
       }
+      
       var search = "|" + this.runid + "|" + this.sampleid + "|" + geneList + "|" + this.startDate + "|" + this.endDate
-      console.log(search)
+
       const baseURI = config.$backend_url + "/api/allsamples";
       axios
         .get(baseURI, { params: {search: search} })

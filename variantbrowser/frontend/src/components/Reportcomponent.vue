@@ -124,7 +124,7 @@
           </body>
           <br />
           <br>
-          {{selectedVariant}} 
+          
         </div>
       </b-col>
     </b-row>
@@ -347,17 +347,11 @@ export default {
 
     rowSelected(items) {
       if (items.length===1) {
-        // this.selectedVariant = items[0].Variant;
         this.selectedVariant = items;
         this.warning = "";
-        console.log("Selected")
       } else if (items.length===0) {
         this.selectedVariant = "";
-        console.log("unselected")
       }
-      // Resette categori/report når ny varaint velges, eller ved deselect.
-      //this.report = "";
-      //this.selectedCategory = null;
     },
 
     async sampleRowSelected(items) {
@@ -463,7 +457,6 @@ export default {
     generateVarRep(category) {
       let aaDictionary = {"Ala": "A", "Arg": "R", "Asn": "N", "Asp": "D", "Cys": "C", "Gln": "Q", "Glu": "E", "Gly": "G", "His": "H", "Ile": "I", "Leu": "L", "Lys": "K", "Met": "M", "Phe": "F", "Pro": "P", "Ser": "S", "Thr": "T", "Trp": "W", "Tyr": "Y", "Val": "V", "Ter": "*"};
       if (this.selectedVariant.length === 0) {
-        console.log("No variant selected")
         this.warning = "No variant selected"
       } else {
 
@@ -515,7 +508,6 @@ export default {
         console.log(name)
 
         this.reportArray.push(eval('`'+category+' \n\n`'));
-        //this.report = this.report.concat(eval('`'+category+' \n\n`'));
         this.generateReport();
       }
     },

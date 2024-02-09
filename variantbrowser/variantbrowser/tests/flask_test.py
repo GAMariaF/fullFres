@@ -7,14 +7,12 @@ import sqlite3
 import unittest
 import flask_test
 import pandas as pd
-from flask import Flask, url_for, request, jsonify, make_response
+#from flask import Flask, url_for, request, jsonify, make_response
 
 from variantbrowser.vb_app import *
 from variantbrowser.userdb import db
 #from flask_sqlalchemy import SQLAlchemy, init_app
 #from variantbrowser.__init__ import db_user as db
-
-from variantbrowser.importutils import importVcfXls
 
 from variantbrowser.cmd_functions import *
 
@@ -44,7 +42,7 @@ class TestSetUpDBs(unittest.TestCase):
         self.assertTrue(os.path.isfile(config['Paths']['db_full_path']))
         self.assertTrue(os.path.isfile(config['Paths']['db_users']))
 
-        # Should probably be done via the proper function, but it was difficult to deal with multiple "inputs" in one function.
+        # Should probably be done via the proper function, but it was difficult to deal with multiple "inputs" in one function. Also, not that important.
         with app.app_context():
             db.session.add(User(public_id=str(uuid.uuid4()), name="testuser", password=generate_password_hash("default", method='scrypt'), admin=True))
             db.session.commit()
@@ -118,27 +116,33 @@ class TestApp(unittest.TestCase):
         #stat_search = self.app.get(f"/api/stat_search{'dates++?'}")
         #get_class = self.app.get(f"/api/get_class{'dates++?'}")
 
-
-    def test_post(self):
-
+        CPADs = []
+        for i in json.loads(variants.data)["data"]:
+            CPADs += [i["CHROM_POS_ALTEND_DATE"]]
         #updatevariants = self.app.post("/api/updatevariants")
         var_dicts = []
         with open("classifications_to_insert.tsv", "r") as classifications_file:
             for line in classifications_file.readlines():
-                var_dicts += [ast.eval(line)]
+                entry = ast.literal_eval(line)
+                entry["CHROM_POS_ALTEND_DATE"] = next(CPAD for CPAD in CPADs if CPAD[:-12] == entry["CHROM_POS_ALTEND_DATE"][:-12])
+                var_dicts += [entry]
 
         updatevariants = self.app.post("/api/updatevariants", json={"variants": var_dicts})
         self.assertEqual(updatevariants.status_code, 200)
 
-        # setta alle variantar til 
-        signoff = self.app.post("/api/signoff", json={"user": "testuser", "sampleid": sampleid, "status": "success"})
+        signoff = self.app.post("/api/signoff", json={"user": "testuser", "sampleid": sampleid, "state": "success"})
         self.assertEqual(signoff.status_code, 200)
+
         #unsignoff = self.app.post("/api/unsignoff", json={"sampleid": "AOHC_PP-test"})
+        #self.assertEqual(unsignoff.status_code, 200)
         # signoff again
 
-        #approve = self.app.post("/api/approve")
+        approve = self.app.post("/api/approve", json={"user": "testuser", "sampleid": sampleid})
+        self.assertEqual(approve.status_code, 200)
         #unapprove = self.app.post("/api/unapprove")
-        #lock = self.app.post("/api/lock")
+
+        lock = self.app.post("/api/lock", json={"user": "testuser", "sampleid": sampleid})
+        self.assertEqual(lock.status_code, 200)
         #failedsample = self.app.post("/api/failedsample")
         #commentsample = self.app.post("/api/commentsample")
 
@@ -153,7 +157,8 @@ class TestApp(unittest.TestCase):
 
 def main():
 
-    test_classes_to_run = [TestSetUpDBs]
+    #test_classes_to_run = [TestSetUpDBs]
+    test_classes_to_run = [TestSetUpDBs, TestApp]
     #test_classes_to_run = [TestApp]
 
     loader = unittest.TestLoader()

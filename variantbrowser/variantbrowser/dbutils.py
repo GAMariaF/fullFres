@@ -345,7 +345,7 @@ def list_sample_variants(db,sampleid):
 	return samplelist_json
 '''
 
-def list_interpretation(db,sampleid):
+def list_interpretation(db, sampleid):
 	#list "tolkningsskjema"
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	stmt = "select VariantsPerSample.runid, VariantsPerSample.sampleid, Samples.Genelist, \
@@ -529,7 +529,6 @@ def list_search(db, args):
 	HAVING FreqGenLis >= {len(diag)}{add_cond}
 	ORDER BY FreqSamples DESC;
 	"""
-	print(stmt)
 	with engine.connect() as conn:
 		results = pd.read_sql_query(text(stmt), con = conn)	
 	list_json = results.to_dict('records')
@@ -590,10 +589,10 @@ def get_classifications(db, data):
 			ON VariantsPerSample.runid = Samples.runid \
 			AND VariantsPerSample.sampleid = Samples.sampleid \
 			WHERE Samples.Status != 'Failed' AND \
-				Variants.CHROM = '{data[1]}' AND \
-				Variants.POS = '{data[2]}' AND \
-				Variants.REF = '{data[3]}' AND \
-				Variants.ALTEND = '{data[4]}' \
+				Variants.CHROM = '{data[0]}' AND \
+				Variants.POS = '{data[1]}' AND \
+				Variants.REF = '{data[2]}' AND \
+				Variants.ALTEND = '{data[3]}' \
 				{date_cond};"
 	
 	with engine.connect() as conn:
@@ -713,7 +712,7 @@ def insert_variants(db, variant_dict):
 				AND ClinVar='"+						dfVarClassification['ClinVar'][0]						+"' \
 				AND Andre_DB='"+					dfVarClassification['Andre_DB'][0]						+"' \
 				AND Comment='"+						dfVarClassification['Comment'][0]						+"' \
-				AND Oncogenicity='"+				str(dfVarClassification['Oncogenicity'][0])				+"' \
+				AND Oncogenicity='"+			str(dfVarClassification['Oncogenicity'][0])				 	+"' \
 				AND evidence_types='"+				dfVarClassification['evidence_types'][0]				+"' \
 				AND Tier='"+						dfVarClassification['Tier'][0]							+"' \
 				AND class='"+						dfVarClassification['class'][0]							+"';"

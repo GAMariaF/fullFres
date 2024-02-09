@@ -397,7 +397,7 @@ export default {
         {key: 'Seq_Date_2', label: 'Sequencing Date'},
         {key: 'Reply', label: 'Reply', sortable: true}, 
         {key: 'Genelist', label: 'Gene List', sortable: true},
-        {key: 'date', label: 'Classification Date'},
+        {key: 'date', label: 'Classification Date', sortable: true},
         {key: 'Classification'},
       ]
     };
@@ -419,7 +419,6 @@ export default {
                 }
               }).then(result => {
           var variants = Object.values(result['data']);
-          console.log(result['data'])
           if (variants.length) {
             this.variants = variants;
           } else {
