@@ -30,10 +30,14 @@
      <template #cell(Type)="data">
         <b class="text-info">{{ data.value.toUpperCase() }}</b>
      </template>
+     <template #cell(gene)="data">
+        <p :style="getGeneColor(data.value)">{{ data.value }}</p>
+     </template>
      <!-- Get specific values for specific variant types -->
      <template #cell(Specific)="data">
         <b class="text-info">{{ typeSpecificValue(data) }}</b>
-      </template>
+     </template>
+ 
 
      <template #cell(Info)="row">
           <b-button
@@ -546,6 +550,14 @@ export default {
       },
     updateVariants() {
       this.$store.commit("SET_STORE", this.variants);
+    },
+
+    getGeneColor(gene) {
+      if (config.genesToBeColored.includes(gene)) {
+        return `color:rgb(212, 0, 255)`
+      } else {
+        return `color:rgb(0, 0, 0)`
+      }
     },
 
     oncoScoring(selectedoncogenicity_list) {

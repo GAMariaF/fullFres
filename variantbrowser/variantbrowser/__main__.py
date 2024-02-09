@@ -4,7 +4,7 @@ def main():
     # Only prints some info
 
     print("""
-    Variantbrowser Version: 0.0.1
+    Variantbrowser Version: 0.1.1
           
     Commandline tools:
           
@@ -18,7 +18,7 @@ def main():
           
     vb-generatedbs: Generate empty variant and user databases. Does not overwrite existing dbs.
           
-    vb-runbackend: Run backend for development
+    vb-backend: Run backend for development
     
     """)
     exit()
