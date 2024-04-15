@@ -4,7 +4,7 @@ def main():
     # Only prints some info
 
     print("""
-    Variantbrowser Version: 0.1.1
+    Variantbrowser Version: 0.1.2
           
     Commandline tools:
           

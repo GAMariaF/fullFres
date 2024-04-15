@@ -17,11 +17,12 @@ def parse_thermo_vcf(vcf,excel):
     df1 = pd.DataFrame()
     df2 = pd.DataFrame()
     df3 = pd.DataFrame()
+    df4 = pd.DataFrame()
     # With fusion 
-    df_excel_w = df_excel.loc[df_excel['Type'] == 'Fusion']
-    if not df_excel_w.empty:
-        df_excel_w = df_excel_w.assign(ID = df_excel_w.loc[:,'Variant ID'] + "_1")
-        df1 = pd.merge(df_excel_w,df_vcf,on='ID',how='left')
+    df_excel_wf = df_excel.loc[df_excel['Type'] == 'Fusion']
+    if not df_excel_wf.empty:
+        df_excel_wf = df_excel_wf.assign(ID = df_excel_wf.loc[:,'Variant ID'] + "_1")
+        df1 = pd.merge(df_excel_wf,df_vcf,on='ID',how='left')
         df1.loc[:,'ID']=df1.loc[:,'Variant ID']
     # With RNAExonVariant
     df_excel_wRNA = df_excel.loc[df_excel['Type'] == 'RNAExonVariant']
@@ -29,19 +30,31 @@ def parse_thermo_vcf(vcf,excel):
         df_excel_wRNA = df_excel_wRNA.assign(ID = df_excel_wRNA.loc[:,'Variant ID'] + "_1")
         df3 = pd.merge(df_excel_wRNA,df_vcf,on='ID',how='left')
         df3.loc[:,'ID']=df3.loc[:,'Variant ID']
-        
-    # Without fusion and without RNAExonVariant
+    
+    # With CNVs
+    df_excel_wc = df_excel.loc[df_excel['Type'] == 'CNV']
+    if not df_excel_wc.empty:
+        df_excel_wc = df_excel_wc.reset_index(drop='True')
+        df_vcf["Locus_vcf"] = df_vcf.CHROM.astype(str)+":" \
+                    +df_vcf.POS.astype(str)
+        # Fix so they will always be unique.
+        df2 = pd.merge(df_excel_wc,df_vcf,\
+                    left_on=['Locus','Variant ID'],right_on=['Locus_vcf','ID'],how='left')
+
+    # Without fusion RNAExonVariants and CNVs
     df_excel_wo = df_excel.loc[df_excel['Type'] != 'Fusion']
     df_excel_wo = df_excel_wo.loc[df_excel_wo['Type'] != 'RNAExonVariant']
+    df_excel_wo = df_excel_wo.loc[df_excel_wo['Type'] != 'CNV']
     if not df_excel_wo.empty:
         df_excel_wo = df_excel_wo.reset_index(drop='True')
         df_vcf["Locus_vcf"] = df_vcf.CHROM.astype(str)+":" \
                     +df_vcf.POS.astype(str)
+        # Fix so they will always be unique.
         df2 = pd.merge(df_excel_wo,df_vcf,\
-                    left_on=['Locus','Variant ID'],right_on=['Locus_vcf','ID'],how='left')
+                    left_on=['Locus','Variant ID', "Ref", "Alt"],right_on=['Locus_vcf', 'ID', "REF", "ALT"],how='left')
         df2 = df2.drop(columns=['Locus_vcf'])
 
-    df = pd.concat([df1,df2,df3])
+    df = pd.concat([df1,df2,df3,df4])
     df = df.reset_index(drop='True')
     df = df.rename(columns={'ALT':'ALTEND'})
     # Removing columns TYPE and SVTYPE (already specifiec in column Type)
