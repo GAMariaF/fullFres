@@ -1,8 +1,8 @@
 <template>
 
 <b-navbar toggleable="lg" type="dark" variant="info">
-    <!--<b-navbar-brand to="/" style="color:Red;">&nbsp;TEST SERVER Variant browser</b-navbar-brand>-->
-    <b-navbar-brand to="/" style="color:rgb(255, 0, 0);">&nbsp;TEST SERVER Variant Browser</b-navbar-brand>
+    <b-navbar-brand to="/" style="color:rgb(255, 255, 255);">&nbsp;Variant Browser</b-navbar-brand>
+    <!--<b-navbar-brand to="/" style="color:rgb(255, 0, 0);">&nbsp;TEST SERVER Variant Browser</b-navbar-brand>-->
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
      <b-navbar-nav>
         <b-nav-item to="/samples" v-show="state">Samples</b-nav-item>

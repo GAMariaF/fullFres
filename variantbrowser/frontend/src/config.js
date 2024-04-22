@@ -1,7 +1,7 @@
 let config;
 
 config = {
-    $backend_url: 'http://172.16.0.3:5001',
+    $backend_url: 'http://172.16.0.3:5000',
     //$backend_url: 'http://'+process.env.IP+':'+process.env.PORTBACKEND,
     $signout_url: function() {
         return this.$backend_url + '/newlogout';
@@ -176,21 +176,33 @@ config = {
         {value: "No_O", text: "No Only"},
     ],
 
-    genesToBeColored: [
+    genesToBeColored1: [
+        "ATM",
         "BAP1",
         "BRCA1",
         "BRCA2",
+        "CHEK2",
         "MLH1",
         "MSH2",
         "MSH6",
+        "NF1",
         "PALB2",
-        "POLE",
         "PMS2",
+        "POLE",
+        "PTCH1",
         "RAD51C",
         "RAD51D",
-        "RB1",
         "RET",
+        "SMARCB1",
         "TSC2"
+    ],
+
+    genesToBeColored2: [
+        "CDKN2A",
+        "PTEN",
+        "RB1",
+        "SMARCA4",
+        "TP53"
     ]
 
     

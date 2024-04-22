@@ -638,8 +638,10 @@ export default {
     },
 
     getGeneColor(gene) {
-      if (config.genesToBeColored.includes(gene)) {
+      if (config.genesToBeColored1.includes(gene)) {
         return `color:rgb(212, 0, 255)`
+      } else if (config.genesToBeColored2.includes(gene)) {
+        return `color:rgb(0, 204, 0)`
       } else {
         return `color:rgb(0, 0, 0)`
       }
