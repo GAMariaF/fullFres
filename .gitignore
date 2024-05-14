@@ -5,6 +5,9 @@ frontend/package.json
 backend/user_db/users.db
 db/*.db
 *.db
+*.tsv
+*.xlsx
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

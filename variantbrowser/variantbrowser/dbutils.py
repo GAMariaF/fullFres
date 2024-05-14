@@ -54,7 +54,7 @@ def generate_db(db):
 	engine = create_engine("sqlite:///"+db, echo=False, future=True)
 	with engine.connect() as conn:
 		result_variantspersample = conn.execute(text("CREATE TABLE VariantsPerSample ( runid TEXT, sampleid TEXT, CHROM_POS_ALTEND_DATE TEXT, DATE_CHANGED_VARIANT_BROWSER TEXT, Reply TEXT, User_Classification TEXT, Variant_ID TEXT, Variant_Name TEXT, Key_Variant TEXT, Oncomine_Reporter_Evidence TEXT, Type TEXT, Call TEXT, Call_Details TEXT, Phred_QUAL_Score TEXT, Zygosity TEXT, P_Value TEXT, PPA TEXT, Read_Counts_Per_Million TEXT, Oncomine_Driver_Gene TEXT, Gene_Isoform TEXT, NormalizedReadCount TEXT, Imbalance_Score TEXT, Copy_Number TEXT, P_Value_1 TEXT, CNV_Confidence TEXT, Valid_CNV_Amplicons TEXT, ID TEXT, QUAL TEXT, FILTER TEXT, GT TEXT, GQ TEXT, CN TEXT, READ_COUNT TEXT, GENE_NAME TEXT, EXON_NUM TEXT, RPM TEXT, NORM_COUNT TEXT, NORM_COUNT_TO_HK TEXT, FUSION_DRIVER_GENE TEXT, ANNOTATION TEXT, PASS_REASON TEXT, Non_Targeted TEXT, PRECISE TEXT, END TEXT, NUMTILES TEXT, SD TEXT, CDF_MAPD TEXT, RAW_CN TEXT, REF_CN TEXT, PVAL TEXT, CI TEXT, AF TEXT, AO TEXT, DP TEXT, FAO TEXT, FDP TEXT, FDVR TEXT, FR TEXT, FRO TEXT, FSAF TEXT, FSAR TEXT, FSRF TEXT, FSRR TEXT, FWDB TEXT, FXX TEXT, GCM TEXT, HRUN TEXT, HS_ONLY TEXT, LEN TEXT, MLLD TEXT, OALT TEXT, OID TEXT, OMAPALT TEXT, OPOS TEXT, OREF TEXT, PB TEXT, PBP TEXT, PPD TEXT, QD TEXT, RBI TEXT, REFB TEXT, REVB TEXT, RO TEXT, SAF TEXT, SAR TEXT, SPD TEXT, SRF TEXT, SRR TEXT, SSEN TEXT, SSEP TEXT, SSSB TEXT, STB TEXT, STBP TEXT, VARB TEXT, NID TEXT, MISA TEXT, CLSF TEXT, VCFALT TEXT, VCFPOS TEXT, VCFREF TEXT, HS TEXT, SUBSET TEXT, MISC TEXT, CommentVPS TEXT, TierVPS TEXT, PRIMARY KEY (runid, sampleid, CHROM_POS_ALTEND_DATE) )"))
-		result_variants = conn.execute(text("CREATE TABLE Variants ( CHROM_POS_ALTEND_DATE TEXT, CHROM TEXT, POS TEXT, ID TEXT, REF TEXT, ALTEND TEXT, DATE TEXT, Type TEXT, gene TEXT, exon TEXT, oncomineGeneClass TEXT, oncomineVariantClass TEXT, origPos TEXT, origRef TEXT, normalizedRef TEXT, normalizedPos TEXT, normalizedAlt TEXT, gt TEXT, codon TEXT, coding TEXT, transcript TEXT, annotation_variant TEXT, annotation_variant2 TEXT, function TEXT, protein TEXT, location TEXT, origAlt TEXT, CLNACC1 TEXT, CLNSIG1 TEXT, CLNREVSTAT1 TEXT, CLNID1 TEXT, polyphen TEXT, sift TEXT, grantham TEXT, PRIMARY KEY (CHROM, POS, ALTEND, DATE) )"))
+		result_variants = conn.execute(text("CREATE TABLE Variants ( CHROM_POS_ALTEND_DATE TEXT, CHROM TEXT, POS TEXT, ID TEXT, REF TEXT, ALTEND TEXT, DATE TEXT, Type TEXT, gene TEXT, exon TEXT, oncomineGeneClass TEXT, oncomineVariantClass TEXT, origPos TEXT, origRef TEXT, normalizedRef TEXT, normalizedPos TEXT, normalizedAlt TEXT, gt TEXT, codon TEXT, coding TEXT, transcript TEXT, annotation_variant TEXT, annotation_variant2 TEXT, function TEXT, protein TEXT, location TEXT, origAlt TEXT, CLNACC1 TEXT, CLNSIG1 TEXT, CLNREVSTAT1 TEXT, CLNID1 TEXT, polyphen TEXT, sift TEXT, grantham TEXT, PRIMARY KEY (CHROM, POS, ALTEND, DATE) )"))  ## ADD REF AT END?
 		result_samples = conn.execute(text("CREATE TABLE Samples ( runid TEXT, sampleid TEXT, Genelist TEXT, Perc_Tumor TEXT, Seq_Date TEXT, Status TEXT, User_Signoff TEXT, Date_Signoff TEXT, User_Approval TEXT, Date_Approval TEXT, CommentSamples TEXT, User_Lock TEXT, Date_Lock TEXT, PRIMARY KEY (runid, sampleid) )"))
 		result_classification = conn.execute(text("CREATE TABLE Classification ( CHROM_POS_ALTEND_DATE TEXT, DATE_CHANGED_VARIANT_BROWSER TEXT, COSMIC TEXT, Populasjonsdata TEXT, Funksjonsstudier TEXT, Prediktive_data TEXT, Cancer_hotspots TEXT, Computational_evidens TEXT, Konservering TEXT, ClinVar TEXT, Andre_DB TEXT, Comment TEXT, Oncogenicity TEXT, Tier TEXT, class TEXT, evidence_types TEXT, changed TEXT, visibility TEXT, User_Class TEXT, PRIMARY KEY (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER) )"))
 
@@ -74,10 +74,12 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 			stmt = f"INSERT INTO Samples (runid, sampleid, Genelist, Perc_Tumor, Seq_Date) VALUES ( '{run_id}', '{sample_id}', '{sample_diseasetype}', '{percent_tumor}', '{sequencing_date}' );"
 			result = conn.execute(text(stmt))
 			conn.commit()
+			# Instert dummy data
 			stmt = f"INSERT INTO VariantsPerSample (CHROM_POS_ALTEND_DATE, DATE_CHANGED_VARIANT_BROWSER, runid, sampleid, Reply) VALUES ( 'FailedSampleFailedSamplenan230130164110', '220631060145', '{run_id}', '{sample_id}', 'No' );"
 			result = conn.execute(text(stmt))
 			conn.commit()
-		return 
+		return
+	
 	dfvcf_copy = dfvcf.copy(deep=True)
 	dfvariant_copy = dfvariant.copy(deep=True)
 	# add chrom_pos_altend_date column
@@ -87,32 +89,45 @@ def populate_thermo_variantdb(db, dfvcf, dfvariant, \
 	dfvcf_copy.insert(3, 'DATE_CHANGED_VARIANT_BROWSER', "" )
 	dfvariant_copy.insert( 0, 'CHROM_POS_ALTEND_DATE', "" )
 	# add date column
-	date=datetime.datetime.now().strftime("%y%m%d%H%M%S")
+	date = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 	dfvariant_copy.insert(6, 'DATE', date)
-	dfvariant_copy["POS"]=dfvariant_copy["POS"].astype(str)
+
+	# Add to nubmer to date to ensure uniqueness, if ref is added to CHROM_POS_ALTEND_DATE it will probably be unnecessary.
+	positions = [x for x in range(len(dfvcf_copy))]  
+	dfvariant_copy["DATE"] = dfvariant_copy["DATE"].apply(lambda x: str(int(x) + positions.pop(0))) 
+
+	dfvariant_copy["POS"] = dfvariant_copy["POS"].astype(str)
 	dfvariant_copy.CHROM_POS_ALTEND_DATE = \
 		dfvariant_copy[["CHROM", "POS", "ALTEND", "DATE"]] \
 			.agg("".join, axis=1)
+	
+	# ADD REF ABOVE IF REF IS TO BE INCLUDED IN CHROM_POS_ALTEND_DATE
 	# Connecting to sqlite database
 	with engine.connect() as conn:
-		#BRUK kombinasjon chrom,pos,alt (/end for CNV) og sjekk om denne er med i Variants-tabell 
+		# BRUK kombinasjon chrom,pos,alt (/end for CNV) og sjekk om denne er med i Variants-tabell
+		# Bruker REF her for å sikre at rett variant blir funnet. Ulike varianter kan strengt tatt få samme CROM, POS, og ALTEND (spesifikt små delesjonar)
 		for row in range(len(dfvcf_copy)):
 			stmt = "select * from Variants \
 				where CHROM = '"+dfvariant_copy.CHROM[row]+"' \
 					AND POS = '"+dfvariant_copy.POS[row]+"' \
+					AND REF = '"+dfvariant_copy.REF[row]+"' \
 					AND ALTEND = '"+dfvariant_copy.ALTEND[row]+"';"
+
 			dfdb_variant = pd.read_sql_query(text(stmt), con = conn)
 			#hvis med: sjekk hvis den er lik den som skal legges in
 			if not dfdb_variant.empty:
 				dfdb_variant_latest = dfdb_variant[ dfdb_variant.CHROM_POS_ALTEND_DATE == \
 					dfdb_variant.CHROM_POS_ALTEND_DATE.max() ]
+					# Grabs the newest examplar of a variant, although, ideally there should only be one examplar.
 				cols = dfvariant_copy.columns.tolist()
 				cols.remove('DATE')
 				cols.remove('CHROM_POS_ALTEND_DATE')
 				cols.remove('annotation_variant2')
 				dfvariant_copy = dfvariant_copy.astype(str)
 				dfdb_variant_latest = dfdb_variant_latest.astype(str)
-				# check if variant in database except key chrom_pos_altend_date
+				# Check if variant in database except key chrom_pos_altend_date
+				dfdb_variant_latest.to_csv(f"{row}_db_latest.tsv", sep = "\t")
+				dfvariant_copy.to_csv(f"{row}_import.tsv", sep = "\t")
 				variantindb = dfdb_variant_latest.reset_index(drop=True)[cols].equals( \
 					dfvariant_copy.loc[[row]].reset_index(drop=True)[cols])
 				if variantindb:
@@ -277,7 +292,7 @@ def list_approved_samples(db, args):
 	#list all approved samples
 
 	if args[1] == "date":
-		cond = " AND Samples.runid IN (SELECT Samples.runid from Samples WHERE Samples.Date_Approval = (SELECT max(Samples.Date_Approval) FROM Samples)) "
+		cond = " AND (Samples.runid IN (SELECT Samples.runid from Samples WHERE Samples.Date_Approval = (SELECT max(Samples.Date_Approval) FROM Samples)) OR (Samples.User_lock IS NULL OR Samples.User_lock == ''))"
 	else:
 		cond = f" AND Samples.{args[1]} = '{args[2]}'"
 
@@ -287,6 +302,7 @@ def list_approved_samples(db, args):
 				WHERE Samples.Date_Approval IS NOT NULL \
 				AND Samples.Date_Approval != '' \
 				{cond};"
+
 	with engine.connect() as conn:
 		samplelist = pd.read_sql_query(text(stmt), con = conn)
 	samplelist_json = samplelist.to_dict('records')
@@ -685,7 +701,7 @@ def insert_variants(db, variant_dict):
 	colSamples = ["runid", "sampleid", \
 								"User_Signoff", "Date_Signoff", \
 								"User_Approval", "Date_Approval"]
-	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "Locus", "ALTEND", "DATE", "annotation_variant2"]
+	colVariants = ["CHROM_POS_ALTEND_DATE", "CHROM", "POS", "Locus", "ALTEND", "DATE", "annotation_variant2"] ## ADD REF ?
 	# Dataframe to table Classification
 	dfVarClassification = pd.DataFrame(dfVariant, columns = colClassification)
 	dfVarClassification = dfVarClassification.fillna('')
@@ -797,7 +813,7 @@ def insert_variants(db, variant_dict):
 					AND ALTEND = \
 						'"+dfVariants.ALTEND[0]+"'\
 					AND CHROM_POS_ALTEND_DATE = \
-						'"+dfVariants.CHROM_POS_ALTEND_DATE[0]+"';"
+						'"+dfVariants.CHROM_POS_ALTEND_DATE[0]+"';" # Why not only have this last condition?
 		result = conn.execute(text(stmtV))
 		conn.commit()
 
@@ -884,7 +900,7 @@ def statistics(db, start_date: str, end_date: str):
 		n_samples = conn.execute(text(f"SELECT COUNT(DISTINCT(sampleid)) \
 			FROM Samples s {first_condition}")).fetchone()[0]
 	
-		# Number of variants
+		# Number of variants  ## ADD REF on all below?
 		n_variants = conn.execute(text(f"SELECT COUNT(*) \
 			FROM (SELECT DISTINCT chrom, pos, altend from Variants v \
 					LEFT JOIN VariantsPerSample vps \
