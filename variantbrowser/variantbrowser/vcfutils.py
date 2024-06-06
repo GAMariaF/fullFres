@@ -199,9 +199,9 @@ def get_run_id(vcf):
 
 def get_percent_tumor(vcf):
     with open(vcf) as v:
-        sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{2}', line) for line in v]
+        sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{1,2}', line) for line in v]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
-    sample_string=sample_string[-2:]
+    sample_string=sample_string.split("=")[-1]
     return sample_string
 # ##manually_input_percent_tumor_cellularity=85
 
