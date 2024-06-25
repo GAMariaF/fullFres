@@ -189,17 +189,26 @@ def get_run_id(vcf):
     # This find functionality should probably be changed
     with open(vcf) as v:
         run_list=[re.findall(r'GNXS-0\d{3}-\d{1,}-GX_\d{4}.*_\d{2,4}/Auto', line) for line in v]
-
-    run_string=[string for string in run_list if len(string) > 0][0][0]
-    run_string_split = run_string.split("-")[-1].split("_")
-    run_string = run_string_split[0] + "_" + run_string_split[1]
+    with open(vcf) as v:
+        # Purpose is to find run name in case of reanalysis and such
+        # Not a perfect solution
+        run_list2 = [re.findall(r'analysis_output/GX_\d{4}', line) for line in v]
+        print(run_list2)
+    try:
+        run_string = [string for string in run_list if len(string) > 0][0][0]
+        run_string_split = run_string.split("-")[-1].split("_")
+        run_string = run_string_split[0] + "_" + run_string_split[1]
+    except IndexError:
+        run_string = [string for string in run_list2 if len(string) > 0][0][0]
+        run_string = run_string.split("/")[-1]
+    
     print("Run string: " + run_string)
     return run_string
 #GNXS-0297-18-GX_0016_22/Auto
 
 def get_percent_tumor(vcf):
     with open(vcf) as v:
-        sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{1,2}', line) for line in v]
+        sample_list=[re.findall(r'##manually_input_percent_tumor_cellularity=\d{1,3}', line) for line in v]
     sample_string=[string for string in sample_list if len(string) > 0][0][0]
     sample_string=sample_string.split("=")[-1]
     return sample_string
