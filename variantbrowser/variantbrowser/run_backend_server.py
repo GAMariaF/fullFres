@@ -27,7 +27,7 @@ def main():
         print("\n\n--Har du husket aa aktivere virtualenv--\n\n--source env/bin/activate--\n")
         exit()
 
-    backendport = 5000
+    backendport = 5001
     ##
     if in_docker():
         from waitress import serve

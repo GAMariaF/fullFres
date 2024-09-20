@@ -4,10 +4,9 @@ OBS: Bare ment for å kjøre på lokalnett eller på en enkelt PC, ikke over int
 
 ## Oppsett:
 * Sqlite-db via Sqlalchemy
-* Python3 
-* Flask for backend-server
-* Vue som frontend
-* Bootstrap som css
+* Python 3 and Flask for backend-server
+* Vue for frontend
+* Bootstrap for css
 
 ## Sett opp tom database
 - Kjør kommandoen: vb-generatedbs 
